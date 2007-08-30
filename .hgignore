@@ -1,0 +1,45 @@
+syntax: regexp
+
+^RPMS/
+^lib/
+
+syntax: glob
+
+# Emacs turds:
+*~
+\#*
+
+# vi[m] turds:
+*.swp
+*.o
+*.m
+*.a
+
+# Automake/autoconf turds:
+autom4te.cache
+
+BUILD
+
+# Cases from specific directories. The autoconf build
+# conventions stink.
+coytools/stamp-h
+coytools/config.log
+coytools/config.status
+coytools/config.h
+coytools/Makefile
+coytools/src/Makefile
+
+coytools/src/astmaker/Makefile
+coytools/src/astmaker/AMparser.cxx
+coytools/src/astmaker/AMparser.hxx
+coytools/src/astmaker/AMparser.output
+coytools/src/astmaker/astmaker
+
+
+coytools/src/libsherpa/Makefile
+
+coytools/src/bntest/Makefile
+coytools/src/bntest/Parser.hxx
+coytools/src/bntest/bntest
+
+SPECS/*.spec

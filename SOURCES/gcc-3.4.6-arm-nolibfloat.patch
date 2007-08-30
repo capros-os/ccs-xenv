@@ -1,0 +1,12 @@
+diff -ruN baseline-gcc-3.4.6/gcc/config/arm/linux-elf.h gcc-3.4.6/gcc/config/arm/linux-elf.h
+--- baseline-gcc-3.4.6/gcc/config/arm/linux-elf.h	2004-01-31 01:18:40.000000000 -0500
++++ gcc-3.4.6/gcc/config/arm/linux-elf.h	2007-02-28 15:43:13.000000000 -0500
+@@ -55,7 +55,7 @@
+    %{shared:-lc} \
+    %{!shared:%{profile:-lc_p}%{!profile:-lc}}"
+ 
+-#define LIBGCC_SPEC "%{msoft-float:-lfloat} -lgcc"
++#define LIBGCC_SPEC "-lgcc"
+ 
+ /* Provide a STARTFILE_SPEC appropriate for GNU/Linux.  Here we add
+    the GNU/Linux magical crtbegin.o file (see crtstuff.c) which

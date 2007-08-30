@@ -1,0 +1,445 @@
+##################################################################
+# NOTE: RPM really wasn't designed for cross builds.
+#
+# We don't want to use --target, because the output binaries
+# are supposed to get installed on the build host. Therefore,
+# I am exploiting a macro hack. This RPM is designed to be run
+# with a command line like:
+#
+#    rpmbuild --define "crossarch i386" --define "crossos coyotos"
+#
+# If the define is not provided, the build will default to
+# target i386.
+#
+##################################################################
+
+%define GCCMAJOR gcc3
+%define CROSSARCH %{crossarch:i386}
+%define CROSSOS %{crossos:coyotos}
+%define CROSSTARGET %{CROSSARCH}-unknown-%{CROSSOS}
+%define CROSSROOT /%{CROSSOS}
+%define CROSSHOSTROOT %{CROSSROOT}/host
+%define CROSSSYSROOT %{CROSSROOT}/sysroot-%{CROSSARCH}
+
+# This particularly sleazy hack lets me do target-specific
+# conditionals, notably in the files list:
+%{expand:%%global crosstarget_%{CROSSARCH} 1}
+%{expand:%%global crossos_%{CROSSOS} 1}
+
+%define debug_package %{nil}
+%define __os_install_post %{nil}
+
+%bcond_without headers
+
+Summary: Various compilers (C, C++, Objective-C, Java, ...)
+Name: %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}
+Version: 3.4.6
+Release: 7%{?dist}
+License: GPL
+Group: Development/Languages
+URL: http://www.coyotos.org
+Source0: gcc-core-%{version}.tar.bz2
+Patch0: capos-gcc-%{version}.patch
+Patch1: gcc-%{version}-arm-bigendian.patch
+Patch2: gcc-%{version}-pr15068-fix.patch
+Patch3: gcc-%{version}-arm-nolibfloat.patch
+Patch4: gcc-%{version}-arm-lib1asm.patch
+# Source1: gcc-c++-%{version}.tar.bz2
+
+Buildroot: %{_tmppath}/%{CROSSOS}-gcc-root
+#Since we are cross building, we don't actually need dejagnu
+#BuildRequires: texinfo >= 4.0, dejagnu, gettext, flex, bison
+BuildRequires: %{CROSSOS}-%{CROSSARCH}-binutils >= 2.16.1
+%if %{with headers}
+BuildRequires: %{CROSSOS}-%{CROSSARCH}-newlib >= 1.13.0
+%endif
+# BuildRequires: zlib-devel, gettext, flex, bison, texinfo
+# BuildRequires: glibc-devel >= 2.2.90
+Requires: %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-cpp = %{version}-%{release}
+Requires: %{CROSSOS}-%{CROSSARCH}-binutils >= 2.16.1
+Requires: %{CROSSOS}-%{CROSSARCH}-filesystem
+BuildRequires: %{CROSSOS}-%{CROSSARCH}-filesystem
+%if %{with headers}
+Requires: %{CROSSOS}-%{CROSSARCH}-newlib >= 1.13.0}
+%endif
+
+# Requires: %{CROSSOS}-%{_arch}-glibc-devel >= 2.16.1
+Prereq: /sbin/install-info
+
+%description
+The gcc package contains the GNU Compiler Collection version 4.0.
+You'll need this package in order to compile C code.
+
+
+%package -n %{CROSSOS}-common-%{GCCMAJOR}
+Summary: Common files for gcc
+Group: Development/Languages
+Prereq: /sbin/install-info
+%if %{with headers}
+Obsoletes: %{CROSSOS}-common-gcc
+%endif
+Autoreq: true
+
+%description -n %{CROSSOS}-common-%{GCCMAJOR}
+Common files for %{CROSSOS}-<target>-%{GCCMAJOR}
+
+%package -n %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-gcc
+Summary: The GNU C compiler.
+Group: Development/Languages
+Requires: %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-cpp
+Requires: %{CROSSOS}-common-%{GCCMAJOR}
+# The following is quite sleazy. What it lets us do is build
+# this package twice. The first time is without headers, and
+# gets installed so that we can build newlib. The second time is
+# WITH headers, and obsoletes the first one.
+%if %{with headers}
+Obsoletes: %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-gcc
+%endif
+
+%description -n %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-gcc
+The gcc package contains the GNU Compiler Collection version 4.0.
+You'll need this package in order to compile C code.
+
+%package -n %{CROSSOS}-common-%{GCCMAJOR}-cpp
+Summary: Common files for cpp.
+Group: Development/Languages
+Prereq: /sbin/install-info
+%if %{with headers}
+Obsoletes: %{CROSSOS}-common-cpp
+Obsoletes: %{CROSSOS}-common-%{GCCMAJOR}-cpp
+%endif
+Autoreq: true
+
+%description -n %{CROSSOS}-common-%{GCCMAJOR}-cpp
+Common files for %{CROSSOS}-<target>-cpp
+
+%package -n %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-cpp
+Summary: The C Preprocessor.
+Group: Development/Languages
+Prereq: /sbin/install-info
+Requires: %{CROSSOS}-common-%{GCCMAJOR}-cpp
+%if %{with headers}
+Obsoletes: %{CROSSOS}-%{CROSSARCH}-cpp
+Obsoletes: %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-cpp
+%endif
+Autoreq: true
+
+%description -n %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-cpp
+Cpp is the GNU C-Compatible Compiler Preprocessor.
+Cpp is a macro processor which is used automatically
+by the C compiler to transform your program before actual
+compilation. It is called a macro processor because it allows
+you to define macros, abbreviations for longer
+constructs.
+
+The C preprocessor provides four separate functionalities: the
+inclusion of header files (files of declarations that can be
+substituted into your program); macro expansion (you can define macros,
+and the C preprocessor will replace the macros with their definitions
+throughout the program); conditional compilation (using special
+preprocessing directives, you can include or exclude parts of the
+program according to various conditions); and line control (if you use
+a program to combine or rearrange source files into an intermediate
+file which is then compiled, you can use line control to inform the
+compiler about where each source line originated).
+
+You should install this package if you are a C programmer and you use
+macros.
+
+## %package c++
+## Summary: C++ support for GCC
+## Group: Development/Languages
+## Requires: gcc = %{version}-%{release}
+## Requires: libstdc++ = %{version}-%{release}
+## Requires: libstdc++-devel = %{version}-%{release}
+## Obsoletes: %{GCCMAJOR}-c++
+## Obsoletes: %{GCCMAJOR}4-c++
+## Obsoletes: %{GCCMAJOR}5-c++
+## Obsoletes: %{GCCMAJOR}-c++
+## Provides: %{GCCMAJOR}-c++ = %{version}-%{release}
+## Autoreq: true
+##
+## %description c++
+## This package adds C++ support to the GNU Compiler Collection.
+## It includes support for most of the current C++ specification,
+## including templates and exception handling.
+##
+## %package -n libstdc++
+## Summary: GNU Standard C++ Library
+## Group: System Environment/Libraries
+## Obsoletes: libstdc++3
+## Obsoletes: libstdc++34
+## Provides: libstdc++34
+## Autoreq: true
+##
+## %description -n libstdc++
+## The libstdc++ package contains a rewritten standard compliant GCC Standard
+## C++ Library.
+##
+## %package -n libstdc++-devel
+## Summary: Header files and libraries for C++ development
+## Group: Development/Libraries
+## Requires: libstdc++ = %{version}-%{release}
+## Obsoletes: libstdc++3-devel
+## Obsoletes: libstdc++34-devel
+## Provides: libstdc++34-devel
+## Autoreq: true
+##
+## %description -n libstdc++-devel
+## This is the GNU implementation of the standard C++ libraries.  This
+## package includes the header files and libraries needed for C++
+## development. This includes rewritten implementation of STL.
+
+
+# %%define _gnu %{nil}
+
+%prep
+%setup -q -n gcc-%{version}
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+
+# FIX: These need to be replicated into the make-xenv script
+perl -pi -e 's/"%{gcc_version}"/"%{gcc_version} \(release\)"/' gcc/version.c
+%if %{defined crossos_coyotos}
+perl -pi -e 's/\((prerelease|experimental|release|Red Hat[^)]*)\)/\(Coyotos %{version}-%{gcc_release}\)/' gcc/version.c
+%endif
+%if %{defined crossos_capros}
+perl -pi -e 's/\((prerelease|experimental|release|Red Hat[^)]*)\)/\(CapROS %{version}-%{gcc_release}\)/' gcc/version.c
+%endif
+
+%build
+%define optflags ""
+rm -rf ../build-gcc-%{CROSSARCH}
+mkdir ../build-gcc-%{CROSSARCH}
+
+##	--bindir=%{CROSSHOSTROOT}/bin
+##	--sbindir=%{CROSSHOSTROOT}/sbin
+##	--sysconfdir=%{CROSSHOSTROOT}/etc
+##	--datadir=%{CROSSHOSTROOT}/share
+##	--libexecdir=%{CROSSHOSTROOT}/libexec
+##	--localstatedir=%{CROSSHOSTROOT}/var
+##	--sharedstatedir=%{CROSSHOSTROOT}/include
+##	--includedir=%{CROSSROOT}/include
+##	--libdir=%{CROSSROOT}/lib
+
+# --enable-threads=posix 
+(cd ../build-gcc-%{CROSSARCH}; \
+  PATH=%{CROSSHOSTROOT}/bin:${PATH} ../gcc-%{version}/configure \
+	--prefix=%{CROSSHOSTROOT} \
+	--mandir=%{CROSSHOSTROOT}/share/man \
+	--infodir=%{CROSSHOSTROOT}/share/info \
+	--with-local-prefix=%{CROSSSYSROOT} \
+	%{?_without_headers} \
+	--with-newlib \
+	%{?with_headers: --with-sysroot=%{CROSSSYSROOT}} \
+	--disable-libmudflap \
+	--enable-languages=c \
+        --target %{CROSSTARGET})
+
+PATH=%{CROSSHOSTROOT}/bin:$PATH make -C ../build-gcc-%{CROSSARCH} gcc_tooldir=%{CROSSHOSTROOT} all-gcc
+#PATH=%{CROSSHOSTROOT}/bin:$PATH make %{_smp_mflags} tooldir=%{_tooldir} info
+#make -k check < /dev/null > check.log 2>&1 || :
+#echo ====================TESTING=========================
+#cat check.log
+#echo ====================TESTING END=====================
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}%{_prefix}
+
+#make install-gcc install-info
+PATH=%{CROSSHOSTROOT}/bin:$PATH make -C ../build-gcc-%{CROSSARCH} DESTDIR=%{buildroot} gcc_tooldir=%{CROSSHOSTROOT} install-gcc
+
+# We need to add some symlinks so that collect2 can work out where the
+# cross version of ld is installed:
+for tool in ld nm strip
+do
+   ln -s ../../../../bin/%{CROSSTARGET}-${tool} %{buildroot}%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/${tool}
+done
+
+# on FC5, installinfo creates a directory file that we do not want.
+# strangely, this does not seem to happen on FC6
+rm -f %{buildroot}%{CROSSHOSTROOT}/share/info/dir
+
+# ARM target publishes crti/crtn for normal and thumb configurations.
+# We are going to supply those in crtfiles, so clobber them here.
+%if %{defined crosstarget_arm}
+rm %{buildroot}%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/crti.o
+rm %{buildroot}%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/crtn.o
+rm %{buildroot}%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crti.o
+rm %{buildroot}%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crtn.o
+%endif
+
+
+# rm %{buildroot}%{_prefix}/%{_lib}/libiberty.a
+# rm %{buildroot}%{_mandir}/man7/fsf-funding.7
+
+%clean
+rm -rf %{buildroot}
+
+%post
+%if %{with headers}
+  # The following cleans up detritus from previous package versions that
+  # were created prior to the %{CROSSOS}-common-filesystem package and used
+  # a different directory layout:
+  if [ -d /coyotos/lib ]
+  then
+    rm -rf /coyotos/lib
+  fi
+  if [ -d /coyotos/include ]
+  then
+    rm -rf /coyotos/include
+  fi
+%endif
+
+
+#################################################################
+# HACK ALERT:
+#
+# I want to get out of this a single, target-neutral source
+# RPM that can be built for multiple, independent targets using
+# --target. The way I am accomplishing this at present is to
+# entirely suppress the creation of a main binary package,
+# and instead create a renamed subpackage that includes the
+# target architecture name as a component.
+#
+# An unfortunate consequence of this is that every target build
+# will independently create the common documentation package,
+# but I don't really know how to resolve that without a lot
+# more work than I am willing to do at the moment.
+#
+# The output package name will take the form
+#
+#   %{CROSSOS}-target-PACKAGE-VERSION.HOSTARCH.rpm
+#
+#################################################################
+
+%files -n %{CROSSOS}-common-%{GCCMAJOR}
+%defattr(-,root,root)
+%{CROSSHOSTROOT}/share/locale/*/LC_MESSAGES/*
+%{CROSSHOSTROOT}/share/info/gcc*
+%{CROSSHOSTROOT}/share/man/man7/*
+
+%files -n %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-gcc
+%defattr(-,root,root)
+%{CROSSHOSTROOT}/bin/%{CROSSTARGET}-gcc
+%{CROSSHOSTROOT}/bin/%{CROSSTARGET}-gcc-%{version}
+%{CROSSHOSTROOT}/bin/%{CROSSTARGET}-gccbug
+%{CROSSHOSTROOT}/bin/%{CROSSTARGET}-gcov
+%dir %{CROSSHOSTROOT}/lib/gcc/
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/crtbegin.o
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/crtend.o
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/libgcov.a
+
+# ARM target includes some thumb support, and also crti/crtn. Not clear 
+# why crti/crtn are called for. I need to look in to that.
+%if %{defined crosstarget_arm}
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crtbegin.o
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crtend.o
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/libgcov.a
+%endif
+
+# m68k is a multilibs target, so we need to include all of
+# the variants.
+%if %{defined crosstarget_m68k}
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5200
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5200/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5200/libgcov.a
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5206e
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5206e/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5206e/libgcov.a
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m528x
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m528x/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m528x/libgcov.a
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5307
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5307/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5307/libgcov.a
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5407
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5407/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m5407/libgcov.a
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m68000
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m68000/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m68000/libgcov.a
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m68040
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m68040/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m68040/libgcov.a
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m68060
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m68060/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/m68060/libgcov.a
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/mcpu32
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/mcpu32/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/mcpu32/libgcov.a
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/msoft-float
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/msoft-float/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/msoft-float/libgcov.a
+%endif
+
+# Following is only in gcc3
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/specs
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/include
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/include/README
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/include/fixed
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/include/*.h
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/install-tools
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/install-tools/gsyslimits.h
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/install-tools/include
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/install-tools/include/README
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/install-tools/include/*.h
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/install-tools/mkheaders.conf
+%dir %{CROSSHOSTROOT}/libexec/gcc
+%dir %{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}
+%dir %{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/collect2
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/install-tools/fix-header
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/install-tools/fixinc.sh
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/install-tools/fixincl
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/install-tools/fixproto
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/install-tools/mkheaders
+# Following is only in gcc3
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/install-tools/mkinstalldirs
+# Following items are symlinks to binutls components:
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/ld
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/nm
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/strip
+# These really should move to some sort of common package...
+%{CROSSHOSTROOT}/share/man/man1/%{CROSSTARGET}-gcc.1
+%{CROSSHOSTROOT}/share/man/man1/%{CROSSTARGET}-gcov.1
+
+%files -n %{CROSSOS}-common-%{GCCMAJOR}-cpp
+%defattr(-,root,root)
+%{CROSSHOSTROOT}/share/info/cpp*
+
+%files -n %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-cpp
+%defattr(-,root,root)
+%{CROSSHOSTROOT}/bin/%{CROSSTARGET}-cpp
+%{CROSSHOSTROOT}/share/man/man1/%{CROSSTARGET}-cpp.1
+%dir %{CROSSHOSTROOT}/libexec/gcc
+%dir %{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}
+%dir %{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}
+%{CROSSHOSTROOT}/libexec/gcc/%{CROSSTARGET}/%{version}/cc1
+
+
+%changelog
+* Sat Oct  1 2005 Jonathan Shapiro <shap@eros-os.org> 4.0.1-3
+- Rebuilt to reflect new cross tools directory structure and
+  to use --with-sysroot. Now adding symlinks into the GCC tree
+  for some of the binutils bits that need to be found by (e.g.)
+  collect2.
+
+* Thu Sep 22 2005 Jonathan Shapiro <shap@eros-os.org> 4.0.1-2
+- Various (unsuccessful) attempts to deal with some directory
+  search issues.
+
+* Sat Sep 17 2005 Jonathan Shapiro <shap@eros-os.org> 4.0.1-1
+- initial setup of spec file. Thought about applying the Fedora
+  patches, but better (I think) to see how it goes without them
+  first, since we are cross building. Much of the install stuff
+  above is based on the Fedora spec file for gcc-4.0.1-1

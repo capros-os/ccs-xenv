@@ -1,0 +1,132 @@
+%copyright {/* This test file is in the public domain. */
+
+/* If a copyright notice is placed within the %copyright directive, it
+   will appear at the top of both the source and the header file. */
+}
+
+%include {
+/* Stuff in a %include section will go before the namespace
+   declaration in the header file. */
+
+#include <libsherpa/BigNum.hxx>
+
+using namespace sherpa;
+}
+
+%header {
+/* Stuff in a %header section will go inside the namespace
+   declaration in the header file, but before any other declarations. */
+struct LitValue {
+  bool   b;     /* boolean Values */
+  BigNum bn;	/* large precision integers */
+  double d;	/* doubles, floats          */
+  std::string s;     /* String Literals          */
+};
+}
+
+%members {
+/* Stuff in a %members section will appear inside the class
+   declaration. */
+  LitValue value;
+}
+
+%source {
+/* Stuff in a %source section will end up in the source file, inside
+   the namespace scope, at the bottom of the file. */
+}
+
+%sourcetop {
+/* Stuff in a %sourcetop section will end up in the source file, ABOVE
+   the namespace declaration for the new AST class. */
+}
+
+%construct {
+/* Stuff in a %construct section will be emitted as the last code in
+   every AST constructor. Recommended use of this is to declare a
+   helper function within a %members block, implement it within a
+   %source block, and then do something like
+
+     %construct {
+       callHelper();
+     }
+
+  to get it called. 
+
+  Example usage:
+     %member {
+       // Support function that will decode literal values for those
+       // AST types that are really literals:
+     void decodeLiteral();
+     }
+     %source {
+     void AST::decodeLiteral()
+     {
+       switch(astType) {
+       case at_BinaryLiteral:
+         {
+           // code to extract literal string into value field
+         }
+       case at_FloatLiteral:
+         {
+           // code to extract literal string into value field
+         }
+       // possibly other cases
+       default:
+         break;
+       }
+     }
+     }
+     %construct {
+     decodeLiteral();
+     }
+
+*/
+}
+
+/* A namespace declaration, if present, will wrap the entire class in
+   a namespace. This lets you rename the class by doing:
+
+     %namespace myast
+
+   in the AST file, and later doing
+
+     %typedef myast::AST DesiredAstClassName;
+
+   somewhere. */
+%namespace foobar
+
+/* Use LEAF declarations for literals. */
+LEAF leaf_1;
+LEAF leaf_2;
+LEAF leaf_3;
+LEAF leaf_4;
+
+/* A group declaration says that any of the things on the right may
+   appear where the group may appear. */
+GROUP grp = leaf_1 | leaf_2;
+
+/* An AST declaration describes the child structure of a given AST.
+   Each AST can be declared once. Names can optionally be followed by
+     '?'  -- at most one, but optional
+     '*'  -- zero or more
+     '+'  -- one or more
+
+   Use of these features in anything other than tail position is
+   probably a bad idea.  */
+AST fred = leaf_1 leaf_2+ leaf_3* leaf_4 grp;
+
+/* Groups can also be given anonymously: */
+AST barney = leaf_1 leaf_2+ leaf_3* leaf_4 (leaf_1 | leaf_2);
+
+/* NOT IMPLEMENTED YET:
+
+   At some point I will add syntactic support for anonymous subtrees,
+   so that the following will be legal:  
+
+     AST let = { letbinding+ } (AT_begin | AT_ibegin)
+
+   with the intended result that a "let" AST will consist of two
+   children. The first will be a generic at_AnyGroup whose children must
+   all be at_letbinding nodes. The second can be either an AT_begin or
+   an AT_ibegin. The consistency checker will validate this properly.
+ */

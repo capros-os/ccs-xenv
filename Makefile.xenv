@@ -1,0 +1,54 @@
+THISMAKEFILE := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
+
+include Makefile.vars
+
+default: build
+
+##################################################################
+#
+#  MULTITARGET targets.
+#
+#  Each of these make targets builds the corresponding component
+#  for *all* target architectures
+#
+#  Invoke as something like:
+#
+#      "make -f Makefile.xenv TARGETS="capros-i386 coyotos-m68k"
+#
+#  where each element of TARGETS is in the set
+#
+#    {coyotos,capros}-{i386,arm,m68k}
+#
+##################################################################
+
+.PHONY: coytools
+
+filesystem binutils pregcc newlib gcc gcc-links crtfiles coytools:
+	@for buildtarget in $(TARGETS); do\
+	  echo $(MAKE) -f Makefile.target BUILDTARGET=$${buildtarget} $@; \
+	  $(MAKE) -f Makefile.target BUILDTARGET=$${buildtarget} $@; \
+	done
+
+##################################################################
+#
+#  HOST targets.
+#
+##################################################################
+
+# Create the BUILD subdirectory, as needed:
+BUILD:
+	mkdir BUILD
+
+.PSEUDO: build
+build: coytools
+	$(MAKE) -f $(THISMAKEFILE) filesystem
+	$(MAKE) -f $(THISMAKEFILE) binutils
+	$(MAKE) -f $(THISMAKEFILE) pregcc
+	$(MAKE) -f $(THISMAKEFILE) newlib
+	$(MAKE) -f $(THISMAKEFILE) gcc
+	$(MAKE) -f $(THISMAKEFILE) gcc-links
+	$(MAKE) -f $(THISMAKEFILE) crtfiles
+	$(MAKE) -f $(THISMAKEFILE) coytools
+
+clean:
+	-rm -rf BUILD

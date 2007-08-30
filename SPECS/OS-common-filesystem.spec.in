@@ -1,0 +1,86 @@
+##################################################################
+# NOTE: RPM really wasn't designed for cross builds.
+#
+# We don't want to use --target, because the output binaries
+# are supposed to get installed on the build host. Therefore,
+# I am exploiting a macro hack. This RPM is designed to be run
+# with a command line like:
+#
+#    rpmbuild --define "crossarch i386"
+#
+# If the define is not provided, the build will default to
+# target i386.
+#
+##################################################################
+
+%define CROSSOS coyotos
+%define CROSSOSNAME Coyotos
+%define CROSSROOT /%{CROSSOS}
+%define CROSSHOSTROOT %{CROSSROOT}/host
+
+Summary: Directory structure for the %{CROSSOSNAME} cross tools
+Name: %{CROSSOS}-common-filesystem
+Version: 0.1.1
+Release: 1%{?dist}
+License: Public Domain
+Group: System Environment/Base
+Buildroot: %{_tmppath}/%{name}-%{version}-root
+
+%description
+Basic filesystem layout for the %{CROSSOSNAME} cross environment.
+
+This package gives us a way to whack the /%{CROSSOS} tree once and for
+all on deinstall so as to make sure that if you remove all of the
+%{CROSSOSNAME} related packages you end up back in a pristine
+state. If we don't do something along the lines of this package, the
+various other packages will leave empty directories lying around. If
+you look at the SPEC file to see what is going on, the only really
+important part is the uninstall section.
+
+%prep
+
+%install
+# This entire exercise is completely unnecessary, but it at least serves
+# to give the %files section to do.
+rm -rf %{buildroot}
+mkdir %{buildroot}
+
+mkdir -p \
+	%{buildroot}%{CROSSROOT} \
+	%{buildroot}%{CROSSHOSTROOT} \
+	%{buildroot}%{CROSSHOSTROOT}/bin \
+	%{buildroot}%{CROSSHOSTROOT}/lib \
+	%{buildroot}%{CROSSHOSTROOT}/share \
+	%{buildroot}%{CROSSHOSTROOT}/share/locale \
+	%{buildroot}%{CROSSHOSTROOT}/share/man \
+	%{buildroot}%{CROSSHOSTROOT}/share/info
+
+%clean
+rm -rf %{buildroot}
+
+%postun
+# The following test is obscurely documented. What happens here is
+# that this chunk of the post-uninstall script will only get run if
+# this is the *last* uninstall. It would be be Extremely Ungood(tm)
+# if this part of the script were to run after, say, an upgrade...
+if [ "$1" = 0 ] ; then
+  rm -rf %{CROSSHOSTROOT}
+  rm -rf /%{CROSSOS}/sysroot*
+
+  # Do the following permissively, in case /%{CROSSOS} is a mount point.
+  rmdir /%{CROSSOS} 2>/dev/null || true
+fi
+
+%files
+%defattr(0755,root,root)
+%dir %{CROSSHOSTROOT}
+%{CROSSHOSTROOT}/bin
+%{CROSSHOSTROOT}/lib
+%dir %{CROSSHOSTROOT}/share
+%{CROSSHOSTROOT}/share/man
+%{CROSSHOSTROOT}/share/locale
+%{CROSSHOSTROOT}/share/info
+
+%changelog
+* Sat Oct  1 2005 Jonathan Shapiro <shap@eros-os.org> - 0.1.1-1
+- initial version

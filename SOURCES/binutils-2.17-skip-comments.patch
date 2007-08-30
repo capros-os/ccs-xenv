@@ -1,0 +1,29 @@
+diff -ruN baseline-binutils-2.17/gas/read.c binutils-2.17/gas/read.c
+--- baseline-binutils-2.17/gas/read.c	2005-11-17 02:29:28.000000000 -0500
++++ binutils-2.17/gas/read.c	2007-02-28 16:51:51.000000000 -0500
+@@ -1008,10 +1008,14 @@
+ 	      unsigned int new_length;
+ 	      char *tmp_buf = 0;
+ 
+-	      bump_line_counters ();
+ 	      s = input_line_pointer;
+ 	      if (strncmp (s, "APP\n", 4))
+-		continue;	/* We ignore it */
++		{
++		  /* We ignore it */
++		  ignore_rest_of_line ();
++		  continue;
++		}
++	      bump_line_counters ();
+ 	      s += 4;
+ 
+ 	      sb_new (&sbuf);
+@@ -1110,7 +1114,7 @@
+ 	    continue;
+ #endif
+ 	  input_line_pointer--;
+-	  /* Report unknown char as ignored.  */
++	  /* Report unknown char as error.  */
+ 	  demand_empty_rest_of_line ();
+ 	}
+ 

@@ -1,0 +1,13 @@
+Patch sources:
+
+From crosstools 0.38:
+
+gcc-3.4.4-arm-bigendian.patch has been regenerated for gcc-3.4.4
+gcc-3.4.4-pr15068-fix.patch has been regenerated for gcc-3.4.4
+gcc-3.4.4-libstdcxx-sh.patch is still pending
+binutils-2.16.1-cross-gprof.patch has been regenerated for binutils-2.16.1
+binutils-2.16.1-psignal.patch has been regenerated for binutils-2.16.1
+binutils-2.16.1-skip-comments.patch has been regenerated for binutils-2.16.1
+
+trap-posix wasn't needed by gcc-3.4.4, and has been dropped
+ppc-asm-spec was integrated by gcc-3.4.4, and has been dropped

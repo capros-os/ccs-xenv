@@ -1,0 +1,170 @@
+# Copyright (c) 2006, The EROS Group, LLC.
+# All rights reserved.
+# 
+# This software was developed to support the EROS secure operating
+# system project (http://www.eros-os.org). The latest version of
+# the libsherpa library can be found at http://www.coyotos.org.
+# 
+# Redistribution and use in source and binary forms, with or
+# without modification, are permitted provided that the following
+# conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials
+#    provided with the distribution.
+# 
+# 3. Neither the name of the The EROS Group, LLC nor the name of
+#    Johns Hopkins University, nor the names of its contributors
+#    may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+# @configure_input@
+
+SHELL = /bin/sh
+
+#### Start of system configuration section. ####
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+
+CC = @CCACHE@ @CC@
+CXX = @CCACHE@ @CXX@
+AR = ar
+
+@SET_MAKE@
+
+VERSION=@VERSION@
+BUILD=@BUILD@
+
+# Set RANLIB = echo if your system doesn't have or need ranlib.
+RANLIB = @RANLIB@
+
+# Use cp if you don't have install.
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+
+DEFS = @DEFS@
+LIBS = @LIBS@
+
+CFLAGS = @CFLAGS@ 
+CXXFLAGS = @CXXFLAGS@ 
+LDFLAGS = @LDFLAGS@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+# Where to install the executables.
+bindir = @bindir@
+
+# Where to put the system-wide files
+libdir = @libdir@
+
+# Where to put header files
+includedir = @includedir@
+
+# Where to put shared, read-only data
+datadir = @datadir@
+
+# shap: I have seen autoconf get this consistently wrong, which
+# is why the following obscure test is present. Surely there must
+# be a better way? I don't like this solution either, as it does not
+# work robustly when the user messes with --prefix...
+
+# Where to put the Info files
+shareinfodir=$(findstring $(datadir)/info,$(wildcard $(datadir)/*))
+infodir = $(if $(shareinfodir),$(shareinfodir),@infodir@)
+
+# Where to put the manual pages.
+sharemandir=$(findstring $(datadir)/man,$(wildcard $(datadir)/*))
+mandir = $(if $(sharemandir),$(sharemandir),@mandir@)
+
+mkinstalldirs = $(top_srcdir)/mkinstalldirs
+
+#### End of system configuration section. ####
+
+default: all
+
+TOPDIR=..
+
+INCLUDE=-I$(TOPDIR)/ @CPPFLAGS@ 
+
+XCXXFLAGS = -Wall -Wreturn-type -DDATADIR=\"$(datadir)\"
+
+TARGET=libsherpa.a
+OBJECTS=$(patsubst %.cxx,%.o,$(wildcard *.cxx))
+HEADERS=$(wildcard *.hxx)
+
+all: $(TARGET)
+
+install: all
+	$(mkinstalldirs) $(DESTDIR)$(libdir)
+	$(INSTALL) -m 755 $(TARGET) $(DESTDIR)$(libdir)/$(TARGET)
+	$(mkinstalldirs) $(DESTDIR)$(includedir)/libsherpa
+	$(INSTALL) -m 755 $(HEADERS) $(DESTDIR)$(includedir)/libsherpa/
+
+install-info:
+uninstall-info:
+
+uninstall:
+	rm -f $(DESTDIR)$(libdir)/$(TARGET)
+	for h in $(HEADERS) do; \
+	  rm -f $(DESTDIR)$(libdir)/$$h \
+        done
+
+clean:
+	-rm -rf *.o *.m *~
+	-rm -rf tests/*.o tests/*.m tests/*~
+	-rm -rf .\#* tests/.\#* \#* tests/\#* $(TESTBINS)
+	rm -f $(TARGET)
+
+realclean distclean: clean nodepend
+	rm -f Makefile
+
+nodepend:
+	find $(TOPDIR) -name '*.m' -exec rm {} \;
+
+$(TARGET): $(OBJECTS)
+	$(AR) crv $(TARGET) $(OBJECTS)
+	$(RANLIB) $(TARGET)
+
+# Set these to "true" if you aren't using GCC:
+C_DEP=@$(CC) $(INCLUDE) $(CFLAGS) $(XCFLAGS) -M -MT $@ -MF $(patsubst %.o,%.m,$@) $<
+CXX_DEP=@$(CXX) $(INCLUDE) $(CXXFLAGS) $(XCXXFLAGS) -M -MT $@ -MF $(patsubst %.o,%.m,$@) $<
+
+C_BUILD=$(CC) $(INCLUDE) $(CFLAGS) $(XCFLAGS) -c $< -o $@
+CXX_BUILD=$(CXX) $(INCLUDE) $(CXXFLAGS) $(XCXXFLAGS) -c $< -o $@
+
+# Whenever we rebuild a .o file, rebuild the .m file:
+%.o: %.c
+	@$(C_DEP)
+	$(C_BUILD)
+
+%.o: %.cxx
+	@$(CXX_DEP)
+	$(CXX_BUILD)
+
+# Include only such .m files as have been built. If there is no .m, there is
+# no .o file. In that case the .o will be built and the .m will be built
+# as a side effect.
+DEPFILES=$(wildcard *.m)
+-include $(DEPFILES)

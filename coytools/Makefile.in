@@ -1,0 +1,365 @@
+# Copyright (c) 2007, The EROS Group, LLC.
+# All rights reserved.
+# 
+# This software was developed to support the EROS secure operating
+# system project (http://www.eros-os.org). The latest version of
+# the libsherpa library can be found at http://www.coyotos.org.
+# 
+# Redistribution and use in source and binary forms, with or
+# without modification, are permitted provided that the following
+# conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials
+#    provided with the distribution.
+# 
+# 3. Neither the name of the The EROS Group, LLC nor the name of
+#    Johns Hopkins University, nor the names of its contributors
+#    may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+# CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+# @configure_input@
+
+# Master Makefile for the libsherpa library.
+
+SHELL = /bin/sh
+
+#### Start of system configuration section. ####
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+
+CC = @CCACHE@ @CC@
+CXX = @CCACHE@ @CXX@
+AR = ar
+
+@SET_MAKE@
+
+VERSION=@VERSION@
+BUILD=@BUILD@
+
+# Set RANLIB = echo if your system doesn't have or need ranlib.
+RANLIB = @RANLIB@
+
+# Use cp if you don't have install.
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+
+DEFS = @DEFS@
+LIBS = @LIBS@
+
+CFLAGS = @CFLAGS@ 
+LDFLAGS = @LDFLAGS@
+
+MAKEINFO = makeinfo
+TEXI2DVI = texi2dvi
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+# Where to install the executables.
+bindir = @bindir@
+
+# Where to put the system-wide files
+libdir = @libdir@
+
+# Where to put shared, read-only data
+datadir = @datadir@
+
+# shap: I have seen autoconf get this consistently wrong, which
+# is why the following obscure test is present. Surely there must
+# be a better way? I don't like this solution either, as it does not
+# work robustly when the user messes with --prefix...
+
+# Where to put the Info files
+shareinfodir=$(findstring $(datadir)/info,$(wildcard $(datadir)/*))
+infodir = $(if $(shareinfodir),$(shareinfodir),@infodir@)
+
+# Where to put the manual pages.
+sharemandir=$(findstring $(datadir)/man,$(wildcard $(datadir)/*))
+mandir = $(if $(sharemandir),$(sharemandir),@mandir@)
+
+#### End of system configuration section. ####
+
+FLAGS_TO_PASS = \
+	AR='$(AR)' \
+	CC='$(CC)' \
+	LIBPROGS='$(LIBPROGS)' \
+	LIBS='$(LIBS)' \
+	MAKE='$(MAKE)' \
+	MAKEINFO='$(MAKEINFO)' \
+	RANLIB='$(RANLIB)' \
+	TEXI2DVI='$(TEXI2DVI)' \
+	YACC='$(YACC)' \
+	bindir='$(bindir)' \
+	infodir='$(infodir)' \
+	shareinfodir='$(shareinfodir)' \
+	libdir='$(libdir)' \
+	sharemandir='$(sharemandir)' \
+	mandir='$(mandir)' \
+	prefix='$(prefix)' \
+	exec_prefix='$(exec_prefix)'
+
+DISTFILES = \
+	COPYING COPYING.LIB INSTALL README TODO PROJECTS \
+	BUGS MINOR-BUGS FAQ HACKING TESTS README.VMS build.com \
+	ChangeLog NEWS ChangeLog.zoo \
+	configure configure.in stamp-h.in config.h.in Makefile.in acconfig.h \
+	mkinstalldirs install-sh \
+
+### Subdirectories to run make in for the primary targets.
+# Unix source subdirs, where we'll want to run lint and etags:
+USOURCE_SUBDIRS = src
+ifeq "@HAVE_MAKEINFO@" "no"
+SKIP_DOCS="yes"
+endif
+ifeq "@HAVE_TEXI2DVI@" "no"
+SKIP_DOCS="yes"
+endif
+ifeq "@HAVE_DVIPS@" "no"
+SKIP_DOCS="yes"
+endif
+
+ifeq "$(SKIP_DOCS)" ""
+#DOC_SUBDIRS=doc
+DOC_SUBDIRS=
+endif
+
+# All other subdirs:
+SUBDIRS = ${USOURCE_SUBDIRS} $(DOC_SUBDIRS)
+
+# Set default target.
+all:
+
+.PHONY: all install uninstall installdirs
+all install uninstall installdirs: config.h Makefile all-local
+	@for subdir in $(SUBDIRS); do \
+	  echo "making $@ in $$subdir"; \
+	  ( cd $$subdir && $(MAKE) $(FLAGS_TO_PASS) $@ ) || exit 1; \
+	done
+
+installdirs: installdirs-local
+
+install: all install-local install-info
+uninstall: uninstall-info
+
+.PHONY: all-local
+all-local:
+
+install-info:
+uninstall-info:
+
+#.PHONY: info dvi clean-info install-info
+#info dvi clean-info install-info uninstall-info:
+#	cd doc && $(MAKE) $(FLAGS_TO_PASS) $@ || exit 1
+
+.PHONY: install-local
+install-local: all-local
+	@: nothing to do locally
+
+.PHONY: installdirs-local
+installdirs-local: all-local
+	@: nothing to do locally
+
+.PHONY: tags
+tags:
+	@for dir in $(TSUBDIRS); do echo making $@ in $$dir; cd $$dir && $(MAKE) $(FLAGS_TO_PASS) $@ || exit 1; cd ..; done
+	@echo making $@ in .
+	@ctags `for i in \`$(MAKE) SUBDIRS="$(TSUBDIRS)" ls\` ; do echo $(srcdir)/$$i ; done`
+
+.PHONY: TAGS
+TAGS:
+	@for dir in $(TSUBDIRS); do echo making $@ in $$dir; cd $$dir && $(MAKE) $(FLAGS_TO_PASS) $@ || exit 1; cd ..; done
+	@echo making $@ in .
+	@etags `for i in \`$(MAKE) SUBDIRS="$(TSUBDIRS)" ls | grep -v 'make\[[0-9]\]'\` ; do echo $(srcdir)/$$i ; done`
+
+.PHONY: ls
+ls:
+	@echo $(DISTFILES)
+	@for dir in $(SUBDIRS); do \
+		for i in `cd $$dir && $(MAKE) $(FLAGS_TO_PASS) $@ | grep -v 'make\[[0-9]\]'` ; do \
+			echo $$dir/$$i ; \
+		done ; \
+	done
+
+.PHONY: clean
+clean: clean-local
+	@for dir in $(SUBDIRS); do echo making $@ in $$dir; cd $$dir && $(MAKE) $(FLAGS_TO_PASS) $@ || exit 1; cd ..; done
+
+.PHONY: distclean
+distclean: distclean-local
+	@for dir in $(SUBDIRS); do echo making $@ in $$dir; cd $$dir && $(MAKE) $(FLAGS_TO_PASS) $@ || exit 1; cd ..; done
+	rm -f config.status config.log config.h Makefile
+	rm -rf autom4te.cache
+
+.PHONY: realclean
+realclean: realclean-local
+	@for dir in $(SUBDIRS); do echo making $@ in $$dir; cd $$dir && $(MAKE) $(FLAGS_TO_PASS) $@ || exit 1; cd ..; done
+	rm -f config.status
+
+.PHONY: mostlyclean-local
+mostlyclean-local:
+	-find . -name '*.m' -exec rm {} \;
+	rm -rf RPMS SRPMS
+	rm -f *~
+	-rm -rf .\#* \#*
+	-rm -rf self-ca
+
+.PHONY: clean-local
+clean-local: mostlyclean-local
+
+.PHONY: distclean-local
+distclean-local: clean-local
+	rm -f Makefile config.cache config.h config.log stamp-h
+	rm -f tags TAGS
+	-rm -f *.rpm *.tgz
+
+.PHONY: realclean-local
+realclean-local: distclean-local
+
+.PHONY: saber
+saber:
+	@for dir in $(SUBDIRS); do cd $$dir && $(MAKE) $(FLAGS_TO_PASS) $@ || exit 1; cd ..; done
+
+.PHONY: lint
+lint:
+	@for dir in $(USOURCE_SUBDIRS); do cd $$dir && $(MAKE) $(FLAGS_TO_PASS) xlint || exit 1; cd ..; done
+
+.PHONY: dist
+GZIP=gzip --best
+GZIP_EXT=.gz
+TAR_VERBOSE=
+dist: spec
+	rm -rf `cat .fname`
+	${MAKE} dist-dir DISTDIR="`cat .fname`"
+	for dir in ${SUBDIRS}; do \
+	  ( DISTDIR="../`cat .fname`/$${dir}"; \
+            cd $${dir} && \
+	    ${MAKE} dist-dir DISTDIR="$${DISTDIR}" \
+	  ); \
+	done
+	(unset GZIP; tar chf${TAR_VERBOSE} - `cat .fname` | ${GZIP} > "`cat .fname`.tar${GZIP_EXT}")
+	rm -rf `cat .fname` .fname .version
+
+.PHONY: dist-dir
+dist-dir:
+	mkdir ${DISTDIR}
+	for i in ${DISTFILES}; do \
+	  ln $(srcdir)/$${i} ${DISTDIR}; \
+	done
+
+# For the justification of the following Makefile rules, see node
+# `Automatic Remaking' in GNU Autoconf documentation.
+Makefile: Makefile.in config.status
+	CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
+
+# Use @CFLAGS@ not $(CFLAGS) because it would be confusing for "make CFLAGS="
+# to sometimes (i.e., if configure is modified) change the configured CFLAGS,
+# and sometimes not.
+config.status: configure
+	CFLAGS="@CFLAGS@" ./config.status --recheck
+
+# The rules to run autoconf and autoheader are commented out.  This is because
+# when the user unpacks a tarfile, configure.in might end up newer than 
+# configure, but the user might not have (and does not need to have) autoconf
+# installed.
+configure: configure.in #aclocal.m4
+	autoconf
+
+config.h: stamp-h
+
+# This used to do a ./config.status --recheck, to update config.status with
+# any new #defines from config.h.in.  The problem was that the rule itself
+# depends on config.status, so that the --recheck would get run several
+# times, which is bad if the user was trying to specify CFLAGS manually.
+# It was a big pain in the neck.
+stamp-h: config.h.in config.status
+	CONFIG_FILES=$@ CONFIG_HEADERS=config.h ./config.status
+
+#config.h.in: stamp-h.in
+#stamp-h.in: configure.in #aclocal.m4 acconfig.h
+#	cd $(srcdir); autoheader
+#	date > $(srcdir)/stamp-h.in
+
+# Tell versions [3.59,3.63) of GNU make not to export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:
+
+
+# In order to perform a release, we need to build a new spec file for 
+# libsherpa. Here is how to generate a release:
+#
+#   1. Update the libsherpa version number in configure.in.
+#      Do a make clean after this just to be sure there are 
+#      no lingering editor files.
+#
+#   2. Re-run autoconf and configure to propagate the version number
+#      into all of the right places in the tree.
+#
+#   3. Commit the code base. Tag it with an appropriate release tag.
+#
+#   4. If you want to create RPM files, you can now type
+#      "make rpms".
+
+# How to do this first one in 'standard' make?
+OUR_TMP=$(firstword $(TMPDIR) /tmp)
+RPM_TOPDIR=$(OUR_TMP)/RPM-TOP
+RPM_TARGET_DIR=$(OUR_TMP)/coytools-$(VERSION)
+RELEASEVER=$(shell sed 's/.*release \([0-9.]*\).*/\1/' /etc/redhat-release)
+DIST=.fc$(RELEASEVER)
+
+# I am absolutely certain that there must be a better way to do this, but
+# I don't know what it is.
+rpms:
+	-rm -rf $(RPM_TARGET_DIR)
+	-rm -rf $(RPM_TOPDIR)
+	-rm -rf RPMS
+	-rm -rf SRPMS
+	mkdir $(RPM_TOPDIR)
+	mkdir $(RPM_TOPDIR)/BUILD
+	mkdir $(RPM_TOPDIR)/RPMS
+	mkdir $(RPM_TOPDIR)/RPMS/i386
+	mkdir $(RPM_TOPDIR)/SOURCES
+	mkdir $(RPM_TOPDIR)/SPECS
+	mkdir $(RPM_TOPDIR)/SRPMS
+	cp -a . $(RPM_TARGET_DIR)
+	(cd $(RPM_TARGET_DIR); make distclean)
+	(cd $(RPM_TARGET_DIR); autoconf)
+	(cd $(OUR_TMP); tar czf $(RPM_TOPDIR)/SOURCES/coytools-$(VERSION)-$(BUILD)$(DIST).tar.gz coytools-$(VERSION))
+	cp coytools.spec $(RPM_TOPDIR)/SPECS/coytools.spec
+	(cd $(RPM_TOPDIR)/SPECS; rpmbuild -ba --define "dist $(DIST)" --define "_topdir $(RPM_TOPDIR)" coytools.spec)
+	mkdir -p SRPMS
+	cp -a $(RPM_TOPDIR)/SRPMS ./SRPMS
+	cp -a $(RPM_TOPDIR)/RPMS ./RPMS
+	-rm -rf $(RPM_TARGET_DIR)
+	-rm -rf $(RPM_TOPDIR)
+
+tarballs:
+	-rm -rf $(RPM_TARGET_DIR)
+	mkdir $(RPM_TARGET_DIR)
+	cp -a . $(RPM_TARGET_DIR)
+	(cd $(RPM_TARGET_DIR); make distclean)
+	(cd $(RPM_TARGET_DIR); autoconf)
+	(cd $(OUR_TMP); tar czf $(RPM_TARGET_DIR)-$(BUILD)-src.tgz coytools-$(VERSION))
+	cp $(RPM_TARGET_DIR)-$(BUILD)-src.tgz .
+	-rm -rf $(RPM_TARGET_DIR)

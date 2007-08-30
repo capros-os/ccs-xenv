@@ -1,0 +1,514 @@
+diff -ruN baseline-gcc-3.4.6/config.sub gcc-3.4.6/config.sub
+--- baseline-gcc-3.4.6/config.sub	2004-02-22 09:44:23.000000000 -0500
++++ gcc-3.4.6/config.sub	2007-08-05 14:36:19.000000000 -0400
+@@ -1166,6 +1166,8 @@
+ 	      | -powermax* | -dnix* | -nx6 | -nx7 | -sei* | -dragonfly*)
+ 	# Remember, each alternative MUST END IN *, to match a version number.
+ 		;;
++	-coyotos* | -capros*)
++		;;
+ 	-qnx*)
+ 		case $basic_machine in
+ 		    x86-* | i*86-*)
+diff -ruN baseline-gcc-3.4.6/gcc/config/arm/capros.h gcc-3.4.6/gcc/config/arm/capros.h
+--- baseline-gcc-3.4.6/gcc/config/arm/capros.h	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/arm/capros.h	2007-08-05 15:37:46.000000000 -0400
+@@ -0,0 +1,30 @@
++/* Definitions for ARM running CapROS-based systems with ELF format.
++   Copyright (C) 2007, The EROS Group LLC.
++
++This file is part of GCC.
++
++GCC is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2, or (at your option)
++any later version.
++
++GCC is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with GCC; see the file COPYING.  If not, write to
++the Free Software Foundation, 59 Temple Place - Suite 330,
++Boston, MA 02111-1307, USA.  */
++
++/* Provide a LINK_SPEC appropriate for Coyotos or CapROS.  Here we
++   provide support for the Coyotos option --small-space, which places
++   things in low(er) memory.  */
++
++/* If ELF is the default format, we should not use /lib/elf.  */
++
++#undef	LINK_SPEC
++#define LINK_SPEC "%{small-space:-m arm_coyotos_small} \
++  %{static:-static}"
++
+diff -ruN baseline-gcc-3.4.6/gcc/config/arm/coyotos.h gcc-3.4.6/gcc/config/arm/coyotos.h
+--- baseline-gcc-3.4.6/gcc/config/arm/coyotos.h	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/arm/coyotos.h	2007-08-05 15:37:32.000000000 -0400
+@@ -0,0 +1,30 @@
++/* Definitions for ARM running Coyotos-based systems with ELF format.
++   Copyright (C) 2007, The EROS Group LLC.
++
++This file is part of GCC.
++
++GCC is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2, or (at your option)
++any later version.
++
++GCC is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with GCC; see the file COPYING.  If not, write to
++the Free Software Foundation, 59 Temple Place - Suite 330,
++Boston, MA 02111-1307, USA.  */
++
++/* Provide a LINK_SPEC appropriate for Coyotos or CapROS.  Here we
++   provide support for the Coyotos option --small-space, which places
++   things in low(er) memory.  */
++
++/* If ELF is the default format, we should not use /lib/elf.  */
++
++#undef	LINK_SPEC
++#define LINK_SPEC "%{small-space:-m arm_coyotos_small} \
++  %{static:-static}"
++
+diff -ruN baseline-gcc-3.4.6/gcc/config/capros.h gcc-3.4.6/gcc/config/capros.h
+--- baseline-gcc-3.4.6/gcc/config/capros.h	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/capros.h	2007-08-05 15:15:48.000000000 -0400
+@@ -0,0 +1,87 @@
++/* Configuration common to all targets running CapROS. 
++   Copyright (C) 2007, The EROS Group LLC.
++
++This file is part of GCC.
++
++GCC is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2, or (at your option)
++any later version.
++
++GCC is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with GCC; see the file COPYING.  If not, write to
++the Free Software Foundation, 59 Temple Place - Suite 330,
++Boston, MA 02111-1307, USA.  */
++
++/* Specify predefined symbols in preprocessor.  */
++
++#ifndef TARGET_SUB_OS_CPP_BUILTINS
++#define TARGET_SUB_OS_CPP_BUILTINS()
++#endif
++
++/* Some genious predefined this for m68k builds... */
++#ifdef TARGET_OS_CPP_BUILTINS
++#undef TARGET_OS_CPP_BUILTINS
++#endif
++
++#define TARGET_OS_CPP_BUILTINS()		\
++  do						\
++    {						\
++	builtin_define ("__capros__");		\
++	builtin_assert ("system=capros");	\
++	TARGET_SUB_OS_CPP_BUILTINS();		\
++    }						\
++  while (0)
++
++/* Provide a STARTFILE_SPEC appropriate for Coyotos. We use
++   crtbegin/crtend bracketing (see crtstuff.c) to get C++ static
++   construction and destruction to happen. We use crti to handle the
++   init section logic. We use crt1 to provide _start and crtn to
++   provide _end. */
++#undef STARTFILE_SPEC
++#if 0
++/* The following will become appropriate when we do shared linking
++   and/or PIE, but at that point we will need to arrange to get the
++   appropriate variants of crtbegin/crtend constructed. */
++#define STARTFILE_SPEC			   \
++  "%{!shared: %{pg|p|profile:gcrt1.o%s;:crt1.o%s}} \
++   crti.o%s %{static:crtbeginT.o%s;shared|pie:crtbeginS.o%s;:crtbegin.o%s}"
++#else
++#define STARTFILE_SPEC \
++  "%{!shared: %{pg|p|profile:gcrt1.o%s;:crt1.o%s}} \
++   crti.o%s crtbegin.o%s"
++#endif
++
++/* Provide a ENDFILE_SPEC appropriate for Coyotos. See comment above
++   for STARTFILE_SPEC. */
++
++#undef	ENDFILE_SPEC
++#if 0
++/* The following will become appropriate when we do shared linking
++   and/or PIE, but at that point we will need to arrange to get the
++   appropriate variants of crtbegin/crtend constructed. */
++#define ENDFILE_SPEC \
++  "%{shared|pie:crtendS.o%s;:crtend.o%s} crtn.o%s"
++#else
++#define ENDFILE_SPEC \
++  "crtend.o%s crtn.o%s"
++#endif
++
++#undef	LIB_SPEC
++#define LIB_SPEC \
++  "%{pthread:-lpthread} \
++   %{small-space:-lcapros-small;:-lcapros-large} \
++   %{shared:-lc} \
++   %{!shared:%{mieee-fp:-lieee} %{profile:-lc_p}%{!profile:-lc}} \
++   -lc-capros"
++
++#if defined(HAVE_LD_EH_FRAME_HDR)
++#define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
++#endif
++
++#define TARGET_C99_FUNCTIONS 1
+diff -ruN baseline-gcc-3.4.6/gcc/config/coyotos.h gcc-3.4.6/gcc/config/coyotos.h
+--- baseline-gcc-3.4.6/gcc/config/coyotos.h	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/coyotos.h	2007-08-05 15:30:09.000000000 -0400
+@@ -0,0 +1,87 @@
++/* Configuration common to all targets running Coyotos. 
++   Copyright (C) 2007, The EROS Group LLC.
++
++This file is part of GCC.
++
++GCC is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2, or (at your option)
++any later version.
++
++GCC is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with GCC; see the file COPYING.  If not, write to
++the Free Software Foundation, 59 Temple Place - Suite 330,
++Boston, MA 02111-1307, USA.  */
++
++/* Specify predefined symbols in preprocessor.  */
++
++#ifndef TARGET_SUB_OS_CPP_BUILTINS
++#define TARGET_SUB_OS_CPP_BUILTINS()
++#endif
++
++/* Some genious predefined this for m68k builds... */
++#ifdef TARGET_OS_CPP_BUILTINS
++#undef TARGET_OS_CPP_BUILTINS
++#endif
++
++#define TARGET_OS_CPP_BUILTINS()		\
++  do						\
++    {						\
++	builtin_define ("__coyotos__");		\
++	builtin_assert ("system=coyotos");	\
++	TARGET_SUB_OS_CPP_BUILTINS();		\
++    }						\
++  while (0)
++
++/* Provide a STARTFILE_SPEC appropriate for Coyotos. We use
++   crtbegin/crtend bracketing (see crtstuff.c) to get C++ static
++   construction and destruction to happen. We use crti to handle the
++   init section logic. We use crt1 to provide _start and crtn to
++   provide _end. */
++#undef STARTFILE_SPEC
++#if 0
++/* The following will become appropriate when we do shared linking
++   and/or PIE, but at that point we will need to arrange to get the
++   appropriate variants of crtbegin/crtend constructed. */
++#define STARTFILE_SPEC			   \
++  "%{!shared: %{pg|p|profile:gcrt1.o%s;:crt1.o%s}} \
++   crti.o%s %{static:crtbeginT.o%s;shared|pie:crtbeginS.o%s;:crtbegin.o%s}"
++#else
++#define STARTFILE_SPEC \
++  "%{!shared: %{pg|p|profile:gcrt1.o%s;:crt1.o%s}} \
++   crti.o%s crtbegin.o%s"
++#endif
++
++/* Provide a ENDFILE_SPEC appropriate for Coyotos. See comment above
++   for STARTFILE_SPEC. */
++
++#undef	ENDFILE_SPEC
++#if 0
++/* The following will become appropriate when we do shared linking
++   and/or PIE, but at that point we will need to arrange to get the
++   appropriate variants of crtbegin/crtend constructed. */
++#define ENDFILE_SPEC \
++  "%{shared|pie:crtendS.o%s;:crtend.o%s} crtn.o%s"
++#else
++#define ENDFILE_SPEC \
++  "crtend.o%s crtn.o%s"
++#endif
++
++#undef	LIB_SPEC
++#define LIB_SPEC \
++  "%{pthread:-lpthread} \
++   %{small-space:-lcoyotos-small;:-lcoyotos-large} \
++   %{shared:-lc} \
++   %{!shared:%{mieee-fp:-lieee} %{profile:-lc_p}%{!profile:-lc}} \
++   -lc-coyotos"
++
++#if defined(HAVE_LD_EH_FRAME_HDR)
++#define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
++#endif
++
++#define TARGET_C99_FUNCTIONS 1
+diff -ruN baseline-gcc-3.4.6/gcc/config/i386/capros.h gcc-3.4.6/gcc/config/i386/capros.h
+--- baseline-gcc-3.4.6/gcc/config/i386/capros.h	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/i386/capros.h	2007-08-05 15:35:29.000000000 -0400
+@@ -0,0 +1,30 @@
++/* Definitions for Intel 386 running CapROS-based systems with ELF format.
++   Copyright (C) 2007, The EROS Group LLC.
++
++This file is part of GCC.
++
++GCC is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2, or (at your option)
++any later version.
++
++GCC is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with GCC; see the file COPYING.  If not, write to
++the Free Software Foundation, 59 Temple Place - Suite 330,
++Boston, MA 02111-1307, USA.  */
++
++/* Provide a LINK_SPEC appropriate for Coyotos or CapROS.  Here we
++   provide support for the Coyotos option --small-space, which places
++   things in low(er) memory.  */
++
++/* If ELF is the default format, we should not use /lib/elf.  */
++
++#undef	LINK_SPEC
++#define LINK_SPEC "%{small-space:-m elf_i386_coyotos_small} \
++  %{static:-static}"
++
+diff -ruN baseline-gcc-3.4.6/gcc/config/i386/coyotos.h gcc-3.4.6/gcc/config/i386/coyotos.h
+--- baseline-gcc-3.4.6/gcc/config/i386/coyotos.h	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/i386/coyotos.h	2007-08-05 15:35:21.000000000 -0400
+@@ -0,0 +1,30 @@
++/* Definitions for Intel 386 running Coyotos-based systems with ELF format.
++   Copyright (C) 2007, The EROS Group LLC.
++
++This file is part of GCC.
++
++GCC is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2, or (at your option)
++any later version.
++
++GCC is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with GCC; see the file COPYING.  If not, write to
++the Free Software Foundation, 59 Temple Place - Suite 330,
++Boston, MA 02111-1307, USA.  */
++
++/* Provide a LINK_SPEC appropriate for Coyotos or CapROS.  Here we
++   provide support for the Coyotos option --small-space, which places
++   things in low(er) memory.  */
++
++/* If ELF is the default format, we should not use /lib/elf.  */
++
++#undef	LINK_SPEC
++#define LINK_SPEC "%{small-space:-m elf_i386_coyotos_small} \
++  %{static:-static}"
++
+diff -ruN baseline-gcc-3.4.6/gcc/config/i386/t-capros64 gcc-3.4.6/gcc/config/i386/t-capros64
+--- baseline-gcc-3.4.6/gcc/config/i386/t-capros64	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/i386/t-capros64	2007-08-05 14:36:19.000000000 -0400
+@@ -0,0 +1,20 @@
++# On x86-64 we do not need any exports for glibc for 64-bit libgcc_s,
++# override the settings
++# from t-slibgcc-elf-ver and t-linux
++SHLIB_MAPFILES = $(srcdir)/libgcc-std.ver \
++		 $(srcdir)/config/i386/libgcc-x86_64-glibc.ver
++
++MULTILIB_OPTIONS = m64/m32
++MULTILIB_DIRNAMES = 64 32 
++MULTILIB_OSDIRNAMES = ../lib64 ../lib
++
++LIBGCC = stmp-multilib
++INSTALL_LIBGCC = install-multilib
++
++EXTRA_MULTILIB_PARTS=crtbegin.o crtend.o # crtbeginS.o crtendS.o crtbeginT.o
++
++# The pushl in CTOR initialization interferes with frame pointer elimination.
++# crtend*.o cannot be compiled without -fno-asynchronous-unwind-tables,
++# because then __FRAME_END__ might not be the last thing in .eh_frame
++# section.
++CRTSTUFF_T_CFLAGS = -fno-omit-frame-pointer -fno-asynchronous-unwind-tables
+diff -ruN baseline-gcc-3.4.6/gcc/config/i386/t-coyotos64 gcc-3.4.6/gcc/config/i386/t-coyotos64
+--- baseline-gcc-3.4.6/gcc/config/i386/t-coyotos64	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/i386/t-coyotos64	2007-08-05 14:36:19.000000000 -0400
+@@ -0,0 +1,20 @@
++# On x86-64 we do not need any exports for glibc for 64-bit libgcc_s,
++# override the settings
++# from t-slibgcc-elf-ver and t-linux
++SHLIB_MAPFILES = $(srcdir)/libgcc-std.ver \
++		 $(srcdir)/config/i386/libgcc-x86_64-glibc.ver
++
++MULTILIB_OPTIONS = m64/m32
++MULTILIB_DIRNAMES = 64 32 
++MULTILIB_OSDIRNAMES = ../lib64 ../lib
++
++LIBGCC = stmp-multilib
++INSTALL_LIBGCC = install-multilib
++
++EXTRA_MULTILIB_PARTS=crtbegin.o crtend.o # crtbeginS.o crtendS.o crtbeginT.o
++
++# The pushl in CTOR initialization interferes with frame pointer elimination.
++# crtend*.o cannot be compiled without -fno-asynchronous-unwind-tables,
++# because then __FRAME_END__ might not be the last thing in .eh_frame
++# section.
++CRTSTUFF_T_CFLAGS = -fno-omit-frame-pointer -fno-asynchronous-unwind-tables
+diff -ruN baseline-gcc-3.4.6/gcc/config/m68k/capros.h gcc-3.4.6/gcc/config/m68k/capros.h
+--- baseline-gcc-3.4.6/gcc/config/m68k/capros.h	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/m68k/capros.h	2007-08-05 15:38:18.000000000 -0400
+@@ -0,0 +1,30 @@
++/* Definitions for Motorolla 68k running CapROS-based systems with ELF format.
++   Copyright (C) 2007, The EROS Group LLC.
++
++This file is part of GCC.
++
++GCC is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2, or (at your option)
++any later version.
++
++GCC is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with GCC; see the file COPYING.  If not, write to
++the Free Software Foundation, 59 Temple Place - Suite 330,
++Boston, MA 02111-1307, USA.  */
++
++/* Provide a LINK_SPEC appropriate for Coyotos or CapROS.  Here we
++   provide support for the Coyotos option --small-space, which places
++   things in low(er) memory.  */
++
++/* If ELF is the default format, we should not use /lib/elf.  */
++
++#undef	LINK_SPEC
++#define LINK_SPEC "%{small-space:-m m68kelf_coyotos_small} \
++  %{static:-static}"
++
+diff -ruN baseline-gcc-3.4.6/gcc/config/m68k/coyotos.h gcc-3.4.6/gcc/config/m68k/coyotos.h
+--- baseline-gcc-3.4.6/gcc/config/m68k/coyotos.h	1969-12-31 19:00:00.000000000 -0500
++++ gcc-3.4.6/gcc/config/m68k/coyotos.h	2007-08-05 15:38:10.000000000 -0400
+@@ -0,0 +1,30 @@
++/* Definitions for Motorolla 68k running Coyotos-based systems with ELF format.
++   Copyright (C) 2007, The EROS Group LLC.
++
++This file is part of GCC.
++
++GCC is free software; you can redistribute it and/or modify
++it under the terms of the GNU General Public License as published by
++the Free Software Foundation; either version 2, or (at your option)
++any later version.
++
++GCC is distributed in the hope that it will be useful,
++but WITHOUT ANY WARRANTY; without even the implied warranty of
++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++GNU General Public License for more details.
++
++You should have received a copy of the GNU General Public License
++along with GCC; see the file COPYING.  If not, write to
++the Free Software Foundation, 59 Temple Place - Suite 330,
++Boston, MA 02111-1307, USA.  */
++
++/* Provide a LINK_SPEC appropriate for Coyotos or CapROS.  Here we
++   provide support for the Coyotos option --small-space, which places
++   things in low(er) memory.  */
++
++/* If ELF is the default format, we should not use /lib/elf.  */
++
++#undef	LINK_SPEC
++#define LINK_SPEC "%{small-space:-m m68kelf_coyotos_small} \
++  %{static:-static}"
++
+diff -ruN baseline-gcc-3.4.6/gcc/config.build gcc-3.4.6/gcc/config.build
+--- baseline-gcc-3.4.6/gcc/config.build	2003-10-01 19:51:10.000000000 -0400
++++ gcc-3.4.6/gcc/config.build	2007-08-05 14:36:19.000000000 -0400
+@@ -89,6 +89,10 @@
+     # 80386 running SCO Open Server 5
+     build_install_headers_dir=install-headers-cpio
+     ;;
++  i[34567]86-*-coyotos* | i[34567]86-*-capros*) 
++    # 80386 running Coyotos
++    build_install_headers_dir=install-headers-cpio
++    ;;
+   i[34567]86-sequent-ptx4* | i[34567]86-sequent-sysv4* )
+     build_xm_defines="SMALL_ARG_MAX"
+     build_install_headers_dir=install-headers-cpio
+diff -ruN baseline-gcc-3.4.6/gcc/config.gcc gcc-3.4.6/gcc/config.gcc
+--- baseline-gcc-3.4.6/gcc/config.gcc	2005-07-19 17:08:48.000000000 -0400
++++ gcc-3.4.6/gcc/config.gcc	2007-08-05 15:20:59.000000000 -0400
+@@ -916,6 +916,50 @@
+ 	tmake_file="t-slibgcc-elf-ver t-linux"
+ 	# broken_install=yes
+ 	;;
++arm*-*-capros*)
++	tm_file="dbxelf.h elfos.h arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/capros.h capros.h"
++	tmake_file=arm/t-arm-elf
++	use_fixproto=yes
++	;;
++arm*-*-coyotos*)
++	tm_file="dbxelf.h elfos.h arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/coyotos.h coyotos.h"
++	tmake_file=arm/t-arm-elf
++	use_fixproto=yes
++	;;
++i[34567]86-*-capros*)
++	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h i386/i386elf.h i386/capros.h capros.h"
++	extra_parts="crti.o crtn.o"
++	tmake_file="i386/t-i386elf t-svr4"
++	use_fixproto=yes
++	;;
++i[34567]86-*-coyotos*)
++	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h i386/i386elf.h i386/coyotos.h coyotos.h"
++	extra_parts="crti.o crtn.o"
++	tmake_file="i386/t-i386elf t-svr4"
++	use_fixproto=yes
++	;;
++m68k-*-capros*)
++	tm_file="m68k/m68k.h m68k/m68k-none.h m68k/m68kelf.h dbxelf.h elfos.h m68k/m68020-elf.h m68k/capros.h capros.h"
++	tmake_file=m68k/t-m68kelf
++	tm_defines="MOTOROLA USE_GAS"
++	use_fixproto=yes
++	;;
++m68k-*-coyotos*)
++	tm_file="m68k/m68k.h m68k/m68k-none.h m68k/m68kelf.h dbxelf.h elfos.h m68k/m68020-elf.h m68k/coyotos.h coyotos.h"
++	tmake_file=m68k/t-m68kelf
++	tm_defines="MOTOROLA USE_GAS"
++	use_fixproto=yes
++	;;
++x86_64-*-capros*)
++	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h i386/x86_64.h capros.h"
++	tmake_file="${tmake_file} i386/t-capros64"
++	use_fixproto=yes
++	;;
++x86_64-*-coyotos*)
++	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h i386/x86_64.h coyotos.h"
++	tmake_file="${tmake_file} i386/t-coyotos64"
++	use_fixproto=yes
++	;;
+ i[34567]86-*-darwin*)
+ 	tm_file="${tm_file} i386/darwin.h"
+ 	;;

@@ -1,0 +1,85 @@
+##################################################################
+# NOTE: RPM really wasn't designed for cross builds.
+#
+# We don't want to use --target, because the output binaries
+# are supposed to get installed on the build host. Therefore,
+# I am exploiting a macro hack. This RPM is designed to be run
+# with a command line like:
+#
+#    rpmbuild --define "crossarch i386"
+#
+# If the define is not provided, the build will default to
+# target i386.
+#
+# NOTE: Building this requires that a suitable pre-gcc has 
+# been installed in the target build environment! The current
+# build process relies on this being done BY HAND
+##################################################################
+
+%bcond_with gcc4
+
+%define GCCMAJOR %{?with_gcc4:gcc4}%{!?with_gcc4:gcc3}
+%define CROSSARCH i386
+%define CROSSOS coyotos
+%define CROSSOSNAME Coyotos
+
+%define CROSSTARGET %{CROSSARCH}-unknown-%{CROSSOS}
+%define CROSSROOT /%{CROSSOS}
+%define CROSSHOSTROOT %{CROSSROOT}/host
+%define CROSSSYSROOT %{CROSSROOT}/sysroot-%{CROSSARCH}
+
+Summary: The %{CROSSOSNAME} C Runtime Files
+Name: %{CROSSOS}-%{CROSSARCH}-crtfiles
+Version: 0.1.0
+Release: 4%{?dist}
+License: LGPL with exceptions
+Group: Development/Tools
+URL: http://www.coyotos.org
+Source: crtfiles-%{version}.tar.bz2
+Buildroot: %{_tmppath}/%{CROSSOS}-crtfiles-root
+BuildRequires: %{CROSSOS}-%{CROSSARCH}-binutils
+BuildRequires: %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-gcc
+
+
+%description
+This package installs the low-level runtime files crt1.o, crti.o, and crtn.o
+for %{CROSSOSNAME}.
+
+%prep
+%setup -q -n crtfiles-%{version}
+
+%build
+rm -rf ../build-crtfiles-%{CROSSARCH}
+mkdir ../build-crtfiles-%{CROSSARCH}
+
+(cd ../build-crtfiles-%{CROSSARCH}; \
+  PATH=%{CROSSHOSTROOT}/bin:${PATH} ../crtfiles-%{version}/configure \
+	--prefix=%{CROSSHOSTROOT} \
+	--with-sysroot=%{CROSSSYSROOT} \
+	--host=%{CROSSTARGET} \
+	--target=%{CROSSTARGET})
+
+PATH=%{CROSSHOSTROOT}/bin:$PATH make -C ../build-crtfiles-%{CROSSARCH} all
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}%{_prefix}
+
+#make install-gcc install-info
+PATH=%{CROSSHOSTROOT}/bin:$PATH make -C ../build-crtfiles-%{CROSSARCH} DESTDIR=%{buildroot} install
+
+%clean
+rm -rf %{buildroot}
+
+## Cross-build does not generate translations:
+#%files -n %{CROSSOS}-%{_arch}-binutils -f binutils.lang
+%files
+%defattr(-,root,root)
+%{CROSSSYSROOT}/usr/lib/crt1.o
+%{CROSSSYSROOT}/usr/lib/crti.o
+%{CROSSSYSROOT}/usr/lib/crtn.o
+
+
+%changelog
+* Sat Sep 26 2005 Jonathan Shapiro <shap@eros-os.org> 0.1.1-1
+- initial setup of spec file.

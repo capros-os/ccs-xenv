@@ -1,0 +1,104 @@
+Rebuilding these RPMs is a serious pain in the neck, because there is
+a circular dependency in the build. An explanation of what is going on
+follows, but the best way to accomplish the rebuild is by using the
+supplied makefile as follows:
+
+    make filesystem
+    # su and install coyotos-common-filesystem
+
+    make binutils
+    # su and install coyotos-common-binutils, coyotos-${COYARCH}-binutils
+
+    make pregcc
+    # su and install coyotos-${COYARCH}-gcc4
+
+    make newlib
+    # su and install coyotos-${COYARCH}-newlib,
+    # **deinstall* coyotos-${COYARCH}-gcc4
+
+    make gcc
+    # su and install coyotos-${COYARCH}-gcc4
+
+
+There are some tricks to all of this.
+
+PACKAGE NAMING:
+
+The naming convention for these packages is:
+
+    coyotos-COYARCH-PACKAGENAME-VER&REL.HOSTARCH.rpm
+
+where COYARCH is the Coyotos *target* architecture, PACKAGENAME is the
+package we are buildling, and HOSTARCH is the architecture of the host
+we are building for.
+
+There are also packages of the form:
+
+    coyotos-common-PACKAGENAME-VER&REL.HOSTARCH.rpm
+
+These packages contain things that are independent of target
+architecture, mainly including some documentation that we need not
+(and must not) install redundantly.
+
+There is a baseline package called
+
+    coyotos-common-filesystem-VER&REL.HOSTARCH.rpm
+
+Technically this doesn't need to be HOSTARCH dependent at all, but
+since this may conceivably change in the future I have left it as
+host architecture dependent. This package provides the basic file
+system layout for the Coyotos cross-development tree. More
+importantly, it arranges to cleanly deinstall everything when the last
+coyotos-related package is removed.
+
+ABOUT THE GCC BUILD
+
+If you look at the GCC SPEC file, you will see that it is designed to
+do something that RPM SPEC files are *never* supposed to do: it builds
+conditionally. Regrettably, this is the only way to get the gcc/newlib
+pair built.
+
+The problem is that newlib cannot be built without GCC, and the final
+version of GCC cannot be built without the header files that are
+installed by newlib. The recommended solution is to do an initial GCC
+build using the --without-headers option, install libc, and then
+rebuild GCC. This is what the current RPM build process does (and also
+the make-xenv.sh script in the directory above this one).
+
+However, it is VERY IMPORTANT to remember that you MUST run both
+passes at the GCC build, and that ONLY the --with-sysroot version (the
+second one) should be published into a RPM repository!
+
+
+ABOUT THE COMMON PACKAGES
+
+The coyotos-common-filesystem package is built in the customary RPM
+way. All of the other "common" packages are constructed using an
+egregious abuse of the package naming system. I am relying here on
+personal knowledge that these bits are, in fact, architecture
+neutral.
+
+It would be very very pleasant if we might somehow manage to build
+these common packages just once. Unfortunately, there is a problem
+with this: the respective configure scripts require that we state SOME
+intended target. This means that we cannot build this
+machine-independent package without taking a position on what target
+we are building for. In particular, we cannot do this using a NOARCH
+package.
+
+One way to deal with this would be to declare, somewhat arbitrarily,
+that the common stuff only gets generated when building for some
+particular target -- perhaps i386. This is probably the smart thing to
+do, but I was reluctant to take a position on which build target
+should be required, and some users may never care to target the
+i386.
+
+Another possibility, which I currently favor, is to add some sort of
+--with option to control this, and let the person building this stuff
+decide (arbitrarily) which target architecture should be "primary". I
+have yet to implement this.
+
+The current strategy is to rely on the fact that since this stuff is
+all machine independent it really doesn't matter what target is built
+in what order. I remain nervous about the impact this will have when
+running update repositories.

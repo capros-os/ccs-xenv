@@ -1,0 +1,72 @@
+##################################################################
+# NOTE: RPM really wasn't designed for cross builds.
+#
+# We don't want to use --target, because the output binaries
+# are supposed to get installed on the build host. Therefore,
+# I am exploiting a macro hack. This RPM is designed to be run
+# with a command line like:
+#
+#    rpmbuild --define "crossarch i386"
+#
+# If the define is not provided, the build will default to
+# target i386.
+#
+##################################################################
+
+%define CROSSARCH i386
+%define CROSSOS coyotos
+%define CROSSOSNAME Coyotos
+
+%define CROSSTARGET %{CROSSARCH}-unknown-%{CROSSOS}
+%define CROSSROOT /%{CROSSOS}
+%define CROSSHOSTROOT %{CROSSROOT}/host
+%define CROSSSYSROOT %{CROSSROOT}/sysroot-%{CROSSARCH}
+
+Summary: Directory structure for the %{CROSSOSNAME} cross tools
+Name: %{CROSSOS}-%{CROSSARCH}-filesystem
+Version: 0.1.1
+Release: 1%{?dist}
+License: Public Domain
+Group: System Environment/Base
+Buildroot: %{_tmppath}/%{name}-%{version}-root
+Requires: %{CROSSOS}-common-filesystem
+
+%description
+Basic target-specific filesystem layout for the %{CROSSOSNAME} cross environment.
+
+%prep
+
+%install
+# This entire exercise is completely unnecessary, but it at least serves
+# to give the %files section to do.
+rm -rf %{buildroot}
+mkdir %{buildroot}
+
+mkdir -p \
+	%{buildroot}%{CROSSSYSROOT} \
+	%{buildroot}%{CROSSSYSROOT}/usr \
+	%{buildroot}%{CROSSSYSROOT}/usr/lib \
+	%{buildroot}%{CROSSSYSROOT}/usr/include
+
+%clean
+rm -rf %{buildroot}
+
+%postun
+# The following test is obscurely documented. What happens here is
+# that this chunk of the post-uninstall script will only get run if
+# this is the *last* uninstall. It would be be Extremely Ungood(tm)
+# if this part of the script were to run after, say, an upgrade...
+if [ "$1" = 0 ] ; then
+  rm -rf %{CROSSSYSROOT}
+fi
+
+%files
+%defattr(0755,root,root)
+%dir %{CROSSSYSROOT}
+%dir %{CROSSSYSROOT}/usr
+%{CROSSSYSROOT}/usr/include
+%{CROSSSYSROOT}/usr/lib
+
+%changelog
+* Sat Oct  1 2005 Jonathan Shapiro <shap@eros-os.org> - 0.1.1-1
+- initial version

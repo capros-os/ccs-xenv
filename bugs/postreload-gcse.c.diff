@@ -1,0 +1,16 @@
+===================================================================
+RCS file: /cvs/gcc/gcc/gcc/postreload-gcse.c,v
+retrieving revision 2.9
+retrieving revision 2.9.10.1
+diff -u -r2.9 -r2.9.10.1
+--- gcc/gcc/postreload-gcse.c	2005/01/18 11:36:16	2.9
++++ gcc/gcc/postreload-gcse.c	2005/09/22 15:57:49	2.9.10.1
+@@ -1072,7 +1072,7 @@
+ 	  npred_ok++;
+ 	  ok_count += pred->count;
+ 	  occr = (struct unoccr *) obstack_alloc (&unoccr_obstack,
+-						  sizeof (struct occr));
++						  sizeof (struct unoccr));
+ 	  occr->insn = avail_insn;
+ 	  occr->pred = pred;
+ 	  occr->next = avail_occrs;

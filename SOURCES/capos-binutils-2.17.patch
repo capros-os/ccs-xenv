@@ -1,0 +1,568 @@
+diff -ruN baseline-binutils-2.17/bfd/config.bfd binutils-2.17/bfd/config.bfd
+--- baseline-binutils-2.17/bfd/config.bfd	2006-04-05 08:41:57.000000000 -0400
++++ binutils-2.17/bfd/config.bfd	2007-08-07 15:45:59.000000000 -0400
+@@ -452,6 +452,21 @@
+     targ_defvec=bfd_elf32_i386_vec
+     targ_selvecs=i386coff_vec
+     ;;
++  arm-*-coyotos* | arm-*-capros*)
++    targ_defvec=bfd_elf32_bigarm_vec
++    targ_selvecs=bfd_elf32_littlearm_vec
++    ;;
++  i[3-7]86-*-coyotos* | i[3-7]86-*-capros*)
++    targ_defvec=bfd_elf32_i386_vec
++    ;;
++  m68k-*-coyotos* | m68k-*-capros*)
++    targ_defvec=bfd_elf32_m68k_vec
++    targ_selvecs="ieee_vec"
++    ;;
++  x86_64-*-coyotos* | x86_64-*-capros*)
++    targ_defvec=bfd_elf64_x86_64_vec
++    targ_selvecs="bfd_elf32_i386_vec"
++    ;;
+   i[3-7]86-*-solaris2*)
+     targ_defvec=bfd_elf32_i386_vec
+     targ_selvecs=i386coff_vec
+diff -ruN baseline-binutils-2.17/bfd/po/Make-in binutils-2.17/bfd/po/Make-in
+--- baseline-binutils-2.17/bfd/po/Make-in	2006-06-12 09:05:03.000000000 -0400
++++ binutils-2.17/bfd/po/Make-in	2007-08-07 15:45:59.000000000 -0400
+@@ -19,10 +19,10 @@
+ 
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+-datadir = $(prefix)/@DATADIRNAME@
++datadir = @datadir@
+ localedir = $(datadir)/locale
+-gnulocaledir = $(prefix)/share/locale
+-gettextsrcdir = $(prefix)/share/gettext/po
++gnulocaledir = $(datadir)/locale
++gettextsrcdir = $(datadir)/gettext/po
+ subdir = po
+ 
+ DESTDIR =
+diff -ruN baseline-binutils-2.17/binutils/po/Make-in binutils-2.17/binutils/po/Make-in
+--- baseline-binutils-2.17/binutils/po/Make-in	2006-06-12 09:05:03.000000000 -0400
++++ binutils-2.17/binutils/po/Make-in	2007-08-07 15:45:59.000000000 -0400
+@@ -19,10 +19,10 @@
+ 
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+-datadir = $(prefix)/@DATADIRNAME@
++datadir = @datadir@
+ localedir = $(datadir)/locale
+-gnulocaledir = $(prefix)/share/locale
+-gettextsrcdir = $(prefix)/share/gettext/po
++gnulocaledir = $(datadir)/locale
++gettextsrcdir = $(datadir)/gettext/po
+ subdir = po
+ 
+ DESTDIR =
+diff -ruN baseline-binutils-2.17/config.sub binutils-2.17/config.sub
+--- baseline-binutils-2.17/config.sub	2006-01-16 12:34:37.000000000 -0500
++++ binutils-2.17/config.sub	2007-08-07 15:45:59.000000000 -0400
+@@ -3,7 +3,7 @@
+ #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+ #   2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+ 
+-timestamp='2006-01-02'
++timestamp='2007-02-28'
+ 
+ # This file is (in principle) common to ALL GNU software.
+ # The presence of a machine in this file suggests that SOME GNU software
+@@ -1218,6 +1218,8 @@
+ 	      | -skyos* | -haiku* | -rdos*)
+ 	# Remember, each alternative MUST END IN *, to match a version number.
+ 		;;
++	-coyotos* | -capros*)
++		;;
+ 	-qnx*)
+ 		case $basic_machine in
+ 		    x86-* | i*86-*)
+diff -ruN baseline-binutils-2.17/gas/configure.tgt binutils-2.17/gas/configure.tgt
+--- baseline-binutils-2.17/gas/configure.tgt	2006-04-05 08:41:57.000000000 -0400
++++ binutils-2.17/gas/configure.tgt	2007-08-07 15:45:59.000000000 -0400
+@@ -100,6 +100,7 @@
+ 
+   arm-*-aout)				fmt=aout ;;
+   arm-*-coff | thumb-*-coff)		fmt=coff ;;
++  arm-*-coyotos* | arm-*-capros*)	fmt=elf ;;
+   arm-*-rtems* | thumb-*-rtems*)	fmt=elf ;;
+   arm-*-elf | thumb-*-elf)		fmt=elf ;;
+   arm-*-eabi*)				fmt=elf em=armeabi ;;
+@@ -165,6 +166,7 @@
+   i386-*-beospe*)			fmt=coff em=pe ;;
+   i386-*-beos*)				fmt=elf ;;
+   i386-*-coff)				fmt=coff ;;
++  i386-*-coyotos* | i386-*-capros*)	fmt=elf ;;
+   i386-*-elf)				fmt=elf ;;
+   i386-*-kaos*)				fmt=elf ;;
+   i386-*-bsd*)				fmt=aout em=386bsd ;;
+@@ -237,6 +239,7 @@
+   m68hc11-*-* | m6811-*-*)		fmt=elf ;;
+   m68hc12-*-* | m6812-*-*)		fmt=elf ;;
+ 
++  m68k-*-coyotos* | m68k-*-capros*)	fmt=elf ;;
+   m68k-*-elf*)				fmt=elf ;;
+   m68k-*-sysv4*)			fmt=elf em=svr4 ;;
+   m68k-*-rtems*)			fmt=elf ;;
+diff -ruN baseline-binutils-2.17/gas/po/Make-in binutils-2.17/gas/po/Make-in
+--- baseline-binutils-2.17/gas/po/Make-in	2006-06-12 09:05:03.000000000 -0400
++++ binutils-2.17/gas/po/Make-in	2007-08-07 15:45:59.000000000 -0400
+@@ -19,10 +19,10 @@
+ 
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+-datadir = $(prefix)/@DATADIRNAME@
++datadir = @datadir@
+ localedir = $(datadir)/locale
+-gnulocaledir = $(prefix)/share/locale
+-gettextsrcdir = $(prefix)/share/gettext/po
++gnulocaledir = $(datadir)/locale
++gettextsrcdir = $(datadir)/gettext/po
+ subdir = po
+ 
+ DESTDIR =
+diff -ruN baseline-binutils-2.17/gprof/po/Make-in binutils-2.17/gprof/po/Make-in
+--- baseline-binutils-2.17/gprof/po/Make-in	2006-06-12 09:05:04.000000000 -0400
++++ binutils-2.17/gprof/po/Make-in	2007-08-07 15:45:59.000000000 -0400
+@@ -19,10 +19,10 @@
+ 
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+-datadir = $(prefix)/@DATADIRNAME@
++datadir = @datadir@
+ localedir = $(datadir)/locale
+-gnulocaledir = $(prefix)/share/locale
+-gettextsrcdir = $(prefix)/share/gettext/po
++gnulocaledir = $(datadir)/locale
++gettextsrcdir = $(datadir)/gettext/po
+ subdir = po
+ 
+ DESTDIR =
+diff -ruN baseline-binutils-2.17/ld/configure.tgt binutils-2.17/ld/configure.tgt
+--- baseline-binutils-2.17/ld/configure.tgt	2006-04-05 08:41:57.000000000 -0400
++++ binutils-2.17/ld/configure.tgt	2007-08-07 15:45:59.000000000 -0400
+@@ -41,6 +41,10 @@
+ arm-*-pe)		targ_emul=armpe ; targ_extra_ofiles="deffilep.o pe-dll.o" ;;
+ arm-*-aout | armel-*-aout) targ_emul=armaoutl ;;
+ armeb-*-aout)		targ_emul=armaoutb ;;
++arm-*-coyotos* | arm-*-capros*)
++	       		targ_emul=armelf_coyotos
++			targ_extra_emuls="armelf_coyotos_small"
++			;;
+ arm-*-coff)		targ_emul=armcoff ;;
+ arm-*-freebsd* | arm-*-kfreebsd*-gnu)
+ 	       		targ_emul=armelf_fbsd
+@@ -155,6 +159,11 @@
+ 			  targ_extra_emuls="$targ_extra_emuls elf_x86_64"
+ 			fi
+ 			tdir_i386linux=${targ_alias}aout ;;
++x86_64-*-coyotos* | x86_64-*-capros*)
++			targ_emul=elf_x86_64
++			targ_extra_emuls="elf_i386"
++			tdir_elf_i386=`echo ${targ_alias} | sed -e 's/x86_64/i386/'`
++			;;
+ x86_64-*-linux-*)	targ_emul=elf_x86_64
+ 			targ_extra_emuls="elf_i386 i386linux"
+ 			targ_extra_libpath=elf_i386
+@@ -187,6 +196,10 @@
+ 				        sed -e 's/netbsd/netbsdelf/'`;;
+ 			esac ;;
+ i[3-7]86-*-netware)	targ_emul=i386nw ;;
++i[3-7]86-*-coyotos* | i[3-7]86-*-capros*)
++			targ_emul=elf_i386_coyotos
++			targ_extra_emuls=elf_i386_coyotos_small
++			;;
+ i[3-7]86-*-elf*)	targ_emul=elf_i386 ;;
+ x86_64-*-elf*)		targ_emul=elf_x86_64
+ 			targ_extra_emuls=elf_i386
+@@ -268,6 +281,10 @@
+ m68*-motorola-sysv*)	targ_emul=delta68 ;;
+ m68*-*-aout)		targ_emul=m68kaout ;;
+ m68*-*-coff)		targ_emul=m68kcoff ;;
++m68k*-*-coyotos* | m68k-*-capros*)
++			targ_emul=m68kelf_coyotos
++			targ_extra_emuls="m68kelf_coyotos_small"
++			;;
+ m68*-*-elf)		targ_emul=m68kelf ;;
+ m68*-*-hpux*)		targ_emul=hp3hpux ;;
+ m68k-*-linux*aout*)	targ_emul=m68klinux
+diff -ruN baseline-binutils-2.17/ld/emulparams/armelf_coyotos.sh binutils-2.17/ld/emulparams/armelf_coyotos.sh
+--- baseline-binutils-2.17/ld/emulparams/armelf_coyotos.sh	1969-12-31 19:00:00.000000000 -0500
++++ binutils-2.17/ld/emulparams/armelf_coyotos.sh	2007-08-07 15:45:59.000000000 -0400
+@@ -0,0 +1,41 @@
++MACHINE=
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-littlearm"
++BIG_OUTPUT_FORMAT="elf32-bigarm"
++LITTLE_OUTPUT_FORMAT="elf32-littlearm"
++TEXT_START_ADDR=0x8000
++TEMPLATE_NAME=elf32
++EXTRA_EM_FILE=armelf
++OTHER_TEXT_SECTIONS='*(.glue_7t) *(.glue_7)'
++OTHER_BSS_SYMBOLS='__bss_start__ = .;'
++OTHER_BSS_END_SYMBOLS='_bss_end__ = . ; __bss_end__ = . ;'
++OTHER_END_SYMBOLS='__end__ = . ;'
++OTHER_SECTIONS='.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
++  .ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }'
++OTHER_READONLY_SECTIONS="
++  .ARM.extab ${RELOCATING-0} : { *(.ARM.extab${RELOCATING+* .gnu.linkonce.armextab.*}) }
++  ${RELOCATING+ __exidx_start = .; }
++  .ARM.exidx ${RELOCATING-0} : { *(.ARM.exidx${RELOCATING+* .gnu.linkonce.armexidx.*}) }
++  ${RELOCATING+ __exidx_end = .; }"
++
++DATA_START_SYMBOLS='PROVIDE(__data_start = .);';
++
++ARCH=arm
++MACHINE=
++MAXPAGESIZE=256
++ENTRY=_start
++EMBEDDED=yes
++
++# This sets the stack to the top of the simulator memory (2^19 bytes).
++STACK_ADDR=0x80000
++
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_SHLIB_SCRIPT=
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_PIE_SCRIPT=
++# ARM does not support .s* sections.
++NO_SMALL_DATA=yes
+diff -ruN baseline-binutils-2.17/ld/emulparams/armelf_coyotos_small.sh binutils-2.17/ld/emulparams/armelf_coyotos_small.sh
+--- baseline-binutils-2.17/ld/emulparams/armelf_coyotos_small.sh	1969-12-31 19:00:00.000000000 -0500
++++ binutils-2.17/ld/emulparams/armelf_coyotos_small.sh	2007-08-07 15:45:59.000000000 -0400
+@@ -0,0 +1,44 @@
++#Link rules variant for Coytos/EROS when compiling for small processes.
++MACHINE=
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-littlearm"
++BIG_OUTPUT_FORMAT="elf32-bigarm"
++LITTLE_OUTPUT_FORMAT="elf32-littlearm"
++TEXT_START_ADDR=0x2000
++NONPAGED_TEXT_START_ADDR=${TEXT_START_ADDR}
++TEMPLATE_NAME=elf32
++EXTRA_EM_FILE=armelf
++OTHER_TEXT_SECTIONS='*(.glue_7t) *(.glue_7)'
++OTHER_BSS_SYMBOLS='__bss_start__ = .;'
++OTHER_BSS_END_SYMBOLS='_bss_end__ = . ; __bss_end__ = . ;'
++OTHER_END_SYMBOLS='__end__ = . ;'
++OTHER_SECTIONS='.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
++  .ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }'
++OTHER_READONLY_SECTIONS="
++  .ARM.extab ${RELOCATING-0} : { *(.ARM.extab${RELOCATING+* .gnu.linkonce.armextab.*}) }
++  ${RELOCATING+ __exidx_start = .; }
++  .ARM.exidx ${RELOCATING-0} : { *(.ARM.exidx${RELOCATING+* .gnu.linkonce.armexidx.*}) }
++  ${RELOCATING+ __exidx_end = .; }"
++
++DATA_START_SYMBOLS='PROVIDE(__data_start = .);';
++
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_SHLIB_SCRIPT=
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_PIE_SCRIPT=
++
++ARCH=arm
++MACHINE=
++MAXPAGESIZE=256
++ENTRY=_start
++EMBEDDED=yes
++
++# This sets the stack to the top of the simulator memory (2^19 bytes).
++STACK_ADDR=0x80000
++
++# ARM does not support .s* sections.
++NO_SMALL_DATA=yes
+diff -ruN baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos.sh binutils-2.17/ld/emulparams/elf_i386_coyotos.sh
+--- baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos.sh	1969-12-31 19:00:00.000000000 -0500
++++ binutils-2.17/ld/emulparams/elf_i386_coyotos.sh	2007-08-07 15:46:59.000000000 -0400
+@@ -0,0 +1,27 @@
++#Link rules variant for Coytos/EROS. This should be the same as elf_i386,
++#except that start address is moved to 0x08000000 so that it will align
++# naturally at a page directory and GPT boundary.
++#
++# I have temporarily disabled PIE and SHLIB, because we aren't using those 
++# and I do not have them debugged.
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-i386"
++TEXT_START_ADDR=0x08000000
++MAXPAGESIZE=0x1000
++COMMONPAGESIZE=0x1000
++NONPAGED_TEXT_START_ADDR=0x08000000
++ARCH=i386
++MACHINE=
++NOP=0x90909090
++TEMPLATE_NAME=elf32
++DATA_START_SYMBOLS='PROVIDE(__data_start = .);'
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_SHLIB_SCRIPT=
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_PIE_SCRIPT=
++NO_SMALL_DATA=yes
++SEPARATE_GOTPLT=12
+diff -ruN baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh
+--- baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh	1969-12-31 19:00:00.000000000 -0500
++++ binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh	2007-08-07 15:47:04.000000000 -0400
+@@ -0,0 +1,22 @@
++#Link rules variant for Coytos/EROS when compiling for small processes.
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-i386"
++TEXT_START_ADDR=0x2000
++MAXPAGESIZE=0x1000
++COMMONPAGESIZE=0x1000
++NONPAGED_TEXT_START_ADDR=0x2000
++ARCH=i386
++MACHINE=
++NOP=0x90909090
++TEMPLATE_NAME=elf32
++DATA_START_SYMBOLS='PROVIDE(__data_start = .);'
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_SHLIB_SCRIPT=
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_PIE_SCRIPT=
++NO_SMALL_DATA=yes
++SEPARATE_GOTPLT=12
+diff -ruN baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos.sh binutils-2.17/ld/emulparams/m68kelf_coyotos.sh
+--- baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos.sh	1969-12-31 19:00:00.000000000 -0500
++++ binutils-2.17/ld/emulparams/m68kelf_coyotos.sh	2007-08-07 15:47:10.000000000 -0400
+@@ -0,0 +1,20 @@
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-m68k"
++TEXT_START_ADDR=0x80000000
++MAXPAGESIZE=0x2000
++NONPAGED_TEXT_START_ADDR=${TEXT_START_ADDR}
++ARCH=m68k
++MACHINE=
++NOP=0x4e754e75
++TEMPLATE_NAME=elf32
++EXTRA_EM_FILE=m68kelf
++DATA_START_SYMBOLS='PROVIDE(__data_start = .);'
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_SHLIB_SCRIPT=
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_PIE_SCRIPT=
++NO_SMALL_DATA=yes
+diff -ruN baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh
+--- baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh	1969-12-31 19:00:00.000000000 -0500
++++ binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh	2007-08-07 15:47:15.000000000 -0400
+@@ -0,0 +1,21 @@
++#Link rules variant for Coytos/EROS when compiling for small processes.
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-m68k"
++TEXT_START_ADDR=0x4000
++MAXPAGESIZE=0x2000
++NONPAGED_TEXT_START_ADDR=${TEXT_START_ADDR}
++ARCH=m68k
++MACHINE=
++NOP=0x4e754e75
++TEMPLATE_NAME=elf32
++EXTRA_EM_FILE=m68kelf
++DATA_START_SYMBOLS='PROVIDE(__data_start = .);'
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_SHLIB_SCRIPT=
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_PIE_SCRIPT=
++NO_SMALL_DATA=yes
+diff -ruN baseline-binutils-2.17/ld/Makefile.am binutils-2.17/ld/Makefile.am
+--- baseline-binutils-2.17/ld/Makefile.am	2006-06-03 00:45:50.000000000 -0400
++++ binutils-2.17/ld/Makefile.am	2007-08-07 15:45:59.000000000 -0400
+@@ -116,6 +116,8 @@
+ 	earmcoff.o \
+ 	earmelf.o \
+ 	earmelfb.o \
++	earmelf_coyotos.o \
++	earmelf_coyotos_small.o \
+ 	earmelf_fbsd.o \
+ 	earmelf_linux.o \
+ 	earmelf_linux_eabi.o \
+@@ -195,6 +197,8 @@
+ 	eelf_i386.o \
+ 	eelf_i386_be.o \
+ 	eelf_i386_chaos.o \
++	eelf_i386_coyotos.o \
++	eelf_i386_coyotos_small.o \
+ 	eelf_i386_fbsd.o \
+ 	eelf_i386_ldso.o \
+ 	eelf_i386_vxworks.o \
+@@ -255,6 +259,8 @@
+ 	em68kaux.o \
+ 	em68kcoff.o \
+ 	em68kelf.o \
++	em68kelf_coyotos.o \
++	em68kelf_coyotos_small.o \
+ 	em68kelfnbsd.o \
+ 	em68klinux.o \
+ 	em68knbsd.o \
+@@ -511,6 +517,14 @@
+   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/armelf.em \
+   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} armelf_fbsd "$(tdir_armelf_fbsd)"
++earmelf_coyotos.c: $(srcdir)/emulparams/armelf_coyotos.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/armelf.em \
++  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} armelf_coyotos "$(tdir_armelf_coyotos)"
++earmelf_coyotos_small.c: $(srcdir)/emulparams/armelf_coyotos_small.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/armelf.em \
++  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} armelf_coyotos_small "$(tdir_armelf_coyotos_small)"
+ earmelf_linux.c: $(srcdir)/emulparams/armelf_linux.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/armelf.em \
+   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+@@ -918,6 +932,12 @@
+ eelf_i386_chaos.c: $(srcdir)/emulparams/elf_i386_chaos.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf_chaos.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf_i386_chaos "$(tdir_elf_i386_chaos)"
++eelf_i386_coyotos.c: $(srcdir)/emulparams/elf_i386_coyotos.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf_i386_coyotos "$(tdir_elf_i386_coyotos)"
++eelf_i386_coyotos_small.c: $(srcdir)/emulparams/elf_i386_coyotos_small.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf_i386_coyotos_small "$(tdir_elf_i386_coyotos_small)"
+ eelf_i386_fbsd.c: $(srcdir)/emulparams/elf_i386_fbsd.sh \
+   $(srcdir)/emulparams/elf_i386.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+@@ -1107,6 +1127,14 @@
+   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
+   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} m68kelf "$(tdir_m68kelf)"
++em68kelf_coyotos.c: $(srcdir)/emulparams/m68kelf_coyotos.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
++  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} m68kelf_coyotos "$(tdir_m68kelf_coyotos)"
++em68kelf_coyotos_small.c: $(srcdir)/emulparams/m68kelf_coyotos_small.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
++  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} m68kelf_coyotos_small "$(tdir_m68kelf_coyotos_small)"
+ em68kelfnbsd.c: $(srcdir)/emulparams/m68kelfnbsd.sh \
+   $(srcdir)/emulparams/m68kelf.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
+diff -ruN baseline-binutils-2.17/ld/Makefile.in binutils-2.17/ld/Makefile.in
+--- baseline-binutils-2.17/ld/Makefile.in	2006-06-03 00:45:50.000000000 -0400
++++ binutils-2.17/ld/Makefile.in	2007-08-07 15:45:59.000000000 -0400
+@@ -340,6 +340,8 @@
+ 	earmcoff.o \
+ 	earmelf.o \
+ 	earmelfb.o \
++	earmelf_coyotos.o \
++	earmelf_coyotos_small.o \
+ 	earmelf_fbsd.o \
+ 	earmelf_linux.o \
+ 	earmelf_linux_eabi.o \
+@@ -419,6 +421,8 @@
+ 	eelf_i386.o \
+ 	eelf_i386_be.o \
+ 	eelf_i386_chaos.o \
++	eelf_i386_coyotos.o \
++	eelf_i386_coyotos_small.o \
+ 	eelf_i386_fbsd.o \
+ 	eelf_i386_ldso.o \
+ 	eelf_i386_vxworks.o \
+@@ -479,6 +483,8 @@
+ 	em68kaux.o \
+ 	em68kcoff.o \
+ 	em68kelf.o \
++	em68kelf_coyotos.o \
++	em68kelf_coyotos_small.o \
+ 	em68kelfnbsd.o \
+ 	em68klinux.o \
+ 	em68knbsd.o \
+@@ -1322,6 +1328,14 @@
+   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/armelf.em \
+   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} armelf_fbsd "$(tdir_armelf_fbsd)"
++earmelf_coyotos.c: $(srcdir)/emulparams/armelf_coyotos.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/armelf.em \
++  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} armelf_coyotos "$(tdir_armelf_coyotos)"
++earmelf_coyotos_small.c: $(srcdir)/emulparams/armelf_coyotos_small.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/armelf.em \
++  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} armelf_coyotos_small "$(tdir_armelf_coyotos_small)"
+ earmelf_linux.c: $(srcdir)/emulparams/armelf_linux.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/armelf.em \
+   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+@@ -1729,6 +1743,12 @@
+ eelf_i386_chaos.c: $(srcdir)/emulparams/elf_i386_chaos.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf_chaos.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf_i386_chaos "$(tdir_elf_i386_chaos)"
++eelf_i386_coyotos.c: $(srcdir)/emulparams/elf_i386_coyotos.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf_i386_coyotos "$(tdir_elf_i386_coyotos)"
++eelf_i386_coyotos_small.c: $(srcdir)/emulparams/elf_i386_coyotos_small.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} elf_i386_coyotos_small "$(tdir_elf_i386_coyotos_small)"
+ eelf_i386_fbsd.c: $(srcdir)/emulparams/elf_i386_fbsd.sh \
+   $(srcdir)/emulparams/elf_i386.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+@@ -1918,6 +1938,14 @@
+   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
+   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} m68kelf "$(tdir_m68kelf)"
++em68kelf_coyotos.c: $(srcdir)/emulparams/m68kelf_coyotos.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
++  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} m68kelf_coyotos "$(tdir_m68kelf_coyotos)"
++em68kelf_coyotos_small.c: $(srcdir)/emulparams/m68kelf_coyotos_small.sh \
++  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
++  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} m68kelf_coyotos_small "$(tdir_m68kelf_coyotos_small)"
+ em68kelfnbsd.c: $(srcdir)/emulparams/m68kelfnbsd.sh \
+   $(srcdir)/emulparams/m68kelf.sh \
+   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
+diff -ruN baseline-binutils-2.17/ld/po/Make-in binutils-2.17/ld/po/Make-in
+--- baseline-binutils-2.17/ld/po/Make-in	2006-06-12 09:05:04.000000000 -0400
++++ binutils-2.17/ld/po/Make-in	2007-08-07 15:45:59.000000000 -0400
+@@ -19,10 +19,10 @@
+ 
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+-datadir = $(prefix)/@DATADIRNAME@
++datadir = @datadir@
+ localedir = $(datadir)/locale
+-gnulocaledir = $(prefix)/share/locale
+-gettextsrcdir = $(prefix)/share/gettext/po
++gnulocaledir = $(datadir)/locale
++gettextsrcdir = $(datadir)/gettext/po
+ subdir = po
+ 
+ DESTDIR =
+diff -ruN baseline-binutils-2.17/opcodes/po/Make-in binutils-2.17/opcodes/po/Make-in
+--- baseline-binutils-2.17/opcodes/po/Make-in	2006-06-12 09:05:04.000000000 -0400
++++ binutils-2.17/opcodes/po/Make-in	2007-08-07 15:45:59.000000000 -0400
+@@ -19,10 +19,10 @@
+ 
+ prefix = @prefix@
+ exec_prefix = @exec_prefix@
+-datadir = $(prefix)/@DATADIRNAME@
++datadir = @datadir@
+ localedir = $(datadir)/locale
+-gnulocaledir = $(prefix)/share/locale
+-gettextsrcdir = $(prefix)/share/gettext/po
++gnulocaledir = $(datadir)/locale
++gettextsrcdir = $(datadir)/gettext/po
+ subdir = po
+ 
+ DESTDIR =

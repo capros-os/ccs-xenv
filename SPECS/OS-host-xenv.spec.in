@@ -1,0 +1,64 @@
+##################################################################
+# NOTE: RPM really wasn't designed for cross builds.
+#
+# We don't want to use --target, because the output binaries
+# are supposed to get installed on the build host. Therefore,
+# I am exploiting a macro hack. This RPM is designed to be run
+# with a command line like:
+#
+#    rpmbuild --define "crossarch i386"
+#
+# If the define is not provided, the build will default to
+# target i386.
+#
+# NOTE: Building this requires that a suitable pre-gcc has 
+# been installed in the target build environment! The current
+# build process relies on this being done BY HAND
+##################################################################
+
+%bcond_with gcc4
+
+%define CROSSOS coyotos
+%define CROSSOSNAME Coyotos
+
+Summary: The %{CROSSOSNAME} Cross Environment
+Name: %{CROSSOS}-host-xenv
+Version: 0.1.3
+Release: 2%{?dist}
+License: GPL
+Group: Development/Tools
+URL: http://www.coyotos.org
+Obsoletes: %{CROSSOS}-host-boehmgc
+
+# Other things that should be installed so that the compile will work:
+Requires: gc-devel transfig tetex-latex libicu-devel
+Requires: /usr/lib/libbfd.a
+# FC6 and later:
+Requires: texinfo-tex
+# Not really required, but VERY helpful:
+Requires: ccache
+# Really required:
+Requires: osdoc
+Requires: libsherpa
+Requires: astmaker
+
+%description
+This is a virtual package that exists purely to pull the rest of the
+host-side packages for %{CROSSOSNAME} when installed via YUM.
+
+%prep
+
+%build
+
+%install
+
+%clean
+
+## Cross-build does not generate translations:
+#%files -n %{CROSSOS}-%{_arch}-binutils -f binutils.lang
+%files
+%defattr(-,root,root)
+
+%changelog
+* Sun Apr 1 2006 Jonathan Shapiro <shap@eros-os.org> 0.1.1-1
+- initial setup of spec file.

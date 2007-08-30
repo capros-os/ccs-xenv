@@ -1,0 +1,414 @@
+Terminals which are not used
+
+   tk_Reserved
+   tk_NOT
+   tk_TRUE
+   tk_FALSE
+
+
+Grammar
+
+    0 $accept: start $end
+
+    1 start: stmt_seq
+
+    2 stmt_seq: statement
+    3         | stmt_seq statement
+
+    4 statement: tk_Ident '=' expr '\n'
+    5          | expr '\n'
+    6          | '\n'
+
+    7 expr: expr '+' expr
+    8     | expr '-' expr
+    9     | expr '*' expr
+   10     | expr '/' expr
+   11     | expr '%' expr
+   12     | '(' expr ')'
+   13     | '-' expr
+   14     | tk_Int
+   15     | tk_Ident
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'\n' (10) 4 5 6
+'%' (37) 11
+'(' (40) 12
+')' (41) 12
+'*' (42) 9
+'+' (43) 7
+'-' (45) 8 13
+'/' (47) 10
+'=' (61) 4
+error (256)
+tk_Reserved (258)
+tk_Ident (259) 4 15
+tk_Int (260) 14
+tk_NOT (261)
+tk_TRUE (262)
+tk_FALSE (263)
+
+
+Nonterminals, with rules where they appear
+
+$accept (18)
+    on left: 0
+start (19)
+    on left: 1, on right: 0
+stmt_seq (20)
+    on left: 2 3, on right: 1 3
+statement (21)
+    on left: 4 5 6, on right: 2 3
+expr (22)
+    on left: 7 8 9 10 11 12 13 14 15, on right: 4 5 7 8 9 10 11 12
+    13
+
+
+state 0
+
+    0 $accept: . start $end
+
+    tk_Ident  shift, and go to state 1
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '\n'      shift, and go to state 4
+    '-'       shift, and go to state 5
+
+    start      go to state 6
+    stmt_seq   go to state 7
+    statement  go to state 8
+    expr       go to state 9
+
+
+state 1
+
+    4 statement: tk_Ident . '=' expr '\n'
+   15 expr: tk_Ident .
+
+    '='  shift, and go to state 10
+
+    $default  reduce using rule 15 (expr)
+
+
+state 2
+
+   14 expr: tk_Int .
+
+    $default  reduce using rule 14 (expr)
+
+
+state 3
+
+   12 expr: '(' . expr ')'
+
+    tk_Ident  shift, and go to state 11
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '-'       shift, and go to state 5
+
+    expr  go to state 12
+
+
+state 4
+
+    6 statement: '\n' .
+
+    $default  reduce using rule 6 (statement)
+
+
+state 5
+
+   13 expr: '-' . expr
+
+    tk_Ident  shift, and go to state 11
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '-'       shift, and go to state 5
+
+    expr  go to state 13
+
+
+state 6
+
+    0 $accept: start . $end
+
+    $end  shift, and go to state 14
+
+
+state 7
+
+    1 start: stmt_seq .
+    3 stmt_seq: stmt_seq . statement
+
+    tk_Ident  shift, and go to state 1
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '\n'      shift, and go to state 4
+    '-'       shift, and go to state 5
+
+    $default  reduce using rule 1 (start)
+
+    statement  go to state 15
+    expr       go to state 9
+
+
+state 8
+
+    2 stmt_seq: statement .
+
+    $default  reduce using rule 2 (stmt_seq)
+
+
+state 9
+
+    5 statement: expr . '\n'
+    7 expr: expr . '+' expr
+    8     | expr . '-' expr
+    9     | expr . '*' expr
+   10     | expr . '/' expr
+   11     | expr . '%' expr
+
+    '\n'  shift, and go to state 16
+    '-'   shift, and go to state 17
+    '+'   shift, and go to state 18
+    '*'   shift, and go to state 19
+    '/'   shift, and go to state 20
+    '%'   shift, and go to state 21
+
+
+state 10
+
+    4 statement: tk_Ident '=' . expr '\n'
+
+    tk_Ident  shift, and go to state 11
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '-'       shift, and go to state 5
+
+    expr  go to state 22
+
+
+state 11
+
+   15 expr: tk_Ident .
+
+    $default  reduce using rule 15 (expr)
+
+
+state 12
+
+    7 expr: expr . '+' expr
+    8     | expr . '-' expr
+    9     | expr . '*' expr
+   10     | expr . '/' expr
+   11     | expr . '%' expr
+   12     | '(' expr . ')'
+
+    ')'  shift, and go to state 23
+    '-'  shift, and go to state 17
+    '+'  shift, and go to state 18
+    '*'  shift, and go to state 19
+    '/'  shift, and go to state 20
+    '%'  shift, and go to state 21
+
+
+state 13
+
+    7 expr: expr . '+' expr
+    8     | expr . '-' expr
+    9     | expr . '*' expr
+   10     | expr . '/' expr
+   11     | expr . '%' expr
+   13     | '-' expr .
+
+    '*'  shift, and go to state 19
+    '/'  shift, and go to state 20
+    '%'  shift, and go to state 21
+
+    $default  reduce using rule 13 (expr)
+
+
+state 14
+
+    0 $accept: start $end .
+
+    $default  accept
+
+
+state 15
+
+    3 stmt_seq: stmt_seq statement .
+
+    $default  reduce using rule 3 (stmt_seq)
+
+
+state 16
+
+    5 statement: expr '\n' .
+
+    $default  reduce using rule 5 (statement)
+
+
+state 17
+
+    8 expr: expr '-' . expr
+
+    tk_Ident  shift, and go to state 11
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '-'       shift, and go to state 5
+
+    expr  go to state 24
+
+
+state 18
+
+    7 expr: expr '+' . expr
+
+    tk_Ident  shift, and go to state 11
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '-'       shift, and go to state 5
+
+    expr  go to state 25
+
+
+state 19
+
+    9 expr: expr '*' . expr
+
+    tk_Ident  shift, and go to state 11
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '-'       shift, and go to state 5
+
+    expr  go to state 26
+
+
+state 20
+
+   10 expr: expr '/' . expr
+
+    tk_Ident  shift, and go to state 11
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '-'       shift, and go to state 5
+
+    expr  go to state 27
+
+
+state 21
+
+   11 expr: expr '%' . expr
+
+    tk_Ident  shift, and go to state 11
+    tk_Int    shift, and go to state 2
+    '('       shift, and go to state 3
+    '-'       shift, and go to state 5
+
+    expr  go to state 28
+
+
+state 22
+
+    4 statement: tk_Ident '=' expr . '\n'
+    7 expr: expr . '+' expr
+    8     | expr . '-' expr
+    9     | expr . '*' expr
+   10     | expr . '/' expr
+   11     | expr . '%' expr
+
+    '\n'  shift, and go to state 29
+    '-'   shift, and go to state 17
+    '+'   shift, and go to state 18
+    '*'   shift, and go to state 19
+    '/'   shift, and go to state 20
+    '%'   shift, and go to state 21
+
+
+state 23
+
+   12 expr: '(' expr ')' .
+
+    $default  reduce using rule 12 (expr)
+
+
+state 24
+
+    7 expr: expr . '+' expr
+    8     | expr . '-' expr
+    8     | expr '-' expr .
+    9     | expr . '*' expr
+   10     | expr . '/' expr
+   11     | expr . '%' expr
+
+    '*'  shift, and go to state 19
+    '/'  shift, and go to state 20
+    '%'  shift, and go to state 21
+
+    $default  reduce using rule 8 (expr)
+
+
+state 25
+
+    7 expr: expr . '+' expr
+    7     | expr '+' expr .
+    8     | expr . '-' expr
+    9     | expr . '*' expr
+   10     | expr . '/' expr
+   11     | expr . '%' expr
+
+    '*'  shift, and go to state 19
+    '/'  shift, and go to state 20
+    '%'  shift, and go to state 21
+
+    $default  reduce using rule 7 (expr)
+
+
+state 26
+
+    7 expr: expr . '+' expr
+    8     | expr . '-' expr
+    9     | expr . '*' expr
+    9     | expr '*' expr .
+   10     | expr . '/' expr
+   11     | expr . '%' expr
+
+    '%'  shift, and go to state 21
+
+    $default  reduce using rule 9 (expr)
+
+
+state 27
+
+    7 expr: expr . '+' expr
+    8     | expr . '-' expr
+    9     | expr . '*' expr
+   10     | expr . '/' expr
+   10     | expr '/' expr .
+   11     | expr . '%' expr
+
+    '%'  shift, and go to state 21
+
+    $default  reduce using rule 10 (expr)
+
+
+state 28
+
+    7 expr: expr . '+' expr
+    8     | expr . '-' expr
+    9     | expr . '*' expr
+   10     | expr . '/' expr
+   11     | expr . '%' expr
+   11     | expr '%' expr .
+
+    $default  reduce using rule 11 (expr)
+
+
+state 29
+
+    4 statement: tk_Ident '=' expr '\n' .
+
+    $default  reduce using rule 4 (statement)

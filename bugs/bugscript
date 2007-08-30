@@ -1,0 +1,25 @@
+mkdir BUGHUNT
+mkdir BUGHUNT/build-binutils-m68k
+mkdir BUGHUNT/build-gcc-m68k
+
+(cd BUGHUNT; tar xjf ../SOURCES/binutils-2.16.1.tar.bz2)
+(cd BUGHUNT; tar xjf ../SOURCES/gcc-core-4.0.2.tar.bz2)
+
+# Unpack binutils-2.16.1
+# make an empty directory, configure as
+cd BUGHUNT/build-binutils-m68k
+
+../binutils-2.16.1/configure --prefix=/usr/local/m68k-elf --target m68k-elf
+
+# Build binutils as follows:
+make tooldir=/usr/local/m68k-elf all
+make install
+
+#
+
+cd ../build-gcc-m68k
+../gcc-4.0.1/configure --prefix=/usr/local/m68k-elf --without-headers --with-newlib --disable-libmudflap --enable-languages=c --target m68k-elf
+# build with:
+PATH=/usr/local/m68k-elf/bin:${PATH} make gcc_tooldir=/usr/local/m68k-elf/bin all-gcc
+PATH=/usr/local/m68k-elf/bin:${PATH} make gcc_tooldir=/usr/local/m68k-elf/bin install-gcc
+

@@ -1,0 +1,98 @@
+dnl Copyright (c) 2006, The EROS Group, LLC.
+dnl All rights reserved.
+dnl 
+dnl This software was developed to support the EROS secure operating
+dnl system project (http://www.eros-os.org). The latest version of
+dnl the OpenCM software can be found at http://www.opencm.org.
+dnl 
+dnl Redistribution and use in source and binary forms, with or
+dnl without modification, are permitted provided that the following
+dnl conditions are met:
+dnl 
+dnl 1. Redistributions of source code must retain the above copyright
+dnl    notice, this list of conditions and the following disclaimer.
+dnl 
+dnl 2. Redistributions in binary form must reproduce the above
+dnl    copyright notice, this list of conditions and the following
+dnl    disclaimer in the documentation and/or other materials
+dnl    provided with the distribution.
+dnl 
+dnl 3. Neither the name of the The EROS Group, LLC nor the name of
+dnl    Johns Hopkins University, nor the names of its contributors
+dnl    may be used to endorse or promote products derived from this
+dnl    software without specific prior written permission.
+dnl 
+dnl THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+dnl CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+dnl INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+dnl MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+dnl DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+dnl BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+dnl EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+dnl TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+dnl DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+dnl ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+dnl OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+dnl OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+dnl POSSIBILITY OF SUCH DAMAGE.
+
+AC_PREREQ(2.13)dnl
+AC_INIT(src/libsherpa/xfopen.cxx)
+AC_CONFIG_HEADER(config.h)
+
+AC_CANONICAL_HOST
+
+dnl Put libsherpa version information here so that it can be substituted in
+dnl where it is needed. When the VERSION bumps, reset the BUILD to 1 and
+dnl remove the "plNNN" suffix
+VERSION="0.2.11"
+BUILD="1"
+
+AC_PROG_CXX
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+
+AC_CHECK_PROGS(CCACHE, ccache, "")
+AC_CHECK_PROG(HAVE_MAKEINFO, makeinfo, yes, no)
+AC_CHECK_PROG(HAVE_TEXI2DVI, texi2dvi, yes, no)
+AC_CHECK_PROG(HAVE_DVIPS, dvips, yes, no)
+
+dnl Set the inline keyword appropriately for the platform
+AC_C_INLINE
+dnl Verify that the platform supports unsigned long long. If cross
+dnl compiling, assume unsigned long long works.
+AC_CHECK_SIZEOF(unsigned long long, 8)
+AC_CHECK_SIZEOF(__uint64, 0)
+
+CHECK_SSL
+
+dnl Checks for header files.
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(fcntl.h limits.h sys/file.h sys/time.h unistd.h paths.h)
+AC_CHECK_HEADERS(sys/vfs.h sys/statfs.h sys/param.h sys/mount.h)
+AC_CHECK_HEADERS(stdint.h inttypes.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_STRUCT_TM
+AC_TYPE_UID_T
+
+dnl Checks for library functions.
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(getcwd gethostname mkdir strerror strtoul)
+AC_FUNC_MEMCMP
+
+AC_SUBST(VERSION)
+AC_SUBST(BUILD)
+
+AC_SUBST(SSL_INC)
+AC_SUBST(SSL_LIBS)
+AC_SUBST(SSL_LDFLAGS)
+
+AC_OUTPUT(Makefile src/Makefile src/libsherpa/Makefile src/bntest/Makefile src/astmaker/Makefile coytools.spec)

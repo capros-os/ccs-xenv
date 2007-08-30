@@ -1,0 +1,40 @@
+Building a cross compile tool chain is a serious pain in the neck. The
+main issue is that there is a circular dependency between gcc and
+libc. Because of this circular dependency, the build MUST proceed in
+the following order:
+
+    1. build binutils
+    2. build a subset of GCC that does not rely on access to libc
+       headers
+    3. build libc using that GCC
+    4. build the production version of GCC
+    5. Set up some required symlinks for gcc.
+
+At each stage, the result of the previous stage must be installed
+before proceeding further.
+
+This sequence is painful, convoluted, and slow, but it is reliable.
+
+The symlinks part deals with the fact that the directory tree
+containing the cross compiler driver programs is not the target
+tree. The symlinks allow GCC to locate other components such as LD and
+AS.
+
+
+Also a note on tree structure here. For packages that we take from
+third parties we want/need to keep the sources completely
+unchanged. For myself, I would *really* prefer to have them here in
+unpacked form. Unfortunately, the gcc configure process mungs the
+input tree even when it is built in a completely separate directory,
+and I have not (yet) found a way to repair that. Hmm. Perhaps cp -al
+would work. In any case, until we can deal with that cleanly we
+unfortunately need to check in the actual tarballs.  So the tarballs
+in the SOURCES directory really are the official sources.
+
+For tools that we maintain ourselves we can make the configure process
+"clean", which leaves us the option to check them in as fully expanded
+trees. That is much more pleasant to maintain, but it means that the
+rpm construction process has to hand-build the tarballs for them. The
+ourtools/ tree contains tools of this form.
+
+Sigh. In this situation you simply can't win for losing.
