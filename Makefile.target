@@ -28,6 +28,9 @@ NEWLIB_VERSION=1.15.0
 NEWLIB_PATCH=newlib-cvs20070817.patch.bz2
 CRTFILES_VERSION=0.1.0
 
+BINUTILS_PATCHES=$(wildcard SOURCES/binutils-$(BINUTILS_VERSION)*.patch)
+GCC_PATCHES=$(wildcard SOURCES/gcc-$(GCC_VERSION)*.patch)
+
 ##################################################################
 #
 #  CONFIGDIRS: Directories to override for configure.
@@ -85,8 +88,8 @@ BUILD/binutils-$(BINUTILS_VERSION): | BUILD
 	@echo "Unpacking binutils-$(BINUTILS_VERSION)"
 	(cd BUILD; tar xjf ../SOURCES/binutils-$(BINUTILS_VERSION).tar.bz2)
 	(cd BUILD; patch -p0 < ../SOURCES/capos-binutils-$(BINUTILS_VERSION).patch)
-	if [ "" != "SOURCES/binutils-$(BINUTILS_VERSION)*.patch" ]; then \
-	for patch in SOURCES/binutils-$(BINUTILS_VERSION)*.patch; do \
+	if [ "" != "$(BINUTILS_PATCHES)" ]; then \
+	for patch in $(BINUTILS_PATCHES); do \
 	  (cd BUILD; patch -p0 < ../$${patch}); \
 	done;\
 	fi
@@ -104,8 +107,8 @@ BUILD/gcc-$(GCC_VERSION): | BUILD
 	(cd BUILD; tar xjf ../SOURCES/gcc-core-$(GCC_VERSION).tar.bz2)
 	(cd BUILD; tar xjf ../SOURCES/gcc-g++-$(GCC_VERSION).tar.bz2)
 	(cd BUILD; patch -p0 < ../SOURCES/capos-gcc-$(GCC_VERSION).patch)
-	if [ "" != "SOURCES/gcc-$(GCC_VERSION)*.patch" ]; then \
-	for patch in SOURCES/gcc-$(GCC_VERSION)*.patch; do \
+	if [ "" != "$(GCC_PATCHES)" ]; then \
+	for patch in $(GCC_PATCHES); do \
 	  (cd BUILD; patch -p0 < ../$${patch}); \
 	done; \
 	fi
