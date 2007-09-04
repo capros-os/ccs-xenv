@@ -188,7 +188,7 @@ namespace sherpa {
     std::string out;
 
     while (len) {
-      uint32_t take = std::min(len, 3u);
+      uint32_t take = std::min(len, (size_t)3);
       uint32_t value = 0;
       uint32_t outlen = (take * 8 + 5) / 6;
       uint32_t i;
