@@ -456,16 +456,25 @@ namespace sherpa {
 
   BigNum::BigNum(const std::string& s, size_t radix)
   {
-    size_t start = 0;
+    negative = false;
+    size_t i = 0;
+
+    if (s[0] == '-') {
+      negative = true;
+      i++;
+    }
+    else if (s[0] == '+') {
+      i++;
+    }
 
     if (radix == 0) {
-      if (s[0] == '0' && ((s[1] == 'x') || (s[1] == 'X'))) {
+      if (s[i] == '0' && ((s[i+1] == 'x') || (s[i+1] == 'X'))) {
 	radix = 16;
-	start = 2;
+	i += 2;
       }
-      else if (s[0] == 0) {
+      else if (s[i] == 0) {
 	radix = 8;
-	start = 1;
+	i += 1;
       }
       else
 	radix = 10;
@@ -473,9 +482,8 @@ namespace sherpa {
 
     nDigits = 1;
     oneDigit = 0;
-    negative = false;
 
-    for (size_t i = start; i < s.size(); i++) {
+    for (; i < s.size(); i++) {
       char c = s[i];
       uint32_t thisDigit = 0;
 
