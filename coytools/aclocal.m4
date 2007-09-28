@@ -34,6 +34,6 @@ AC_DEFUN([CHECK_SSL], [
     AC_DEFINE(HAVE_OPENSSL, 1,
               [Define if you have the OpenSSL library])
   else
-    AC_MSG_ERROR([You must have OpenSSL installed to use OpenCM])
+    AC_MSG_ERROR([You must have OpenSSL installed to build coytools])
   fi
 ])dnl
