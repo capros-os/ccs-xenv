@@ -34,8 +34,6 @@ coytools/src/astmaker/AMparser.cxx
 coytools/src/astmaker/AMparser.hxx
 coytools/src/astmaker/AMparser.output
 coytools/src/astmaker/astmaker
-
-
 coytools/src/libsherpa/Makefile
 
 coytools/src/bntest/Makefile
@@ -43,3 +41,6 @@ coytools/src/bntest/Parser.hxx
 coytools/src/bntest/bntest
 
 SPECS/*.spec
+
+RPMS
+SRPMS
