@@ -348,9 +348,8 @@ rpms:
 	(cd $(OUR_TMP); tar czf $(RPM_TOPDIR)/SOURCES/coytools-$(VERSION)-$(BUILD)$(DIST).tar.gz coytools-$(VERSION))
 	cp coytools.spec $(RPM_TOPDIR)/SPECS/coytools.spec
 	(cd $(RPM_TOPDIR)/SPECS; rpmbuild -ba --define "dist $(DIST)" --define "_topdir $(RPM_TOPDIR)" coytools.spec)
-	mkdir -p SRPMS RPMS
-	cp -a $(RPM_TOPDIR)/SRPMS/* ./SRPMS/
-	cp -a $(RPM_TOPDIR)/RPMS/* ./RPMS/
+	rsync -av --delete $(RPM_TOPDIR)/SRPMS/ ./SRPMS/
+	rsync -av --delete $(RPM_TOPDIR)/RPMS/ ./RPMS/
 	-rm -rf $(RPM_TARGET_DIR)
 	-rm -rf $(RPM_TOPDIR)
 
