@@ -254,9 +254,10 @@ namespace sherpa {
   {
     uint64_t borrow = 0llu;
 
-    while (n3.len > n1.len) {
-      n3.vec[n3.len-1] = 0;
-    }
+    assert(n1.len <= n3.len);
+
+    for (size_t i = n1.len; i < n3.len; i++)
+      n3.vec[i] = 0;
 
     for (size_t i = 0; i < n1.len; i++) {
       // Note that in the following carry does not get truncated but
@@ -270,8 +271,8 @@ namespace sherpa {
 	borrow = 1;
       }
 
-      if (i < n3.len)
-	n3.vec[i] = n1digit - n2digit;
+      assert(i < n3.len);
+      n3.vec[i] = n1digit - n2digit;
     }
 
     assert(borrow == 0);
@@ -580,9 +581,14 @@ namespace sherpa {
     const nvec nvthis(*this);
     const nvec nvother(other);
 
-    nvec r(0, 0);		// discard remainder
+    // Following are longer than we need, but required to satisfy
+    // vu_sub input field length requirements.
+    nvec r;			// will be discarded
+    r.len = nvthis.len;
+    r.vec = (uint32_t *) alloca(r.len * sizeof(uint32_t));
+
     nvec q;
-    q.len = nvthis.len - nvother.len + 1;
+    q.len = nvthis.len;
     q.vec = (uint32_t *) alloca(q.len * sizeof(uint32_t));
 
     vu_divqr(nvthis, nvother, q, r);
@@ -595,10 +601,15 @@ namespace sherpa {
     const nvec nvthis(*this);
     const nvec nvother(other);
 
-    nvec q(0, 0);		// discard remainder
+    // Following are longer than we need, but required to satisfy
+    // vu_sub input field length requirements.
     nvec r;
-    r.len = nvother.len;
+    r.len = nvthis.len;
     r.vec = (uint32_t *) alloca(r.len * sizeof(uint32_t));
+
+    nvec q;			// will be discarded
+    q.len = nvthis.len;
+    q.vec = (uint32_t *) alloca(q.len * sizeof(uint32_t));
 
     vu_divqr(nvthis, nvother, q, r);
 
@@ -730,7 +741,8 @@ namespace sherpa {
 
       while (me != 0) {
 	BigNum thisDigit = me % radix;
-	result.append(1, hexdigits[thisDigit.oneDigit]);
+
+	result.append(1, hexdigits[thisDigit.getDigit(0)]);
 	
 	me /= radix;
       }
