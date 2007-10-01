@@ -1382,7 +1382,7 @@ host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 
 
 VERSION="0.2.11"
-BUILD="2"
+BUILD="3"
 
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -4440,8 +4440,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
   else
-    { { echo "$as_me:$LINENO: error: You must have OpenSSL installed to use OpenCM" >&5
-echo "$as_me: error: You must have OpenSSL installed to use OpenCM" >&2;}
+    { { echo "$as_me:$LINENO: error: You must have OpenSSL installed to build coytools" >&5
+echo "$as_me: error: You must have OpenSSL installed to build coytools" >&2;}
    { (exit 1); exit 1; }; }
   fi
 
