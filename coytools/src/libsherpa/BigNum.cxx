@@ -226,7 +226,7 @@ namespace sherpa {
 
   BigNum BigNum::lshift_digits(size_t n) const
   {
-    if ((nDigits == 0) && (oneDigit == 0))
+    if ((nDigits == 1) && (oneDigit == 0))
       return *this;
 
     if (n == 0)
@@ -357,13 +357,13 @@ namespace sherpa {
     // Need to do things the hard way...
 
     nvec q;
-    q.len = (dividend.len - divisor.len + 1);
+    q.len = dividend.len;  // conservative
     q.vec = (uint32_t *) alloca(q.len * sizeof(uint32_t));
     rmemset(q.vec, 0, q.len * sizeof(uint32_t));
 
     // Internal working copies of quotient and remainder:
     nvec tmp;
-    tmp.len = q.len + divisor.len;	// because of bit mis-estimation
+    tmp.len = q.len + divisor.len;	// because of vu_mul requirement
     tmp.vec = (uint32_t *) alloca(tmp.len * sizeof(uint32_t));
     
     size_t bits = q.len * 32;
@@ -423,10 +423,16 @@ namespace sherpa {
   BigNum::BigNum(uint64_t u, bool neg)
   {
     negative = neg;
-    nDigits = 2;
-    digits = new uint32_t[nDigits];
-    digits[0] = u;		// truncating
-    digits[1] = (u >> 32);
+    if (u > UINT32_T_MAX) {
+      nDigits = 2;
+      digits = new uint32_t[nDigits];
+      digits[0] = u;		// truncating
+      digits[1] = (u >> 32);
+    }
+    else {
+      nDigits = 1;
+      oneDigit = u;
+    }
   }
 
   // This should be called *only* in return position, because it
