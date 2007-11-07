@@ -109,9 +109,9 @@ namespace sherpa {
   } ;
 
   static uint32_t u_zero = 0;
-  static nvec nv_zero(1, &u_zero);
+  static const nvec nv_zero(1, &u_zero);
   static uint32_t u_one = 1;
-  static nvec nv_one(1, &u_one);
+  static const nvec nv_one(1, &u_one);
 
   /// @brief compare two digit vectors for relative magnitude. Return
   /// -1, 0, 1 according to whether v1 is less than, equal to, or
@@ -135,6 +135,8 @@ namespace sherpa {
   }
 
   /// @brief n2 = n1 / (radix^nShift)
+  ///
+  /// Requirement: n2 > 0
   static void 
   vu_rshift_digits(const nvec n1, size_t nShift, nvec n2)
   {
@@ -144,14 +146,16 @@ namespace sherpa {
     }
 
     for (size_t i = 0; i < min(n1.len - nShift, n2.len); i++)
-      n2.vec[i] = n1.vec[i];
+      n2.vec[i] = n1.vec[i + nShift];
     for (size_t i = n1.len - nShift; i <n2.len; i++)
       n2.vec[i] = 0;
 
     return;
   }
 
-  /// @brief n2 = n1 / (radix^nShift)
+  /// @brief n2 = n1 * (radix^nShift)
+  ///
+  /// Requirement: n2 > 0
   static void
   vu_lshift_digits(const nvec n1, size_t nShift, nvec n2)
   {
@@ -165,6 +169,8 @@ namespace sherpa {
   }
 
   /// @brief n2 = n1 >> nShift
+  ///
+  /// Requirement: n2 > 0
   static void 
   vu_rshift_bits(const nvec n1, size_t nShift, nvec n2)
   {
@@ -172,8 +178,8 @@ namespace sherpa {
     nShift %= 32;
 
     for (size_t i = 0; i < n2.len; i++) {
-      uint32_t u = n1.getDigit(i) >> nShift;
-      u |= (n1.getDigit(i+1) << (32 - nShift));
+      uint32_t u = n2.getDigit(i) >> nShift;
+      u |= (n2.getDigit(i+1) << (32 - nShift));
 
       n2.vec[i] = u;
     }
@@ -182,6 +188,8 @@ namespace sherpa {
   }
 
   /// @brief n2 = n1 << nShift
+  ///
+  /// Requirement: n2 > 0
   static void
   vu_lshift_bits(const nvec n1, size_t nShift, nvec n2)
   {
@@ -191,9 +199,9 @@ namespace sherpa {
     for (size_t i = 0; i < min(n1.len, n2.len - nShift); i++) {
       size_t pos = n2.len - i - 1;
       
-      uint32_t u = n1.getDigit(pos) << nShift;
+      uint32_t u = n2.getDigit(pos) << nShift;
       if (pos > 0)
-	u |= n1.getDigit(pos-1) >> (32 - nShift);
+	u |= n2.getDigit(pos-1) >> (32 - nShift);
       n2.vec[pos] = u;
     }
 
@@ -234,6 +242,7 @@ namespace sherpa {
 
     size_t nNewDigits = nDigits + n;
     uint32_t *newDigits = (uint32_t *) alloca(nNewDigits * sizeof(uint32_t));
+    rmemset(newDigits, 0, nNewDigits * sizeof(uint32_t));
 
     for (size_t i = 0; i < nNewDigits; i++)
       newDigits[i+n] = getDigit(i);
@@ -626,8 +635,8 @@ namespace sherpa {
   int BigNum::cmp(const BigNum& other) const
   {
     if (negative == other.negative) {
-      nvec n1(*this);
-      nvec n2(other);
+      const nvec n1(*this);
+      const nvec n2(other);
       int result= vu_cmp(n1, n2);
       return negative ? -result : result;
     }
@@ -664,7 +673,7 @@ namespace sherpa {
     nv.len = nDigits + ((n+31)/32); // upper bound
     nv.vec = (uint32_t *) alloca(nv.len * sizeof(uint32_t));
 
-    nvec me(*this);
+    const nvec me(*this);
     vu_lshift_bits(me, n, nv);
 
     return BigNum(nv.len, nv.vec, negative);
@@ -676,7 +685,7 @@ namespace sherpa {
     nv.len = nDigits - (n/32);	// upper bound
     nv.vec = (uint32_t *) alloca(nv.len * sizeof(uint32_t));
 
-    nvec me(*this);
+    const nvec me(*this);
     vu_rshift_bits(me, n, nv);
 
     return BigNum(nv.len, nv.vec, negative);
