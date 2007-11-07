@@ -84,6 +84,7 @@ includedir = @includedir@
 
 # Where to put shared, read-only data
 datadir = @datadir@
+datarootdir = @datarootdir@
 
 # shap: I have seen autoconf get this consistently wrong, which
 # is why the following obscure test is present. Surely there must

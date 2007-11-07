@@ -65,7 +65,7 @@ iBinaryStream::setByteOrder(bs_base::Endian _byteOrder)
 void 
 iBinaryStream::align(size_t off)
 {
-  while(tellg() % off)
+  while(offset % off)
     getByte();
 }
 
@@ -133,26 +133,5 @@ iBinaryStream::operator>>(uint64_t& val)
     val += ((uint64_t) getByte()) << 8;
     val += getByte();
   }
-  return *this;
-}
-
-
-std::streampos 
-iBinaryStream::tellg()
-{
-  return rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
-}
-
-iBinaryStream& 
-iBinaryStream::seekg(std::streampos pos)
-{
-  rdbuf()->pubseekpos(pos, ios_base::in);
-  return *this;
-}
-
-iBinaryStream&
-iBinaryStream::seekg(std::streamoff off, std::ios_base::seekdir dir)
-{
-  rdbuf()->pubseekoff(off, dir, ios_base::in);
   return *this;
 }

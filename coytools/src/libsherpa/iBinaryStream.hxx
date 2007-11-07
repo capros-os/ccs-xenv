@@ -38,28 +38,32 @@
  *
  **************************************************************************/
 
-#include <streambuf>
+#include <iostream>
 #include "ByteString.hxx"
 #include "bs_base.hxx"
 
 namespace sherpa {
   class iBinaryStream {
+    size_t offset;
+
     bs_base::Endian byteOrder;
 
-    std::streambuf *sb;
+    std::istream& is;
 
     void setByteOrder(bs_base::Endian _byteOrder);
 
   public:
-    explicit iBinaryStream(std::streambuf *_sb = 0)
+    explicit iBinaryStream(std::istream& _is)
+      :is(_is)
     {
-      sb = _sb;
+      offset = 0;
       setByteOrder(bs_base::HostEndian);
     }
 
     inline uint8_t getByte()
     {
-      uint8_t b = sb->sbumpc();
+      uint8_t b = is.get();
+      offset++;
       return b;
     }
 
@@ -88,29 +92,21 @@ namespace sherpa {
       return *this;
     }
 
-    inline iBinaryStream& flush()
+    void align(size_t off);
+
+    std::streampos tellp()
     {
-      sb->pubsync();
-      return *this;
+      return offset;
     }
 
-    inline std::streambuf *rdbuf() const
+    bool seekg(std::streampos pos)
     {
-      return sb;
-    };
-
-    inline std::streambuf *rdbuf(std::streambuf *_sb)
-    {
-      std::streambuf *oldsb = sb;
-      sb = _sb;
-      return oldsb;
-    };
-
-    std::streampos tellg();
-    iBinaryStream& seekg(std::streampos pos);
-    iBinaryStream& seekg(std::streamoff off, std::ios_base::seekdir dir);
-
-    void align(size_t off);
+      is.seekg(pos);
+      if (is.fail())
+	return false;
+      offset = pos;
+      return true;
+    }
 
     inline iBinaryStream& operator>>(bs_base::Endian _byteOrder)
     {

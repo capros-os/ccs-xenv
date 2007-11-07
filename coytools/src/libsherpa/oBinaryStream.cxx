@@ -65,7 +65,7 @@ oBinaryStream::setByteOrder(bs_base::Endian _byteOrder)
 void
 oBinaryStream::align(size_t off)
 {
-  while (tellp() % off)
+  while (offset % off)
     putByte(0);
 }
 
@@ -130,25 +130,5 @@ oBinaryStream::operator<<(uint64_t val)
     putByte((val >> 8) & 0xffu);
     putByte(val & 0xffu);
   }
-  return *this;
-}
-
-std::streampos 
-oBinaryStream::tellp()
-{
-  return rdbuf()->pubseekoff(0, ios_base::cur, ios_base::in);
-}
-
-oBinaryStream& 
-oBinaryStream::seekp(std::streampos pos)
-{
-  rdbuf()->pubseekpos(pos, ios_base::in);
-  return *this;
-}
-
-oBinaryStream&
-oBinaryStream::seekp(std::streamoff off, std::ios_base::seekdir dir)
-{
-  rdbuf()->pubseekoff(off, dir, ios_base::in);
   return *this;
 }
