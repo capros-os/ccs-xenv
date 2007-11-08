@@ -10,7 +10,7 @@ CONFIGURE_TARGET=i686-unknown-elf
 PREFIX=/coyotos
 
 ifeq "$(TARGETS)" ""
-TARGETS=$(COYOTOS_TARGET)
+TARGETS=$(COYOTOS_GCC_ARCH)
 endif
 
 RPMBUILD=rpmbuild --rcfile SPECS/rpmrc
