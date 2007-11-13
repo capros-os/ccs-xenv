@@ -1,13 +1,14 @@
 Summary: General-purpose utility library for C++
 Name: coytools
 Version: 0.3.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: System Environment/Libraries
 Source0: %{name}-%{version}-%{release}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: libsherpa
 Requires: astmaker
+BuildRequires: libicu-devel
 
 %define debug_package %{nil}
 
@@ -27,6 +28,10 @@ rm -rf $RPM_BUILD_ROOT
 # Hand-generate the debuginfo so that we can package it in the proper
 # subpackages:
 %{__debug_install_post}
+
+# Work-around to F8 build-id madness until I understand what the heck
+# it does:
+rm -rf $RPM_BUILD_ROOT/usr/lib/debug/.build-id
 
 %clean
 rm -rf $RPM_BUILD_ROOT

@@ -78,7 +78,7 @@ SubProcess::run(const char *input, const char *output, const char *errput,
     }
   
     if (output) {
-      fout = open(output, O_WRONLY | O_CREAT);
+      fout = open(output, O_WRONLY | O_CREAT, 0666);
       if (fout < 0)
 	THROW(excpt::Subprocess, 
 	      format("Unable to redirect command output to %s", output));
