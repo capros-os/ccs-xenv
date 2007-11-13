@@ -1,6 +1,6 @@
 diff -ruN baseline-binutils-2.17/bfd/config.bfd binutils-2.17/bfd/config.bfd
 --- baseline-binutils-2.17/bfd/config.bfd	2006-04-05 08:41:57.000000000 -0400
-+++ binutils-2.17/bfd/config.bfd	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/bfd/config.bfd	2007-11-12 23:51:06.000000000 -0500
 @@ -452,6 +452,21 @@
      targ_defvec=bfd_elf32_i386_vec
      targ_selvecs=i386coff_vec
@@ -25,7 +25,7 @@ diff -ruN baseline-binutils-2.17/bfd/config.bfd binutils-2.17/bfd/config.bfd
      targ_selvecs=i386coff_vec
 diff -ruN baseline-binutils-2.17/bfd/po/Make-in binutils-2.17/bfd/po/Make-in
 --- baseline-binutils-2.17/bfd/po/Make-in	2006-06-12 09:05:03.000000000 -0400
-+++ binutils-2.17/bfd/po/Make-in	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/bfd/po/Make-in	2007-11-12 23:51:06.000000000 -0500
 @@ -19,10 +19,10 @@
  
  prefix = @prefix@
@@ -42,7 +42,7 @@ diff -ruN baseline-binutils-2.17/bfd/po/Make-in binutils-2.17/bfd/po/Make-in
  DESTDIR =
 diff -ruN baseline-binutils-2.17/binutils/po/Make-in binutils-2.17/binutils/po/Make-in
 --- baseline-binutils-2.17/binutils/po/Make-in	2006-06-12 09:05:03.000000000 -0400
-+++ binutils-2.17/binutils/po/Make-in	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/binutils/po/Make-in	2007-11-12 23:51:06.000000000 -0500
 @@ -19,10 +19,10 @@
  
  prefix = @prefix@
@@ -59,7 +59,7 @@ diff -ruN baseline-binutils-2.17/binutils/po/Make-in binutils-2.17/binutils/po/M
  DESTDIR =
 diff -ruN baseline-binutils-2.17/config.sub binutils-2.17/config.sub
 --- baseline-binutils-2.17/config.sub	2006-01-16 12:34:37.000000000 -0500
-+++ binutils-2.17/config.sub	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/config.sub	2007-11-12 23:51:06.000000000 -0500
 @@ -3,7 +3,7 @@
  #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
  #   2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
@@ -78,9 +78,8 @@ diff -ruN baseline-binutils-2.17/config.sub binutils-2.17/config.sub
  	-qnx*)
  		case $basic_machine in
  		    x86-* | i*86-*)
-diff -ruN baseline-binutils-2.17/gas/configure.tgt binutils-2.17/gas/configure.tgt
 --- baseline-binutils-2.17/gas/configure.tgt	2006-04-05 08:41:57.000000000 -0400
-+++ binutils-2.17/gas/configure.tgt	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/gas/configure.tgt	2007-11-12 23:51:06.000000000 -0500
 @@ -100,6 +100,7 @@
  
    arm-*-aout)				fmt=aout ;;
@@ -107,7 +106,7 @@ diff -ruN baseline-binutils-2.17/gas/configure.tgt binutils-2.17/gas/configure.t
    m68k-*-rtems*)			fmt=elf ;;
 diff -ruN baseline-binutils-2.17/gas/po/Make-in binutils-2.17/gas/po/Make-in
 --- baseline-binutils-2.17/gas/po/Make-in	2006-06-12 09:05:03.000000000 -0400
-+++ binutils-2.17/gas/po/Make-in	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/gas/po/Make-in	2007-11-12 23:51:06.000000000 -0500
 @@ -19,10 +19,10 @@
  
  prefix = @prefix@
@@ -124,7 +123,7 @@ diff -ruN baseline-binutils-2.17/gas/po/Make-in binutils-2.17/gas/po/Make-in
  DESTDIR =
 diff -ruN baseline-binutils-2.17/gprof/po/Make-in binutils-2.17/gprof/po/Make-in
 --- baseline-binutils-2.17/gprof/po/Make-in	2006-06-12 09:05:04.000000000 -0400
-+++ binutils-2.17/gprof/po/Make-in	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/gprof/po/Make-in	2007-11-12 23:51:06.000000000 -0500
 @@ -19,10 +19,10 @@
  
  prefix = @prefix@
@@ -141,7 +140,7 @@ diff -ruN baseline-binutils-2.17/gprof/po/Make-in binutils-2.17/gprof/po/Make-in
  DESTDIR =
 diff -ruN baseline-binutils-2.17/ld/configure.tgt binutils-2.17/ld/configure.tgt
 --- baseline-binutils-2.17/ld/configure.tgt	2006-04-05 08:41:57.000000000 -0400
-+++ binutils-2.17/ld/configure.tgt	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/ld/configure.tgt	2007-11-12 23:51:06.000000000 -0500
 @@ -41,6 +41,10 @@
  arm-*-pe)		targ_emul=armpe ; targ_extra_ofiles="deffilep.o pe-dll.o" ;;
  arm-*-aout | armel-*-aout) targ_emul=armaoutl ;;
@@ -189,7 +188,7 @@ diff -ruN baseline-binutils-2.17/ld/configure.tgt binutils-2.17/ld/configure.tgt
  m68k-*-linux*aout*)	targ_emul=m68klinux
 diff -ruN baseline-binutils-2.17/ld/emulparams/armelf_coyotos.sh binutils-2.17/ld/emulparams/armelf_coyotos.sh
 --- baseline-binutils-2.17/ld/emulparams/armelf_coyotos.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.17/ld/emulparams/armelf_coyotos.sh	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/ld/emulparams/armelf_coyotos.sh	2007-11-12 23:51:06.000000000 -0500
 @@ -0,0 +1,41 @@
 +MACHINE=
 +SCRIPT_NAME=elf
@@ -234,7 +233,7 @@ diff -ruN baseline-binutils-2.17/ld/emulparams/armelf_coyotos.sh binutils-2.17/l
 +NO_SMALL_DATA=yes
 diff -ruN baseline-binutils-2.17/ld/emulparams/armelf_coyotos_small.sh binutils-2.17/ld/emulparams/armelf_coyotos_small.sh
 --- baseline-binutils-2.17/ld/emulparams/armelf_coyotos_small.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.17/ld/emulparams/armelf_coyotos_small.sh	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/ld/emulparams/armelf_coyotos_small.sh	2007-11-12 23:51:06.000000000 -0500
 @@ -0,0 +1,44 @@
 +#Link rules variant for Coytos/EROS when compiling for small processes.
 +MACHINE=
@@ -282,7 +281,7 @@ diff -ruN baseline-binutils-2.17/ld/emulparams/armelf_coyotos_small.sh binutils-
 +NO_SMALL_DATA=yes
 diff -ruN baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos.sh binutils-2.17/ld/emulparams/elf_i386_coyotos.sh
 --- baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.17/ld/emulparams/elf_i386_coyotos.sh	2007-08-07 15:46:59.000000000 -0400
++++ binutils-2.17/ld/emulparams/elf_i386_coyotos.sh	2007-11-12 23:51:06.000000000 -0500
 @@ -0,0 +1,27 @@
 +#Link rules variant for Coytos/EROS. This should be the same as elf_i386,
 +#except that start address is moved to 0x08000000 so that it will align
@@ -313,7 +312,7 @@ diff -ruN baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos.sh binutils-2.17
 +SEPARATE_GOTPLT=12
 diff -ruN baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh
 --- baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh	2007-08-07 15:47:04.000000000 -0400
++++ binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh	2007-11-12 23:51:06.000000000 -0500
 @@ -0,0 +1,22 @@
 +#Link rules variant for Coytos/EROS when compiling for small processes.
 +SCRIPT_NAME=elf
@@ -339,7 +338,7 @@ diff -ruN baseline-binutils-2.17/ld/emulparams/elf_i386_coyotos_small.sh binutil
 +SEPARATE_GOTPLT=12
 diff -ruN baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos.sh binutils-2.17/ld/emulparams/m68kelf_coyotos.sh
 --- baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.17/ld/emulparams/m68kelf_coyotos.sh	2007-08-07 15:47:10.000000000 -0400
++++ binutils-2.17/ld/emulparams/m68kelf_coyotos.sh	2007-11-12 23:51:06.000000000 -0500
 @@ -0,0 +1,20 @@
 +SCRIPT_NAME=elf
 +OUTPUT_FORMAT="elf32-m68k"
@@ -363,7 +362,7 @@ diff -ruN baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos.sh binutils-2.17/
 +NO_SMALL_DATA=yes
 diff -ruN baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh
 --- baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh	2007-08-07 15:47:15.000000000 -0400
++++ binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh	2007-11-12 23:51:06.000000000 -0500
 @@ -0,0 +1,21 @@
 +#Link rules variant for Coytos/EROS when compiling for small processes.
 +SCRIPT_NAME=elf
@@ -388,7 +387,7 @@ diff -ruN baseline-binutils-2.17/ld/emulparams/m68kelf_coyotos_small.sh binutils
 +NO_SMALL_DATA=yes
 diff -ruN baseline-binutils-2.17/ld/Makefile.am binutils-2.17/ld/Makefile.am
 --- baseline-binutils-2.17/ld/Makefile.am	2006-06-03 00:45:50.000000000 -0400
-+++ binutils-2.17/ld/Makefile.am	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/ld/Makefile.am	2007-11-12 23:51:06.000000000 -0500
 @@ -116,6 +116,8 @@
  	earmcoff.o \
  	earmelf.o \
@@ -461,7 +460,7 @@ diff -ruN baseline-binutils-2.17/ld/Makefile.am binutils-2.17/ld/Makefile.am
    $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
 diff -ruN baseline-binutils-2.17/ld/Makefile.in binutils-2.17/ld/Makefile.in
 --- baseline-binutils-2.17/ld/Makefile.in	2006-06-03 00:45:50.000000000 -0400
-+++ binutils-2.17/ld/Makefile.in	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/ld/Makefile.in	2007-11-12 23:51:06.000000000 -0500
 @@ -340,6 +340,8 @@
  	earmcoff.o \
  	earmelf.o \
@@ -534,7 +533,7 @@ diff -ruN baseline-binutils-2.17/ld/Makefile.in binutils-2.17/ld/Makefile.in
    $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
 diff -ruN baseline-binutils-2.17/ld/po/Make-in binutils-2.17/ld/po/Make-in
 --- baseline-binutils-2.17/ld/po/Make-in	2006-06-12 09:05:04.000000000 -0400
-+++ binutils-2.17/ld/po/Make-in	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/ld/po/Make-in	2007-11-12 23:51:06.000000000 -0500
 @@ -19,10 +19,10 @@
  
  prefix = @prefix@
@@ -551,7 +550,7 @@ diff -ruN baseline-binutils-2.17/ld/po/Make-in binutils-2.17/ld/po/Make-in
  DESTDIR =
 diff -ruN baseline-binutils-2.17/opcodes/po/Make-in binutils-2.17/opcodes/po/Make-in
 --- baseline-binutils-2.17/opcodes/po/Make-in	2006-06-12 09:05:04.000000000 -0400
-+++ binutils-2.17/opcodes/po/Make-in	2007-08-07 15:45:59.000000000 -0400
++++ binutils-2.17/opcodes/po/Make-in	2007-11-12 23:51:06.000000000 -0500
 @@ -19,10 +19,10 @@
  
  prefix = @prefix@

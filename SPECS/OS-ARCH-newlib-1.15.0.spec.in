@@ -40,7 +40,8 @@ Group: Development/Tools
 URL: http://www.coyotos.org
 Source: newlib-%{version}.tar.bz2
 Patch0: newlib-cvs20070817.patch.bz2
-Patch1: capos-newlib-%{version}.patch
+Patch1: newlib-%{version}-makeinfo411.patch
+Patch2: capos-newlib-%{version}.patch
 
 Buildroot: %{_tmppath}/%{CROSSOS}-newlib-root
 BuildRequires: %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-gcc
@@ -56,6 +57,7 @@ enhancements.
 %setup -q -n newlib-%{version}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 %define optflags ""

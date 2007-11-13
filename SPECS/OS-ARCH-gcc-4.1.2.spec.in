@@ -40,6 +40,7 @@ Group: Development/Languages
 URL: http://www.coyotos.org
 Source0: gcc-core-%{version}.tar.bz2
 Patch0: capos-gcc-%{version}.patch
+Patch1: gcc-4.1.2-makeinfo411.patch
 #Patch4: gcc-%{version}-arm-lib1asm.patch
 # Source1: gcc-c++-%{version}.tar.bz2
 
@@ -197,6 +198,7 @@ macros.
 %prep
 %setup -q -n gcc-%{version}
 %patch0 -p1
+%patch1 -p1
 #%patch4 -p1
 
 # FIX: These need to be replicated into the make-xenv script

@@ -6,7 +6,7 @@ default: all
 FCRELEASEVER=$(shell sed 's/.*release \([0-9.]*\).*/\1/' /etc/redhat-release)
 FCDIST=.fc$(FCRELEASEVER)
 
-BINUTILS_VERSION=2.17
+BINUTILS_VERSION=2.18
 BINUTILS_SPEC=OS-ARCH-binutils-$(BINUTILS_VERSION).spec
 #NEWLIB_VERSION=1.13.0
 NEWLIB_VERSION=1.15.0

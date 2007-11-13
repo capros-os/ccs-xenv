@@ -19,13 +19,14 @@ CROSSSYSROOT=$(CROSSROOT)/sysroot-$(CROSSARCH)
 #  currently using gcc3.4.6
 #
 ##################################################################
-BINUTILS_VERSION=2.17
+BINUTILS_VERSION=2.18
 #GCC_VERSION=3.4.6
 #NEWLIB_VERSION=1.13.0
-#NEWLIB_PATCH=newlib-cvs20051119.patch.bz2
+#NEWLIB_CVS_PATCH=newlib-cvs20051119.patch.bz2
 GCC_VERSION=4.1.2
 NEWLIB_VERSION=1.15.0
-NEWLIB_PATCH=newlib-cvs20070817.patch.bz2
+NEWLIB_CVS_PATCH=newlib-cvs20070817.patch.bz2
+NEWLIB_PATCHES=$(wildcard SOURCES/newlib-$(NEWLIB_VERSION)*.patch)
 CRTFILES_VERSION=0.1.0
 
 BINUTILS_PATCHES=$(wildcard SOURCES/binutils-$(BINUTILS_VERSION)*.patch)
@@ -98,8 +99,13 @@ BUILD/binutils-$(BINUTILS_VERSION): | BUILD
 BUILD/newlib-$(NEWLIB_VERSION): | BUILD
 	@echo "Unpacking newlib-$(NEWLIB_VERSION)"
 	(cd BUILD; tar xjf ../SOURCES/newlib-$(NEWLIB_VERSION).tar.bz2)
-	(cd BUILD; bzcat ../SOURCES/$(NEWLIB_PATCH) | patch -p0)
+	(cd BUILD; bzcat ../SOURCES/$(NEWLIB_CVS_PATCH) | patch -p0)
 	(cd BUILD; patch -p0 < ../SOURCES/capos-newlib-$(NEWLIB_VERSION).patch)
+	if [ "" != "$(NEWLIB_PATCHES)" ]; then \
+	for patch in $(NEWLIB_PATCHES); do \
+	  (cd BUILD; patch -p0 < ../$${patch}); \
+	done;\
+	fi
 
 # unpack gcc, apply patches
 BUILD/gcc-$(GCC_VERSION): | BUILD
