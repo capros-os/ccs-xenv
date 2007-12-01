@@ -20,7 +20,6 @@ CROSSSYSROOT=$(CROSSROOT)/sysroot-$(CROSSARCH)
 #
 ##################################################################
 BINUTILS_VERSION=2.18
-#GCC_VERSION=3.4.6
 #NEWLIB_VERSION=1.13.0
 #NEWLIB_CVS_PATCH=newlib-cvs20051119.patch.bz2
 GCC_VERSION=4.1.2
