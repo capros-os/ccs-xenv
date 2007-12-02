@@ -4,9 +4,6 @@ COYOTOS_SRC=..
 
 include $(COYOTOS_SRC)/build/make/makerules.mk
 
-BINUTILS_DIR=binutils-2.17
-GCC_DIR=gcc-3.4.6
-CONFIGURE_TARGET=i686-unknown-elf
 PREFIX=/coyotos
 
 ifeq "$(TARGETS)" ""
@@ -28,20 +25,6 @@ message:
 # behave sensibly.
 libs:
 interfaces:
-
-build:
-	./make-xenv.sh --stopat binutils 2>&1 | tee binutils.out
-	find /coyotos -type f |sort > binutils.files
-	find /coyotos -type d |sort > binutils.dirs
-	./make-xenv.sh --skip binutils --stopat pregcc 2>&1 | tee pregcc.out
-	find /coyotos -type f |sort > pregcc.files
-	find /coyotos -type d |sort > pregcc.dirs
-	./make-xenv.sh --skip binutils --skip pregcc --stopat newlib 2>&1 | tee newlib.out
-	find /coyotos -type f |sort > newlib.files
-	find /coyotos -type d |sort > newlib.dirs
-	./make-xenv.sh --skip binutils --skip pregcc --skip newlib 2>&1 | tee gcc.out
-	find /coyotos -type f |sort > gcc.files
-	find /coyotos -type d |sort > gcc.dirs
 
 #$(MAKE) -C SPECS TARGETS=$(TARGETS)
 
