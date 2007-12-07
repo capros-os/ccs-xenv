@@ -28,7 +28,7 @@
 Summary: A GNU collection of binary utilities.
 Name: %{CROSSOS}-%{CROSSARCH}-binutils
 Version: 2.18
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
@@ -36,6 +36,7 @@ Source: binutils-%{version}.tar.bz2
 Patch0: capos-binutils-%{version}.patch
 Patch1: binutils-%{version}-makeinfo411.patch
 Patch2: binutils-%{version}-coldfire-ccrsr-disasm.patch
+Patch3: binutils-%{version}-coldfire-intouch-disasm.patch
 
 Buildroot: %{_tmppath}/%{CROSSOS}-binutils-root
 #Since we are cross building, we don't actually need dejagnu
@@ -65,6 +66,7 @@ addresses to file and line).
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %define optflags ""

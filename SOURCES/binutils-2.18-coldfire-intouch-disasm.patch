@@ -1,0 +1,32 @@
+diff -ruN baseline-binutils-2.18/opcodes/m68k-opc.c binutils-2.18/opcodes/m68k-opc.c
+--- baseline-binutils-2.18/opcodes/m68k-opc.c	2007-08-06 15:59:06.000000000 -0400
++++ binutils-2.18/opcodes/m68k-opc.c	2007-12-07 16:32:28.000000000 -0500
+@@ -248,9 +248,28 @@
+ {"cinvl", 2,	one(0xf400|SCOPE_LINE), one(0xff38), "ceas", m68040up },
+ {"cinvp", 2,	one(0xf400|SCOPE_PAGE), one(0xff38), "ceas", m68040up },
+ 
++/* Need to break this into two entries, because 0xf428 is INTOUCH. The
++   bit pattern of CPUSHL is 1111 0100 cc10 1aaa where 'cc' indicates
++   which cache to flush and 'aaa' is an address register selector. A
++   cc value of 0 is RESERVED (invalid).
++
++   The bit pattern of INTOUCH is 1111 0100 0010 1aaa where 'aaa' is an
++   address register. The only reason this does not collide with CPUSHL
++   is because cc=00 is reserved. The old patterns here did not match
++   that correctly. */
++#if 0
+ {"cpusha", 2,	one(0xf420|SCOPE_ALL),  one(0xff38), "ce",   m68040up },
+ {"cpushl", 2,	one(0xf420|SCOPE_LINE), one(0xff38), "ceas", m68040up | mcfisa_a },
+ {"cpushp", 2,	one(0xf420|SCOPE_PAGE), one(0xff38), "ceas", m68040up },
++#else
++{"cpusha", 2,	one(0xf460|SCOPE_ALL),  one(0xfff8), "ce",   m68040up },
++{"cpusha", 2,	one(0xf4a0|SCOPE_ALL),  one(0xffb8), "ce",   m68040up },
++{"cpushl", 2,	one(0xf460|SCOPE_LINE), one(0xfff8), "ceas", m68040up | mcfisa_a },
++{"cpushl", 2,	one(0xf4a0|SCOPE_LINE), one(0xffb8), "ceas", m68040up | mcfisa_a },
++{"cpushp", 2,	one(0xf460|SCOPE_PAGE), one(0xfff8), "ceas", m68040up },
++{"cpushp", 2,	one(0xf4a0|SCOPE_PAGE), one(0xffb8), "ceas", m68040up },
++#endif
++
+ 
+ #undef SCOPE_LINE
+ #undef SCOPE_PAGE
