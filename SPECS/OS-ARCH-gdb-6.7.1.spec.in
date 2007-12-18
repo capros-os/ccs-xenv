@@ -38,6 +38,8 @@ Group: Development/Tools
 URL: http://www.coyotos.org
 Source: gdb-%{version}.tar.bz2
 Patch0: capos-gdb-%{version}.patch
+Patch1: gdb-6.7.1-coldfire-ccrsr-disasm.patch
+Patch2: gdb-6.7.1-coldfire-intouch-disasm.patch
 
 Buildroot: %{_tmppath}/%{CROSSOS}-gdb-root
 #Since we are cross building, we don't actually need dejagnu
@@ -56,6 +58,8 @@ and printing their data.
 %prep
 %setup -q -n gdb-%{version}
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
 
 %build
 %define optflags ""
