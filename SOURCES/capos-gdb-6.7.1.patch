@@ -1,0 +1,53 @@
+diff -ruN baseline-gdb-6.7.1/bfd/config.bfd gdb-6.7.1/bfd/config.bfd
+--- baseline-gdb-6.7.1/bfd/config.bfd	2007-08-28 07:02:55.000000000 -0400
++++ gdb-6.7.1/bfd/config.bfd	2007-12-18 08:46:20.000000000 -0500
+@@ -482,6 +482,21 @@
+     targ_defvec=bfd_elf32_i386_vec
+     targ_selvecs=i386coff_vec
+     ;;
++  arm-*-coyotos* | arm-*-capros*)
++    targ_defvec=bfd_elf32_bigarm_vec
++    targ_selvecs=bfd_elf32_littlearm_vec
++    ;;
++  i[3-7]86-*-coyotos* | i[3-7]86-*-capros*)
++    targ_defvec=bfd_elf32_i386_vec
++    ;;
++  m68k-*-coyotos* | m68k-*-capros*)
++    targ_defvec=bfd_elf32_m68k_vec
++    targ_selvecs="ieee_vec"
++    ;;
++  x86_64-*-coyotos* | x86_64-*-capros*)
++    targ_defvec=bfd_elf64_x86_64_vec
++    targ_selvecs="bfd_elf32_i386_vec"
++    ;;
+   i[3-7]86-*-solaris2*)
+     targ_defvec=bfd_elf32_i386_vec
+     targ_selvecs=i386coff_vec
+diff -ruN baseline-gdb-6.7.1/config.sub gdb-6.7.1/config.sub
+--- baseline-gdb-6.7.1/config.sub	2007-08-29 11:23:21.000000000 -0400
++++ gdb-6.7.1/config.sub	2007-12-18 08:42:58.000000000 -0500
+@@ -1229,6 +1229,12 @@
+ 	      | -skyos* | -haiku* | -rdos* | -toppers* | -drops*)
+ 	# Remember, each alternative MUST END IN *, to match a version number.
+ 		;;
++	-capros*)
++		os=-capros
++		;;
++	-coyotos*)
++		os=-coyotos
++		;;
+ 	-qnx*)
+ 		case $basic_machine in
+ 		    x86-* | i*86-*)
+diff -ruN baseline-gdb-6.7.1/gdb/configure.tgt gdb-6.7.1/gdb/configure.tgt
+--- baseline-gdb-6.7.1/gdb/configure.tgt	2007-04-27 09:19:48.000000000 -0400
++++ gdb-6.7.1/gdb/configure.tgt	2007-12-18 09:36:49.000000000 -0500
+@@ -141,6 +141,8 @@
+ m68*-*-aout*)		gdb_target=monitor ;;
+ m68*-*-coff*)		gdb_target=monitor ;;
+ m68*-*-elf*)		gdb_target=monitor ;;
++m68*-*-capros)		gdb_target=monitor ;;
++m68*-*-coyotos)		gdb_target=monitor ;;
+ m68*-*-rtems*)		gdb_target=monitor ;;
+ m68*-*-linux*)		gdb_target=linux
+ 			build_gdbserver=yes

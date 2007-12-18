@@ -8,14 +8,19 @@ FCDIST=.fc$(FCRELEASEVER)
 
 BINUTILS_VERSION=2.18
 BINUTILS_SPEC=OS-ARCH-binutils-$(BINUTILS_VERSION).spec
+
 #NEWLIB_VERSION=1.13.0
 NEWLIB_VERSION=1.15.0
 NEWLIB_SPEC=OS-ARCH-newlib-$(NEWLIB_VERSION).spec
+
 GCC_VERSION=4.2.2
 GCC_SPEC=OS-ARCH-gcc-$(GCC_VERSION).spec
-
 GCCMAJOR=gcc$(firstword $(subst ., ,$(GCC_VERSION)))
 #GCCMAJOR=gcc4
+
+
+GDB_VERSION=6.7.1
+GDB_SPEC=OS-ARCH-gdb-$(GDB_VERSION).spec
 
 WITHGCC=--with $(GCCMAJOR)
 
@@ -44,6 +49,9 @@ FS_SPECS=\
 BINUTILS_SPECS=\
   $(foreach T,$(TARGETS),$(patsubst OS-ARCH%,$(T)%,$(BINUTILS_SPEC)))
 
+GDB_SPECS=\
+  $(foreach T,$(TARGETS),$(patsubst OS-ARCH%,$(T)%,$(GDB_SPEC)))
+
 NEWLIB_SPECS=\
   $(foreach T,$(TARGETS),$(patsubst OS-ARCH%,$(T)%,$(NEWLIB_SPEC)))
 
@@ -53,61 +61,18 @@ GCC_SPECS=\
 CRTFILES_SPECS=\
   $(foreach T,$(TARGETS),$(patsubst OS-ARCH%,$(T)%,OS-ARCH-crtfiles.spec))
 
-# ALL_OS=coyotos capros
-# ALL_ARCH=arm m68k i386
-# 
-# XENV_SPECS=\
-# 	capros-arm-xenv.spec \
-# 	capros-i386-xenv.spec \
-# 	coyotos-arm-xenv.spec \
-# 	coyotos-i386-xenv.spec \
-# 	coyotos-m68k-xenv.spec \
-# 
-# HOST_XENV_SPECS=\
-# 	capros-host-xenv.spec \
-# 	coyotos-host-xenv.spec \
-# 
-# FS_SPECS=\
-# 	capros-arm-filesystem.spec \
-# 	capros-common-filesystem.spec \
-# 	coyotos-common-filesystem.spec \
-# 	capros-i386-filesystem.spec \
-# 	coyotos-arm-filesystem.spec \
-# 	coyotos-i386-filesystem.spec \
-# 	coyotos-m68k-filesystem.spec \
-# 
-# BINUTILS_SPECS=\
-# 	capros-arm-binutils.spec \
-# 	capros-i386-binutils.spec \
-# 	coyotos-arm-binutils.spec \
-# 	coyotos-i386-binutils.spec \
-# 	coyotos-m68k-binutils.spec \
-# 
-# NEWLIB_SPECS=\
-# 	capros-arm-newlib.spec \
-# 	capros-i386-newlib.spec \
-# 	coyotos-arm-newlib.spec \
-# 	coyotos-i386-newlib.spec \
-# 	coyotos-m68k-newlib.spec \
-# 
-# GCC_SPECS=\
-# 	capros-arm-gcc.spec \
-# 	capros-i386-gcc.spec \
-# 	coyotos-arm-gcc.spec \
-# 	coyotos-i386-gcc.spec \
-# 	coyotos-m68k-gcc.spec \
-
 ALL_SPECS=\
 	$(XENV_SPECS) \
 	$(HOST_XENV_SPECS) \
 	$(FS_SPECS) \
 	$(BINUTILS_SPECS) \
+	$(GDB_SPECS) \
 	$(NEWLIB_SPECS) \
 	$(CRTFILES_SPECS) \
 	$(GCC_SPECS)
 
 ifndef TARGETS
-TARGETS=i386
+TARGETS=coyotos-i386
 endif
 
 RPMBUILD=rpmbuild
@@ -136,6 +101,14 @@ filesystem: ../BUILD ../RPMS ../SRPMS $(FS_SPECS)
 
 binutils: ../BUILD ../RPMS ../SRPMS $(BINUTILS_SPECS)
 	(set -x; for spec in $(BINUTILS_SPECS); do \
+	  $(RPMBUILD) -bb \
+		--define "dist $(FCDIST)" \
+		--define "_topdir $(PWD)/.." \
+		$${spec};\
+	done)
+
+gdb: ../BUILD ../RPMS ../SRPMS $(GDB_SPECS)
+	(set -x; for spec in $(GDB_SPECS); do \
 	  $(RPMBUILD) -bb \
 		--define "dist $(FCDIST)" \
 		--define "_topdir $(PWD)/.." \

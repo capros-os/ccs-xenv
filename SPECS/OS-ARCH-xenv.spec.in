@@ -26,11 +26,12 @@
 Summary: The %{CROSSOSNAME} Cross Environment
 Name: %{CROSSOS}-%{CROSSARCH}-xenv
 Version: 0.1.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
 Requires: %{CROSSOS}-%{CROSSARCH}-binutils
+Requires: %{CROSSOS}-%{CROSSARCH}-gdb
 Requires: %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}-gcc
 Requires: %{CROSSOS}-%{CROSSARCH}-newlib
 Requires: %{CROSSOS}-host-xenv

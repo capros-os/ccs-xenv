@@ -23,7 +23,7 @@ default: build
 
 .PHONY: coytools
 
-filesystem binutils pregcc newlib gcc gcc-links crtfiles coytools:
+filesystem binutils gdb pregcc newlib gcc gcc-links crtfiles coytools:
 	@for buildtarget in $(TARGETS); do\
 	  echo $(MAKE) -f Makefile.target BUILDTARGET=$${buildtarget} $@; \
 	  $(MAKE) -f Makefile.target BUILDTARGET=$${buildtarget} $@; \
@@ -43,6 +43,7 @@ BUILD:
 build: coytools
 	$(MAKE) -f $(THISMAKEFILE) filesystem
 	$(MAKE) -f $(THISMAKEFILE) binutils
+	$(MAKE) -f $(THISMAKEFILE) gdb
 	$(MAKE) -f $(THISMAKEFILE) pregcc
 	$(MAKE) -f $(THISMAKEFILE) newlib
 	$(MAKE) -f $(THISMAKEFILE) gcc

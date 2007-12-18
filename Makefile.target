@@ -20,16 +20,19 @@ CROSSSYSROOT=$(CROSSROOT)/sysroot-$(CROSSARCH)
 #
 ##################################################################
 BINUTILS_VERSION=2.18
-#NEWLIB_VERSION=1.13.0
-#NEWLIB_CVS_PATCH=newlib-cvs20051119.patch.bz2
+BINUTILS_PATCHES=$(wildcard SOURCES/binutils-$(BINUTILS_VERSION)*.patch)
+
 GCC_VERSION=4.2.2
+GCC_PATCHES=$(wildcard SOURCES/gcc-$(GCC_VERSION)*.patch)
+
 NEWLIB_VERSION=1.15.0
 NEWLIB_CVS_PATCH=newlib-cvs20070817.patch.bz2
 NEWLIB_PATCHES=$(wildcard SOURCES/newlib-$(NEWLIB_VERSION)*.patch)
+
 CRTFILES_VERSION=0.1.0
 
-BINUTILS_PATCHES=$(wildcard SOURCES/binutils-$(BINUTILS_VERSION)*.patch)
-GCC_PATCHES=$(wildcard SOURCES/gcc-$(GCC_VERSION)*.patch)
+GDB_VERSION=6.7.1
+GDB_PATCHES=$(wildcard SOURCES/gdb-$(GDB_VERSION)*.patch)
 
 ##################################################################
 #
@@ -118,6 +121,17 @@ BUILD/gcc-$(GCC_VERSION): | BUILD
 	done; \
 	fi
 
+# unpack gdb, apply patches
+BUILD/gdb-$(GDB_VERSION): | BUILD
+	@echo "Unpacking gdb-$(GDB_VERSION)"
+	(cd BUILD; tar xjf ../SOURCES/gdb-$(GDB_VERSION).tar.bz2)
+	(cd BUILD; patch -p0 < ../SOURCES/capos-gdb-$(GDB_VERSION).patch)
+	if [ "" != "$(GDB_PATCHES)" ]; then \
+	for patch in $(GDB_PATCHES); do \
+	  (cd BUILD; patch -p0 < ../$${patch}); \
+	done; \
+	fi
+
 # unpack gcc, apply patches
 BUILD/crtfiles-$(CRTFILES_VERSION): | BUILD
 	@echo "Unpacking crtfiles-$(CRTFILES_VERSION)"
@@ -165,6 +179,26 @@ binutils:
 	     --target ${CROSSTARGET})
 	$(MAKE) -C BUILD/build-binutils-$(CROSSARCH) tooldir=$(CROSSHOSTROOT) all
 	$(MAKE) -C BUILD/build-binutils-$(CROSSARCH) install
+
+##################################################################
+#
+# GDB
+#
+# Get the per-target gdb built and installed
+#
+##################################################################
+gdb: filesystem
+gdb: | BUILD/gdb-$(GDB_VERSION)
+gdb:
+	rm -rf BUILD/build-gdb-$(CROSSARCH)	
+	mkdir BUILD/build-gdb-$(CROSSARCH)
+	(cd BUILD/build-gdb-$(CROSSARCH); \
+	  CC="${CCACHE} gcc" ../gdb-$(GDB_VERSION)/configure \
+	     ${CONFIGDIRS} \
+	     --with-sysroot=$(CROSSSYSROOT) \
+	     --target ${CROSSTARGET})
+	$(MAKE) -C BUILD/build-gdb-$(CROSSARCH) tooldir=$(CROSSHOSTROOT) all
+	#$(MAKE) -C BUILD/build-gdb-$(CROSSARCH) install
 
 ##################################################################
 #

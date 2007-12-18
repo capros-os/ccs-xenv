@@ -1,0 +1,174 @@
+##################################################################
+# NOTE: RPM really wasn't designed for cross builds.
+#
+# We don't want to use --target, because the output binaries
+# are supposed to get installed on the build host. Therefore,
+# I am exploiting a macro hack. This RPM is designed to be run
+# with a command line like:
+#
+#    rpmbuild --define "crossarch i386" --define "crossos coyotos"
+#
+# If the define is not provided, the build will default to
+# target i386.
+#
+##################################################################
+
+%define CROSSARCH i386
+%define CROSSOS coyotos
+%define CROSSOSNAME Coyotos
+
+%define CROSSTARGET %{CROSSARCH}-unknown-%{CROSSOS}
+%define CROSSROOT /%{CROSSOS}
+%define CROSSHOSTROOT %{CROSSROOT}/host
+%define CROSSSYSROOT %{CROSSROOT}/sysroot-%{CROSSARCH}
+
+%define debug_package %{nil}
+%define __os_install_post %{nil}
+
+Summary: A GNU source-level debugger for C, C++, Java, and other languages
+Name: %{CROSSOS}-%{CROSSARCH}-gdb
+Version: 6.7.1
+Release: 1%{?dist}
+License: GPL
+Group: Development/Tools
+URL: http://www.coyotos.org
+Source: gdb-%{version}.tar.bz2
+Patch0: capos-gdb-%{version}.patch
+
+Buildroot: %{_tmppath}/%{CROSSOS}-binutils-root
+#Since we are cross building, we don't actually need dejagnu
+#BuildRequires: texinfo >= 4.0, dejagnu, gettext, flex, bison
+BuildRequires: texinfo >= 4.0, gettext
+Prereq: /sbin/install-info
+
+%description
+GDB, the GNU debugger, allows you to debug programs written in C, C++,
+Java, and other languages, by executing them in a controlled fashion
+and printing their data.
+
+# %%define _gnu %{nil}
+
+%prep
+%setup -q -n gdb-%{version}
+%patch0 -p1
+
+%build
+%define optflags ""
+rm -rf ../build-gdb-%{CROSSARCH}
+mkdir ../build-gdb-%{CROSSARCH}
+
+##	--bindir=%{CROSSHOSTROOT}/bin
+##	--sbindir=%{CROSSHOSTROOT}/sbin
+##	--sysconfdir=%{CROSSHOSTROOT}/etc
+##	--datadir=%{CROSSHOSTROOT}/share
+##	--libexecdir=%{CROSSHOSTROOT}/libexec
+##	--localstatedir=%{CROSSHOSTROOT}/var
+##	--sharedstatedir=%{CROSSHOSTROOT}/include
+##	--includedir=%{CROSSSYSROOT}/include
+##	--libdir=%{CROSSSYSROOT}/lib
+
+(cd ../build-gdb-%{CROSSARCH}; ../gdb-%{version}/configure \
+	--prefix=%{CROSSHOSTROOT} \
+	--mandir=%{CROSSHOSTROOT}/share/man \
+	--infodir=%{CROSSHOSTROOT}/share/info \
+	--with-sysroot=%{CROSSSYSROOT} \
+	--target=%{CROSSTARGET})
+
+#make %{_smp_mflags} tooldir=%{_tooldir} all
+make -C ../build-gdb-%{CROSSARCH} tooldir=%{CROSSHOSTROOT} all
+
+#make -k check < /dev/null > check.log 2>&1 || :
+#echo ====================TESTING=========================
+#cat check.log
+#echo ====================TESTING END=====================
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}%{_prefix}
+
+# FIX: need destdir
+make -C ../build-gdb-%{CROSSARCH} DESTDIR=%{buildroot} install
+
+# on FC5, installinfo creates a directory file that we do not want.
+# strangely, this does not seem to happen on FC6
+rm -f %{buildroot}%{CROSSHOSTROOT}/share/info/dir
+
+# make prefix=%{buildroot}%{_prefix} infodir=%{buildroot}%{_infodir} install-info
+# gzip -q9f %{buildroot}%{_infodir}/*.info*
+
+# libiberty gets installed into the wrong location. Move it:
+# install -m 755 -d %{buildroot}%{CROSSHOSTROOT}/lib
+# mv %{buildroot}%{CROSSROOT}/lib/libiberty.a %{buildroot}%{CROSSHOSTROOT}/lib/libiberty.a
+
+# The cross-build process doesn't generate anything translated...
+#%find_lang binutils
+#%find_lang opcodes
+#%find_lang bfd
+#%find_lang gas
+#%find_lang ld
+#%find_lang gprof
+#cat opcodes.lang >> binutils.lang
+#cat bfd.lang >> binutils.lang
+#cat gas.lang >> binutils.lang
+#cat ld.lang >> binutils.lang
+#cat gprof.lang >> binutils.lang
+
+%clean
+rm -rf %{buildroot}
+
+#################################################################
+# HACK ALERT:
+#
+# I want to get out of this a single, target-neutral source
+# RPM that can be built for multiple, independent targets using
+# --target. The way I am accomplishing this at present is to
+# entirely suppress the creation of a main binary package,
+# and instead create a renamed subpackage that includes the
+# target architecture name as a component.
+#
+# An unfortunate consequence of this is that every target build
+# will independently create the common documentation package,
+# but I don't really know how to resolve that without a lot
+# more work than I am willing to do at the moment.
+#
+# The output package name will take the form
+#
+#   %{CROSSOS}-target-PACKAGE-VERSION.HOSTARCH.rpm
+#
+#################################################################
+
+## %package -n %{CROSSOS}-host-gdb
+## Summary: Cross-gdb host-specific files
+## Group: Development/Tools
+##
+## %description -n %{CROSSOS}-host-gdb 
+## Host-specific gdb files for all target platforms
+##
+## %files -n %{CROSSOS}-host-gdb
+## %{_prefix}/include/*
+## %{_prefix}/%{_lib}/lib*
+
+
+%package -n %{CROSSOS}-common-gdb
+Summary: Cross-gdb documentation and man pages, all targets
+Group: Development/Tools
+
+%description -n %{CROSSOS}-common-gdb 
+Documentation and common, shared content for the cross-gdb 
+package.
+
+%files -n %{CROSSOS}-common-gdb
+%{CROSSHOSTROOT}/share/locale/*/LC_MESSAGES/*
+%{CROSSHOSTROOT}/share/info/*info*
+%{CROSSHOSTROOT}/lib/libiberty.a
+
+# Cross-build does not generate translations:
+%files
+%defattr(-,root,root)
+#%doc README
+%{CROSSHOSTROOT}/bin/*
+%{CROSSHOSTROOT}/share/man/man1/*
+
+%changelog
+* Tue Dec 18 2007 Jonathan Shapiro <shap@eros-os.org> 6.7.1.1
+- Initial RPM spec that appears to work.
