@@ -22,6 +22,10 @@
 %define CROSSHOSTROOT %{CROSSROOT}/host
 %define CROSSSYSROOT %{CROSSROOT}/sysroot-%{CROSSARCH}
 
+# This particularly sleazy hack lets me do target-specific
+# conditionals, notably in the files list:
+%{expand:%%global crosstarget_%{CROSSARCH} 1}
+
 %define debug_package %{nil}
 %define __os_install_post %{nil}
 
@@ -35,10 +39,11 @@ URL: http://www.coyotos.org
 Source: gdb-%{version}.tar.bz2
 Patch0: capos-gdb-%{version}.patch
 
-Buildroot: %{_tmppath}/%{CROSSOS}-binutils-root
+Buildroot: %{_tmppath}/%{CROSSOS}-gdb-root
 #Since we are cross building, we don't actually need dejagnu
 #BuildRequires: texinfo >= 4.0, dejagnu, gettext, flex, bison
 BuildRequires: texinfo >= 4.0, gettext
+BuildRequires: ncurses-devel
 Prereq: /sbin/install-info
 
 %description
@@ -168,6 +173,9 @@ package.
 #%doc README
 %{CROSSHOSTROOT}/bin/*
 %{CROSSHOSTROOT}/share/man/man1/*
+%if %{defined crosstarget_arm}
+%{CROSSHOSTROOT}/lib/libarm-unknown-coyotos-sim.a
+%endif
 
 %changelog
 * Tue Dec 18 2007 Jonathan Shapiro <shap@eros-os.org> 6.7.1.1
