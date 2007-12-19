@@ -32,7 +32,7 @@
 Summary: A GNU source-level debugger for C, C++, Java, and other languages
 Name: %{CROSSOS}-%{CROSSARCH}-gdb
 Version: 6.7.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
@@ -46,6 +46,7 @@ Buildroot: %{_tmppath}/%{CROSSOS}-gdb-root
 #BuildRequires: texinfo >= 4.0, dejagnu, gettext, flex, bison
 BuildRequires: texinfo >= 4.0, gettext
 BuildRequires: ncurses-devel
+Requires: %{CROSSOS}-common-gdb
 Prereq: /sbin/install-info
 
 %description
