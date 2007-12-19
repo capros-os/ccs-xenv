@@ -32,7 +32,7 @@
 Summary: A GNU source-level debugger for C, C++, Java, and other languages
 Name: %{CROSSOS}-%{CROSSARCH}-gdb
 Version: 6.7.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
@@ -106,9 +106,8 @@ rm -f %{buildroot}%{CROSSHOSTROOT}/share/info/dir
 # make prefix=%{buildroot}%{_prefix} infodir=%{buildroot}%{_infodir} install-info
 # gzip -q9f %{buildroot}%{_infodir}/*.info*
 
-# libiberty gets installed into the wrong location. Move it:
-# install -m 755 -d %{buildroot}%{CROSSHOSTROOT}/lib
-# mv %{buildroot}%{CROSSROOT}/lib/libiberty.a %{buildroot}%{CROSSHOSTROOT}/lib/libiberty.a
+# libiberty conflicts with binutils. Let binutils win.
+rm %{buildroot}%{CROSSHOSTROOT}/lib/libiberty.a
 
 # The cross-build process doesn't generate anything translated...
 #%find_lang binutils
@@ -170,7 +169,6 @@ package.
 %files -n %{CROSSOS}-common-gdb
 %{CROSSHOSTROOT}/share/locale/*/LC_MESSAGES/*
 %{CROSSHOSTROOT}/share/info/*info*
-%{CROSSHOSTROOT}/lib/libiberty.a
 
 # Cross-build does not generate translations:
 %files
@@ -179,7 +177,7 @@ package.
 %{CROSSHOSTROOT}/bin/*
 %{CROSSHOSTROOT}/share/man/man1/*
 %if %{defined crosstarget_arm}
-%{CROSSHOSTROOT}/lib/libarm-unknown-coyotos-sim.a
+%{CROSSHOSTROOT}/lib/libarm-unknown-%{CROSSOS}-sim.a
 %endif
 
 %changelog
