@@ -1661,7 +1661,7 @@ diff -ruN baseline-gcc-4.2.2/gcc/config/arm/capros.h gcc-4.2.2/gcc/config/arm/ca
 +/* If ELF is the default format, we should not use /lib/elf.  */
 +
 +#undef	LINK_SPEC
-+#define LINK_SPEC "%{small-space:-m arm_coyotos_small} \
++#define LINK_SPEC "%{small-space:-m armelf_coyotos_small} \
 +  %{static:-static}"
 +
 diff -ruN baseline-gcc-4.2.2/gcc/config/arm/coyotos.h gcc-4.2.2/gcc/config/arm/coyotos.h
@@ -1695,7 +1695,7 @@ diff -ruN baseline-gcc-4.2.2/gcc/config/arm/coyotos.h gcc-4.2.2/gcc/config/arm/c
 +/* If ELF is the default format, we should not use /lib/elf.  */
 +
 +#undef	LINK_SPEC
-+#define LINK_SPEC "%{small-space:-m arm_coyotos_small} \
++#define LINK_SPEC "%{small-space:-m armelf_coyotos_small} \
 +  %{static:-static}"
 +
 diff -ruN baseline-gcc-4.2.2/gcc/config/capros.h gcc-4.2.2/gcc/config/capros.h
