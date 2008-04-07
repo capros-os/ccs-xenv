@@ -31,7 +31,7 @@
 Summary: The %{CROSSOSNAME} C Runtime Files
 Name: %{CROSSOS}-%{CROSSARCH}-crtfiles
 Version: 0.1.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: LGPL with exceptions
 Group: Development/Tools
 URL: http://www.coyotos.org
