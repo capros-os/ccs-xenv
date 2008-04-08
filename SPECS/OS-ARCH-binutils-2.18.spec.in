@@ -28,7 +28,7 @@
 Summary: A GNU collection of binary utilities.
 Name: %{CROSSOS}-%{CROSSARCH}-binutils
 Version: 2.18
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
