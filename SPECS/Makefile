@@ -184,6 +184,7 @@ build:
 	rpm -ivh ../RPMS/i386/*$(GCCMAJOR)*.rpm
 	$(MAKE) crtfiles
 	rpm -ivh ../RPMS/i386/*crtfiles*.rpm
+	$(MAKE) gdb
 
 clean:
 	-rm -f $(foreach os,$(ALL_OS),$(patsubst OS-%,$(os)-%,OS-*.spec)) *~
