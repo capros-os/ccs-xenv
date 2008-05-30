@@ -19,7 +19,7 @@ GCCMAJOR=gcc$(firstword $(subst ., ,$(GCC_VERSION)))
 #GCCMAJOR=gcc4
 
 
-GDB_VERSION=6.7.1
+GDB_VERSION=6.8
 GDB_SPEC=OS-ARCH-gdb-$(GDB_VERSION).spec
 
 WITHGCC=--with $(GCCMAJOR)

@@ -31,7 +31,7 @@ NEWLIB_PATCHES=$(wildcard SOURCES/newlib-$(NEWLIB_VERSION)*.patch)
 
 CRTFILES_VERSION=0.1.0
 
-GDB_VERSION=6.7.1
+GDB_VERSION=6.8
 GDB_PATCHES=$(wildcard SOURCES/gdb-$(GDB_VERSION)*.patch)
 
 ##################################################################
