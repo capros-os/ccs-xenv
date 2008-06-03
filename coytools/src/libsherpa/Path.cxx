@@ -40,6 +40,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include "Path.hxx"
 #include "UExcept.hxx"

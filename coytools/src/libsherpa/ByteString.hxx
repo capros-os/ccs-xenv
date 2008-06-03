@@ -40,6 +40,8 @@
  *
  **************************************************************************/
 
+#include <string.h>  // for memcpy() and friends
+
 // Need a specialization of char_traits for this:
 namespace std {
   template<> struct char_traits<uint8_t> {

@@ -97,7 +97,7 @@ namespace sherpa {
   std::string
   hex_encode(const ByteString& s)
   {
-    static char *hex_digits = "0123456789abcdef";
+    static const char *hex_digits = "0123456789abcdef";
     std::string out;
 
     for (size_t u = 0; u < s.length(); u++) {

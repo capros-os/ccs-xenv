@@ -42,6 +42,7 @@
 #include <syslog.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <dirent.h>
 
 #include <string>

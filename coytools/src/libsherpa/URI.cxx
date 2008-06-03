@@ -40,6 +40,7 @@
 #include "../config.h"
 #include <stdint.h>
 #include <dirent.h>
+#include <string.h>
 
 #include <string>
 
