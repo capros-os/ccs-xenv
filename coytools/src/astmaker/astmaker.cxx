@@ -46,6 +46,7 @@
 #include <iostream>
 #include <iomanip>
 #include <locale>
+#include <algorithm>
 #include <string>
 #include <cctype>
 
