@@ -19,6 +19,7 @@
  */
 
 #include <assert.h>
+#include <string.h>
 #include <string>
 
 #include <unicode/uchar.h>
