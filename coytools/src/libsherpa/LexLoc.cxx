@@ -43,6 +43,8 @@
 #include <string>
 #include <sstream>
 
+#include <stdlib.h>  // for strtoul()
+
 #include "LexLoc.hxx"
 
 namespace sherpa {
@@ -76,7 +78,7 @@ namespace sherpa {
        allows us to write a regular expression that can skip location 
        updates without difficulty. */
     for (size_t i = 0; i < pathStr.size(); i++) {
-      if (pathStr[i] == '}' | pathStr[i] == '#')
+      if (pathStr[i] == '}' || pathStr[i] == '#')
 	msg << '#';
       msg << pathStr[i];
     }
