@@ -37,6 +37,7 @@
 
 #include <assert.h>
 #include <string>
+#include <string.h>  /* For memset() */
 #include "BigNum.hxx"
 #include "UExcept.hxx"
 
