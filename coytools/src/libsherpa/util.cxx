@@ -102,7 +102,7 @@ unsigned64_to_buffer(uint64_t ul, char *buf)
   p = &buf[BUFSZ-1];
 
   if (ul == 0)
-    return "0";
+    *(--p) = '0';
 
   while(ul) {
     *(--p) = '0' + (ul % 10);
