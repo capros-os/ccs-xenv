@@ -42,6 +42,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <assert.h>
+#include <string.h>
 
 #include <string>
 #include <iostream>
