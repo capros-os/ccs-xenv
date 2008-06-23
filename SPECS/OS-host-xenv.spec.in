@@ -24,7 +24,7 @@
 Summary: The %{CROSSOSNAME} Cross Environment
 Name: %{CROSSOS}-host-xenv
 Version: 0.1.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
@@ -37,8 +37,6 @@ Requires: /usr/lib/libbfd.a
 Requires: texinfo-tex
 # Only needed if you plan to pull the coyotos source code :-)
 Requires: mercurial
-# Not really required, but VERY helpful:
-Requires: ccache
 # Really required:
 Requires: osdoc
 Requires: libsherpa
