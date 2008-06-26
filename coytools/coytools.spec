@@ -47,7 +47,7 @@ other applications as well.
 
 %files -n libsherpa
 %defattr(-,root,root,-)
-/usr/lib/libsherpa.a
+%{_libdir}/libsherpa.a
 /usr/include/libsherpa/*.hxx
 
 %package -n libsherpa-debuginfo
@@ -91,7 +91,7 @@ package or when debugging this package.\
 %files -n astmaker-debuginfo
 %defattr(-,root,root,-)
 /usr/src/debug/%{name}-%{version}/src/astmaker/*
-%{_libdir}/debug/usr/bin/astmaker.debug
+/usr/lib/debug/usr/bin/astmaker.debug
 
 
 %changelog
