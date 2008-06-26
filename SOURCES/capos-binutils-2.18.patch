@@ -1,6 +1,6 @@
 diff -ruN baseline-binutils-2.18/bfd/config.bfd binutils-2.18/bfd/config.bfd
 --- baseline-binutils-2.18/bfd/config.bfd	2007-08-28 13:19:33.000000000 -0400
-+++ binutils-2.18/bfd/config.bfd	2007-11-12 23:33:49.000000000 -0500
++++ binutils-2.18/bfd/config.bfd	2008-06-25 13:04:50.000000000 -0400
 @@ -482,6 +482,21 @@
      targ_defvec=bfd_elf32_i386_vec
      targ_selvecs=i386coff_vec
@@ -25,7 +25,7 @@ diff -ruN baseline-binutils-2.18/bfd/config.bfd binutils-2.18/bfd/config.bfd
      targ_selvecs=i386coff_vec
 diff -ruN baseline-binutils-2.18/bfd/po/Make-in binutils-2.18/bfd/po/Make-in
 --- baseline-binutils-2.18/bfd/po/Make-in	2007-08-24 10:01:13.000000000 -0400
-+++ binutils-2.18/bfd/po/Make-in	2007-11-12 23:34:55.000000000 -0500
++++ binutils-2.18/bfd/po/Make-in	2008-06-25 13:04:51.000000000 -0400
 @@ -20,10 +20,10 @@
  
  prefix = @prefix@
@@ -42,7 +42,7 @@ diff -ruN baseline-binutils-2.18/bfd/po/Make-in binutils-2.18/bfd/po/Make-in
  DESTDIR =
 diff -ruN baseline-binutils-2.18/binutils/po/Make-in binutils-2.18/binutils/po/Make-in
 --- baseline-binutils-2.18/binutils/po/Make-in	2007-08-24 10:01:17.000000000 -0400
-+++ binutils-2.18/binutils/po/Make-in	2007-11-12 23:35:21.000000000 -0500
++++ binutils-2.18/binutils/po/Make-in	2008-06-25 13:04:51.000000000 -0400
 @@ -20,10 +20,10 @@
  
  prefix = @prefix@
@@ -59,7 +59,7 @@ diff -ruN baseline-binutils-2.18/binutils/po/Make-in binutils-2.18/binutils/po/M
  DESTDIR =
 diff -ruN baseline-binutils-2.18/config.sub binutils-2.18/config.sub
 --- baseline-binutils-2.18/config.sub	2007-08-06 16:00:30.000000000 -0400
-+++ binutils-2.18/config.sub	2007-11-12 23:35:46.000000000 -0500
++++ binutils-2.18/config.sub	2008-06-25 13:04:51.000000000 -0400
 @@ -1229,6 +1229,8 @@
  	      | -skyos* | -haiku* | -rdos* | -toppers* | -drops*)
  	# Remember, each alternative MUST END IN *, to match a version number.
@@ -71,7 +71,7 @@ diff -ruN baseline-binutils-2.18/config.sub binutils-2.18/config.sub
  		    x86-* | i*86-*)
 diff -ruN baseline-binutils-2.18/gas/configure.tgt binutils-2.18/gas/configure.tgt
 --- baseline-binutils-2.18/gas/configure.tgt	2007-08-28 13:19:36.000000000 -0400
-+++ binutils-2.18/gas/configure.tgt	2007-11-12 23:40:36.000000000 -0500
++++ binutils-2.18/gas/configure.tgt	2008-06-25 13:04:51.000000000 -0400
 @@ -105,6 +105,7 @@
  
    arm-*-aout)				fmt=aout ;;
@@ -98,7 +98,7 @@ diff -ruN baseline-binutils-2.18/gas/configure.tgt binutils-2.18/gas/configure.t
    m68k-*-rtems*)			fmt=elf ;;
 diff -ruN baseline-binutils-2.18/gas/po/Make-in binutils-2.18/gas/po/Make-in
 --- baseline-binutils-2.18/gas/po/Make-in	2007-08-24 10:01:25.000000000 -0400
-+++ binutils-2.18/gas/po/Make-in	2007-11-12 23:36:52.000000000 -0500
++++ binutils-2.18/gas/po/Make-in	2008-06-25 13:04:51.000000000 -0400
 @@ -20,10 +20,10 @@
  
  prefix = @prefix@
@@ -115,7 +115,7 @@ diff -ruN baseline-binutils-2.18/gas/po/Make-in binutils-2.18/gas/po/Make-in
  DESTDIR =
 diff -ruN baseline-binutils-2.18/gprof/po/Make-in binutils-2.18/gprof/po/Make-in
 --- baseline-binutils-2.18/gprof/po/Make-in	2007-08-24 10:01:50.000000000 -0400
-+++ binutils-2.18/gprof/po/Make-in	2007-11-12 23:40:36.000000000 -0500
++++ binutils-2.18/gprof/po/Make-in	2008-06-25 13:04:51.000000000 -0400
 @@ -20,10 +20,10 @@
  
  prefix = @prefix@
@@ -132,7 +132,7 @@ diff -ruN baseline-binutils-2.18/gprof/po/Make-in binutils-2.18/gprof/po/Make-in
  DESTDIR =
 diff -ruN baseline-binutils-2.18/ld/configure.tgt binutils-2.18/ld/configure.tgt
 --- baseline-binutils-2.18/ld/configure.tgt	2007-08-28 13:19:42.000000000 -0400
-+++ binutils-2.18/ld/configure.tgt	2007-11-12 23:38:24.000000000 -0500
++++ binutils-2.18/ld/configure.tgt	2008-06-25 13:04:51.000000000 -0400
 @@ -48,6 +48,10 @@
  arm-*-pe)		targ_emul=armpe ; targ_extra_ofiles="deffilep.o pe-dll.o" ;;
  arm-*-aout | armel-*-aout) targ_emul=armaoutl ;;
@@ -180,39 +180,22 @@ diff -ruN baseline-binutils-2.18/ld/configure.tgt binutils-2.18/ld/configure.tgt
  m68k-*-linux*aout*)	targ_emul=m68klinux
 diff -ruN baseline-binutils-2.18/ld/emulparams/armelf_coyotos.sh binutils-2.18/ld/emulparams/armelf_coyotos.sh
 --- baseline-binutils-2.18/ld/emulparams/armelf_coyotos.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.18/ld/emulparams/armelf_coyotos.sh	2007-11-12 23:40:47.000000000 -0500
-@@ -0,0 +1,41 @@
-+MACHINE=
++++ binutils-2.18/ld/emulparams/armelf_coyotos.sh	2008-06-25 13:21:32.000000000 -0400
+@@ -0,0 +1,55 @@
++# Originally derived from armelf.sh
++
++ARCH=arm
 +SCRIPT_NAME=elf
 +OUTPUT_FORMAT="elf32-littlearm"
 +BIG_OUTPUT_FORMAT="elf32-bigarm"
 +LITTLE_OUTPUT_FORMAT="elf32-littlearm"
-+TEXT_START_ADDR=0x8000
++MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
++COMMONPAGESIZE="CONSTANT (COMMONPAGESIZE)"
 +TEMPLATE_NAME=elf32
 +EXTRA_EM_FILE=armelf
-+OTHER_TEXT_SECTIONS='*(.glue_7t) *(.glue_7)'
-+OTHER_BSS_SYMBOLS='__bss_start__ = .;'
-+OTHER_BSS_END_SYMBOLS='_bss_end__ = . ; __bss_end__ = . ;'
-+OTHER_END_SYMBOLS='__end__ = . ;'
-+OTHER_SECTIONS='.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
-+  .ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }'
-+OTHER_READONLY_SECTIONS="
-+  .ARM.extab ${RELOCATING-0} : { *(.ARM.extab${RELOCATING+* .gnu.linkonce.armextab.*}) }
-+  ${RELOCATING+ __exidx_start = .; }
-+  .ARM.exidx ${RELOCATING-0} : { *(.ARM.exidx${RELOCATING+* .gnu.linkonce.armexidx.*}) }
-+  ${RELOCATING+ __exidx_end = .; }"
 +
-+DATA_START_SYMBOLS='PROVIDE(__data_start = .);';
-+
-+ARCH=arm
-+MACHINE=
-+MAXPAGESIZE=256
-+ENTRY=_start
-+EMBEDDED=yes
-+
-+# This sets the stack to the top of the simulator memory (2^19 bytes).
-+STACK_ADDR=0x80000
-+
++# NOT FOR NOW
++#
 +# If this is set to an nonempty string, genscripts.sh will invoke the
 +# scripttempl script an extra time to create a shared library script.
 +#
@@ -221,60 +204,55 @@ diff -ruN baseline-binutils-2.18/ld/emulparams/armelf_coyotos.sh binutils-2.18/l
 +# scripttempl script an extra time to create a shared library script.
 +#
 +# GENERATE_PIE_SCRIPT=
++
++DATA_START_SYMBOLS='PROVIDE(__data_start = .);';
++OTHER_TEXT_SECTIONS='*(.glue_7t) *(.glue_7)'
++OTHER_BSS_SYMBOLS='__bss_start__ = .;'
++OTHER_BSS_END_SYMBOLS='_bss_end__ = . ; __bss_end__ = . ;'
++OTHER_END_SYMBOLS='__end__ = . ;'
++OTHER_SECTIONS='.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }'
++ATTRS_SECTIONS='.ARM.attributes 0 : { KEEP (*(.ARM.attributes)) KEEP (*(.gnu.attributes)) }'
++
++OTHER_READONLY_SECTIONS="
++  .ARM.extab ${RELOCATING-0} : { *(.ARM.extab${RELOCATING+* .gnu.linkonce.armextab.*}) }
++  ${RELOCATING+ __exidx_start = .; }
++  .ARM.exidx ${RELOCATING-0} : { *(.ARM.exidx${RELOCATING+* .gnu.linkonce.armexidx.*}) }
++  ${RELOCATING+ __exidx_end = .; }"
++
++
++TEXT_START_ADDR=0x8000
++TARGET2_TYPE=got-rel
++
 +# ARM does not support .s* sections.
 +NO_SMALL_DATA=yes
++
++
++MACHINE=
++ENTRY=_start
++EMBEDDED=yes
++
++# We do not set STACK_ADDR for Coyotos.
++#STACK_ADDR=0x80000
++
++# ARM does not support .s* sections.
++NO_SMALL_DATA=yes
++
 diff -ruN baseline-binutils-2.18/ld/emulparams/armelf_coyotos_small.sh binutils-2.18/ld/emulparams/armelf_coyotos_small.sh
 --- baseline-binutils-2.18/ld/emulparams/armelf_coyotos_small.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.18/ld/emulparams/armelf_coyotos_small.sh	2007-11-12 23:40:47.000000000 -0500
-@@ -0,0 +1,44 @@
++++ binutils-2.18/ld/emulparams/armelf_coyotos_small.sh	2008-06-25 13:21:31.000000000 -0400
+@@ -0,0 +1,6 @@
 +#Link rules variant for Coytos/EROS when compiling for small processes.
-+MACHINE=
-+SCRIPT_NAME=elf
-+OUTPUT_FORMAT="elf32-littlearm"
-+BIG_OUTPUT_FORMAT="elf32-bigarm"
-+LITTLE_OUTPUT_FORMAT="elf32-littlearm"
++
++. ${srcdir}/emulparams/armelf_coyotos.sh
++
++# Override text start address for small process:
 +TEXT_START_ADDR=0x2000
-+NONPAGED_TEXT_START_ADDR=${TEXT_START_ADDR}
-+TEMPLATE_NAME=elf32
-+EXTRA_EM_FILE=armelf
-+OTHER_TEXT_SECTIONS='*(.glue_7t) *(.glue_7)'
-+OTHER_BSS_SYMBOLS='__bss_start__ = .;'
-+OTHER_BSS_END_SYMBOLS='_bss_end__ = . ; __bss_end__ = . ;'
-+OTHER_END_SYMBOLS='__end__ = . ;'
-+OTHER_SECTIONS='.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
-+  .ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }'
-+OTHER_READONLY_SECTIONS="
-+  .ARM.extab ${RELOCATING-0} : { *(.ARM.extab${RELOCATING+* .gnu.linkonce.armextab.*}) }
-+  ${RELOCATING+ __exidx_start = .; }
-+  .ARM.exidx ${RELOCATING-0} : { *(.ARM.exidx${RELOCATING+* .gnu.linkonce.armexidx.*}) }
-+  ${RELOCATING+ __exidx_end = .; }"
-+
-+DATA_START_SYMBOLS='PROVIDE(__data_start = .);';
-+
-+# If this is set to an nonempty string, genscripts.sh will invoke the
-+# scripttempl script an extra time to create a shared library script.
-+#
-+# GENERATE_SHLIB_SCRIPT=
-+# If this is set to an nonempty string, genscripts.sh will invoke the
-+# scripttempl script an extra time to create a shared library script.
-+#
-+# GENERATE_PIE_SCRIPT=
-+
-+ARCH=arm
-+MACHINE=
-+MAXPAGESIZE=256
-+ENTRY=_start
-+EMBEDDED=yes
-+
-+# This sets the stack to the top of the simulator memory (2^19 bytes).
-+STACK_ADDR=0x80000
-+
-+# ARM does not support .s* sections.
-+NO_SMALL_DATA=yes
 diff -ruN baseline-binutils-2.18/ld/emulparams/elf_i386_coyotos.sh binutils-2.18/ld/emulparams/elf_i386_coyotos.sh
 --- baseline-binutils-2.18/ld/emulparams/elf_i386_coyotos.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.18/ld/emulparams/elf_i386_coyotos.sh	2007-11-12 23:40:47.000000000 -0500
-@@ -0,0 +1,27 @@
++++ binutils-2.18/ld/emulparams/elf_i386_coyotos.sh	2008-06-25 13:21:31.000000000 -0400
+@@ -0,0 +1,28 @@
++# Derived from elf_i386.sh
++
 +#Link rules variant for Coytos/EROS. This should be the same as elf_i386,
 +#except that start address is moved to 0x08000000 so that it will align
 +# naturally at a page directory and GPT boundary.
@@ -284,9 +262,8 @@ diff -ruN baseline-binutils-2.18/ld/emulparams/elf_i386_coyotos.sh binutils-2.18
 +SCRIPT_NAME=elf
 +OUTPUT_FORMAT="elf32-i386"
 +TEXT_START_ADDR=0x08000000
-+MAXPAGESIZE=0x1000
-+COMMONPAGESIZE=0x1000
-+NONPAGED_TEXT_START_ADDR=0x08000000
++MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
++COMMONPAGESIZE="CONSTANT (COMMONPAGESIZE)"
 +ARCH=i386
 +MACHINE=
 +NOP=0x90909090
@@ -304,39 +281,23 @@ diff -ruN baseline-binutils-2.18/ld/emulparams/elf_i386_coyotos.sh binutils-2.18
 +SEPARATE_GOTPLT=12
 diff -ruN baseline-binutils-2.18/ld/emulparams/elf_i386_coyotos_small.sh binutils-2.18/ld/emulparams/elf_i386_coyotos_small.sh
 --- baseline-binutils-2.18/ld/emulparams/elf_i386_coyotos_small.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.18/ld/emulparams/elf_i386_coyotos_small.sh	2007-11-12 23:40:47.000000000 -0500
-@@ -0,0 +1,22 @@
++++ binutils-2.18/ld/emulparams/elf_i386_coyotos_small.sh	2008-06-25 13:21:31.000000000 -0400
+@@ -0,0 +1,5 @@
 +#Link rules variant for Coytos/EROS when compiling for small processes.
-+SCRIPT_NAME=elf
-+OUTPUT_FORMAT="elf32-i386"
++
++. ${srcdir}/emulparams/m68kelf_coyotos.sh
++
 +TEXT_START_ADDR=0x2000
-+MAXPAGESIZE=0x1000
-+COMMONPAGESIZE=0x1000
-+NONPAGED_TEXT_START_ADDR=0x2000
-+ARCH=i386
-+MACHINE=
-+NOP=0x90909090
-+TEMPLATE_NAME=elf32
-+DATA_START_SYMBOLS='PROVIDE(__data_start = .);'
-+# If this is set to an nonempty string, genscripts.sh will invoke the
-+# scripttempl script an extra time to create a shared library script.
-+#
-+# GENERATE_SHLIB_SCRIPT=
-+# If this is set to an nonempty string, genscripts.sh will invoke the
-+# scripttempl script an extra time to create a shared library script.
-+#
-+# GENERATE_PIE_SCRIPT=
-+NO_SMALL_DATA=yes
-+SEPARATE_GOTPLT=12
 diff -ruN baseline-binutils-2.18/ld/emulparams/m68kelf_coyotos.sh binutils-2.18/ld/emulparams/m68kelf_coyotos.sh
 --- baseline-binutils-2.18/ld/emulparams/m68kelf_coyotos.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.18/ld/emulparams/m68kelf_coyotos.sh	2007-11-12 23:40:47.000000000 -0500
-@@ -0,0 +1,20 @@
++++ binutils-2.18/ld/emulparams/m68kelf_coyotos.sh	2008-06-25 13:21:30.000000000 -0400
+@@ -0,0 +1,21 @@
++# Derived from m68kelf.sh
++
 +SCRIPT_NAME=elf
 +OUTPUT_FORMAT="elf32-m68k"
 +TEXT_START_ADDR=0x80000000
-+MAXPAGESIZE=0x2000
-+NONPAGED_TEXT_START_ADDR=${TEXT_START_ADDR}
++MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
 +ARCH=m68k
 +MACHINE=
 +NOP=0x4e754e75
@@ -354,32 +315,17 @@ diff -ruN baseline-binutils-2.18/ld/emulparams/m68kelf_coyotos.sh binutils-2.18/
 +NO_SMALL_DATA=yes
 diff -ruN baseline-binutils-2.18/ld/emulparams/m68kelf_coyotos_small.sh binutils-2.18/ld/emulparams/m68kelf_coyotos_small.sh
 --- baseline-binutils-2.18/ld/emulparams/m68kelf_coyotos_small.sh	1969-12-31 19:00:00.000000000 -0500
-+++ binutils-2.18/ld/emulparams/m68kelf_coyotos_small.sh	2007-11-12 23:40:47.000000000 -0500
-@@ -0,0 +1,21 @@
++++ binutils-2.18/ld/emulparams/m68kelf_coyotos_small.sh	2008-06-25 13:21:27.000000000 -0400
+@@ -0,0 +1,6 @@
 +#Link rules variant for Coytos/EROS when compiling for small processes.
-+SCRIPT_NAME=elf
-+OUTPUT_FORMAT="elf32-m68k"
++
++. ${srcdir}/emulparams/m68kelf_coyotos.sh
++
++# Override text start address for small process:
 +TEXT_START_ADDR=0x4000
-+MAXPAGESIZE=0x2000
-+NONPAGED_TEXT_START_ADDR=${TEXT_START_ADDR}
-+ARCH=m68k
-+MACHINE=
-+NOP=0x4e754e75
-+TEMPLATE_NAME=elf32
-+EXTRA_EM_FILE=m68kelf
-+DATA_START_SYMBOLS='PROVIDE(__data_start = .);'
-+# If this is set to an nonempty string, genscripts.sh will invoke the
-+# scripttempl script an extra time to create a shared library script.
-+#
-+# GENERATE_SHLIB_SCRIPT=
-+# If this is set to an nonempty string, genscripts.sh will invoke the
-+# scripttempl script an extra time to create a shared library script.
-+#
-+# GENERATE_PIE_SCRIPT=
-+NO_SMALL_DATA=yes
 diff -ruN baseline-binutils-2.18/ld/Makefile.am binutils-2.18/ld/Makefile.am
 --- baseline-binutils-2.18/ld/Makefile.am	2007-08-06 16:00:17.000000000 -0400
-+++ binutils-2.18/ld/Makefile.am	2007-11-12 23:40:47.000000000 -0500
++++ binutils-2.18/ld/Makefile.am	2008-06-25 13:04:51.000000000 -0400
 @@ -120,6 +120,8 @@
  	earmcoff.o \
  	earmelf.o \
@@ -452,7 +398,7 @@ diff -ruN baseline-binutils-2.18/ld/Makefile.am binutils-2.18/ld/Makefile.am
    $(ELF_DEPS) $(srcdir)/emultempl/m68kelf.em \
 diff -ruN baseline-binutils-2.18/ld/Makefile.in binutils-2.18/ld/Makefile.in
 --- baseline-binutils-2.18/ld/Makefile.in	2007-08-06 16:29:54.000000000 -0400
-+++ binutils-2.18/ld/Makefile.in	2007-11-12 23:40:47.000000000 -0500
++++ binutils-2.18/ld/Makefile.in	2008-06-25 13:04:51.000000000 -0400
 @@ -367,6 +367,8 @@
  	earmcoff.o \
  	earmelf.o \
@@ -525,7 +471,7 @@ diff -ruN baseline-binutils-2.18/ld/Makefile.in binutils-2.18/ld/Makefile.in
    $(ELF_DEPS) $(srcdir)/emultempl/m68kelf.em \
 diff -ruN baseline-binutils-2.18/ld/po/Make-in binutils-2.18/ld/po/Make-in
 --- baseline-binutils-2.18/ld/po/Make-in	2007-08-24 10:01:57.000000000 -0400
-+++ binutils-2.18/ld/po/Make-in	2007-11-12 23:40:35.000000000 -0500
++++ binutils-2.18/ld/po/Make-in	2008-06-25 13:04:51.000000000 -0400
 @@ -20,10 +20,10 @@
  
  prefix = @prefix@
@@ -542,7 +488,7 @@ diff -ruN baseline-binutils-2.18/ld/po/Make-in binutils-2.18/ld/po/Make-in
  DESTDIR =
 diff -ruN baseline-binutils-2.18/opcodes/po/Make-in binutils-2.18/opcodes/po/Make-in
 --- baseline-binutils-2.18/opcodes/po/Make-in	2007-08-24 10:02:22.000000000 -0400
-+++ binutils-2.18/opcodes/po/Make-in	2007-11-12 23:40:28.000000000 -0500
++++ binutils-2.18/opcodes/po/Make-in	2008-06-25 13:04:51.000000000 -0400
 @@ -20,10 +20,10 @@
  
  prefix = @prefix@
