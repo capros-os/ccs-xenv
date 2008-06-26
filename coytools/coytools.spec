@@ -1,7 +1,7 @@
 Summary: General-purpose utility library for C++
 Name: coytools
 Version: 0.3.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: System Environment/Libraries
 Source0: %{name}-%{version}-%{release}.tar.gz
@@ -91,7 +91,7 @@ package or when debugging this package.\
 %files -n astmaker-debuginfo
 %defattr(-,root,root,-)
 /usr/src/debug/%{name}-%{version}/src/astmaker/*
-/usr/lib/debug/usr/bin/astmaker.debug
+%{_libdir}/debug/usr/bin/astmaker.debug
 
 
 %changelog

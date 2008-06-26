@@ -91,7 +91,7 @@ package or when debugging this package.\
 %files -n astmaker-debuginfo
 %defattr(-,root,root,-)
 /usr/src/debug/%{name}-%{version}/src/astmaker/*
-/usr/lib/debug/usr/bin/astmaker.debug
+%{_libdir}/debug/usr/bin/astmaker.debug
 
 
 %changelog
