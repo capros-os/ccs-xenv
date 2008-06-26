@@ -2,11 +2,11 @@ syntax: regexp
 
 ^RPMS/
 ^lib/
-SOURCES/baseline-.*
-SOURCES/binutils-[0-9]+(\.[0-9]+)+
-SOURCES/gcc-[0-9]+(\.[0-9]+)+
-SOURCES/gdb-[0-9]+(\.[0-9]+)+
-SOURCES/glibc-[0-9]+(\.[0-9]+)+
+^SOURCES/baseline-.*$
+^SOURCES/binutils-[0-9]+(\.[0-9]+)+$
+^SOURCES/gcc-[0-9]+(\.[0-9]+)+$
+^SOURCES/gdb-[0-9]+(\.[0-9]+)+$
+^SOURCES/glibc-[0-9]+(\.[0-9]+)+$
 
 
 syntax: glob
