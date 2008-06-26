@@ -1,7 +1,7 @@
 Summary: General-purpose utility library for C++
 Name: coytools
 Version: 0.3.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: BSD
 Group: System Environment/Libraries
 Source0: %{name}-%{version}-%{release}.tar.gz
@@ -47,7 +47,7 @@ other applications as well.
 
 %files -n libsherpa
 %defattr(-,root,root,-)
-/usr/lib/libsherpa.a
+%{_libdir}/libsherpa.a
 /usr/include/libsherpa/*.hxx
 
 %package -n libsherpa-debuginfo

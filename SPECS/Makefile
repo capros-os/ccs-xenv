@@ -18,6 +18,7 @@ GCC_SPEC=OS-ARCH-gcc-$(GCC_VERSION).spec
 GCCMAJOR=gcc$(firstword $(subst ., ,$(GCC_VERSION)))
 #GCCMAJOR=gcc4
 
+BUILD_PLATFORM=`uname -i`
 
 GDB_VERSION=6.8
 GDB_SPEC=OS-ARCH-gdb-$(GDB_VERSION).spec
@@ -171,19 +172,19 @@ build:
 	$(MAKE) host_xenv
 	$(MAKE) xenv
 	$(MAKE) filesystem
-	rpm -ivh ../RPMS/i386/*filesystem*.rpm
+	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*filesystem*.rpm
 	$(MAKE) binutils
-	rpm -ivh ../RPMS/i386/*binutils*.rpm
+	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*binutils*.rpm
 	$(MAKE) pregcc
-	rpm -ivh ../RPMS/i386/*$(GCCMAJOR)*.rpm
+	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*$(GCCMAJOR)*.rpm
 	$(MAKE) newlib
-	rpm -ivh ../RPMS/i386/*newlib*.rpm;
+	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*newlib*.rpm;
 	# Deinstall in reverse order because of dependencies:
 	rpm -e `rpm -q -a | egrep '(coyotos|capros)' |grep $(GCCMAJOR)`
 	$(MAKE) gcc
-	rpm -ivh ../RPMS/i386/*$(GCCMAJOR)*.rpm
+	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*$(GCCMAJOR)*.rpm
 	$(MAKE) crtfiles
-	rpm -ivh ../RPMS/i386/*crtfiles*.rpm
+	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*crtfiles*.rpm
 	$(MAKE) gdb
 
 clean:

@@ -47,7 +47,7 @@ other applications as well.
 
 %files -n libsherpa
 %defattr(-,root,root,-)
-/usr/lib/libsherpa.a
+%{_libdir}/libsherpa.a
 /usr/include/libsherpa/*.hxx
 
 %package -n libsherpa-debuginfo
