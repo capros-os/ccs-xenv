@@ -1,5 +1,5 @@
-#ifndef LIBSHERPA_REPORT_HXX
-#define LIBSHERPA_REPORT_HXX
+#ifndef LIBSHERPA_BIGNUM_HXX
+#define LIBSHERPA_BIGNUM_HXX
 
 /**************************************************************************
  *
@@ -243,4 +243,4 @@ std::istream& operator>>(std::istream& strm, sherpa::BigNum& bn)
   return strm;
 }
 
-#endif /* LIBSHERPA_REPORT_HXX */
+#endif /* LIBSHERPA_BIGNUM_HXX */
