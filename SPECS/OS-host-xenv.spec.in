@@ -24,7 +24,7 @@
 Summary: The %{CROSSOSNAME} Cross Environment
 Name: %{CROSSOS}-host-xenv
 Version: 0.1.3
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
@@ -32,7 +32,7 @@ Obsoletes: %{CROSSOS}-host-boehmgc
 
 # Other things that should be installed so that the compile will work:
 Requires: gc-devel transfig tetex-latex libicu-devel
-Requires: /usr/lib/libbfd.a
+Requires: /usr/%{_lib}/libbfd.a
 # FC6 and later:
 Requires: texinfo-tex
 # Only needed if you plan to pull the coyotos source code :-)
