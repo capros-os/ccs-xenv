@@ -285,7 +285,7 @@ diff -ruN baseline-binutils-2.18/ld/emulparams/elf_i386_coyotos_small.sh binutil
 @@ -0,0 +1,5 @@
 +#Link rules variant for Coytos/EROS when compiling for small processes.
 +
-+. ${srcdir}/emulparams/m68kelf_coyotos.sh
++. ${srcdir}/emulparams/elf_i386_coyotos.sh
 +
 +TEXT_START_ADDR=0x2000
 diff -ruN baseline-binutils-2.18/ld/emulparams/m68kelf_coyotos.sh binutils-2.18/ld/emulparams/m68kelf_coyotos.sh
