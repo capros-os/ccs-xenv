@@ -28,7 +28,7 @@
 Summary: A GNU collection of binary utilities.
 Name: %{CROSSOS}-%{CROSSARCH}-binutils
 Version: 2.18
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
@@ -178,7 +178,7 @@ package.
 %files -n %{CROSSOS}-common-binutils
 %{CROSSHOSTROOT}/share/locale/*/LC_MESSAGES/*
 %{CROSSHOSTROOT}/share/info/*info*
-%{CROSSHOSTROOT}/lib/libiberty.a
+%{CROSSHOSTROOT}/%{_lib}/libiberty.a
 
 ## Cross-build does not generate translations:
 #%files -n %{CROSSOS}-%{_arch}-binutils -f binutils.lang

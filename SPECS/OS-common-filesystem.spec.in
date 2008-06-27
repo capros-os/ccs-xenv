@@ -21,7 +21,7 @@
 Summary: Directory structure for the %{CROSSOSNAME} cross tools
 Name: %{CROSSOS}-common-filesystem
 Version: 0.1.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: Public Domain
 Group: System Environment/Base
 Buildroot: %{_tmppath}/%{name}-%{version}-root
@@ -45,11 +45,16 @@ important part is the uninstall section.
 rm -rf %{buildroot}
 mkdir %{buildroot}
 
+# .../lib and .../{%_lib} are the same on 32-bit systems,
+# but on 64 bit systems it is likely that %{_lib} is "lib64".
+# The following works correctly in both cases:
+
 mkdir -p \
 	%{buildroot}%{CROSSROOT} \
 	%{buildroot}%{CROSSHOSTROOT} \
 	%{buildroot}%{CROSSHOSTROOT}/bin \
 	%{buildroot}%{CROSSHOSTROOT}/lib \
+	%{buildroot}%{CROSSHOSTROOT}/%{_lib} \
 	%{buildroot}%{CROSSHOSTROOT}/share \
 	%{buildroot}%{CROSSHOSTROOT}/share/locale \
 	%{buildroot}%{CROSSHOSTROOT}/share/man \
@@ -75,7 +80,11 @@ fi
 %defattr(0755,root,root)
 %dir %{CROSSHOSTROOT}
 %{CROSSHOSTROOT}/bin
+# lib and %{_lib} will be the same on 32-bit systems, but may be
+# different on 64 bit systems. The following pair is a kludge, but
+# it works in both cases.
 %{CROSSHOSTROOT}/lib
+%{CROSSHOSTROOT}/%{_lib}
 %dir %{CROSSHOSTROOT}/share
 %{CROSSHOSTROOT}/share/man
 %{CROSSHOSTROOT}/share/locale

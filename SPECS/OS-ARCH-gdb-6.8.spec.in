@@ -32,7 +32,7 @@
 Summary: A GNU source-level debugger for C, C++, Java, and other languages
 Name: %{CROSSOS}-%{CROSSARCH}-gdb
 Version: 6.8
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
@@ -105,7 +105,7 @@ rm -f %{buildroot}%{CROSSHOSTROOT}/share/info/dir
 # gzip -q9f %{buildroot}%{_infodir}/*.info*
 
 # libiberty conflicts with binutils. Let binutils win.
-rm %{buildroot}%{CROSSHOSTROOT}/lib/libiberty.a
+rm %{buildroot}%{CROSSHOSTROOT}/%{_lib}/libiberty.a
 # bfd.info similarly conflicts with binutils
 rm %{buildroot}%{CROSSHOSTROOT}/share/info/bfd.info
 # standards.info similarly conflicts with binutils
