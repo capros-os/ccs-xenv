@@ -48,14 +48,14 @@
 #include "LexLoc.hxx"
 
 namespace sherpa {
-  LexLoc LexLoc::Unspecified(new Path("<internal>"), 0,0);
+  LexLoc LexLoc::Unspecified("<internal>", 0,0);
 
   std::string
   LexLoc::asString() const
   {
     if (line) {
       std::ostringstream msg;
-      msg << *path << ":"
+      msg << origin << ":"
 	  << line << ":" << offset;
       return msg.str();
     }
@@ -66,21 +66,19 @@ namespace sherpa {
   std::string 
   LexLoc::encode() const
   {
-    const std::string& pathStr = path->asString();
-
     std::ostringstream msg;
 
     msg << '#' << '{'
-	<< pathStr.size()
+	<< origin.size()
 	<< ' ';
 
-    /* If the path string contains a '}' character, double it. This
+    /* If the origin string contains a '}' character, double it. This
        allows us to write a regular expression that can skip location 
        updates without difficulty. */
-    for (size_t i = 0; i < pathStr.size(); i++) {
-      if (pathStr[i] == '}' || pathStr[i] == '#')
+    for (size_t i = 0; i < origin.size(); i++) {
+      if (origin[i] == '}' || origin[i] == '#')
 	msg << '#';
-      msg << pathStr[i];
+      msg << origin[i];
     }
 
     msg << ' ' << line << ' ' << offset << '}';
@@ -115,10 +113,6 @@ namespace sherpa {
       i++;
     }
 
-    LexLoc loc;
-
-    loc.path = new Path(fileName);
-
     assert (s[i] == ' ');
     i++;
 
@@ -129,7 +123,7 @@ namespace sherpa {
       i++;
     }
 
-    loc.line = strtoul(num_s.c_str(), 0, 0);
+    unsigned line = strtoul(num_s.c_str(), 0, 0);
 
     assert (s[i] == ' ');
     i++;
@@ -141,7 +135,9 @@ namespace sherpa {
       i++;
     }
 
-    loc.offset = strtoul(num_s.c_str(), 0, 0);
+    unsigned offset = strtoul(num_s.c_str(), 0, 0);
+
+    LexLoc loc(fileName, line, offset);
 
     assert (s[i] == '}');
     i++;

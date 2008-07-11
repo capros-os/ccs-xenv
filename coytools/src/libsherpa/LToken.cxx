@@ -53,8 +53,6 @@ namespace sherpa {
   std::string 
   LToken::asEncodedString() const
   {
-    const std::string pathStr = loc.path->asString();
-
     std::ostringstream msg;
 
     msg << loc.encode();

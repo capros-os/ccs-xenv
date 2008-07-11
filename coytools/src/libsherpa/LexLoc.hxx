@@ -45,39 +45,45 @@
 namespace sherpa {
 
   struct LexLoc {
-    GCPtr<Path> path;
-    unsigned line;		// 0 indicates no real line
+    std::string origin;
+    unsigned line;	// 0 indicates no real line
     unsigned offset;
 
     LexLoc()
     {
-      this->path = 0;
+      this->origin = std::string();
       this->line = 0;
       this->offset = 0;
     }
 
     ~LexLoc()
     {
-      path = 0;
     }
 
     LexLoc(GCPtr<Path> filePath, unsigned line, unsigned offset)
     {
-      this->path = filePath;
+      this->origin = filePath->asString();
+      this->line = line;
+      this->offset = offset;
+    }
+
+    LexLoc(const std::string& origin, unsigned line, unsigned offset)
+    {
+      this->origin = origin;
       this->line = line;
       this->offset = offset;
     }
 
     LexLoc(const LexLoc& ll)
     {
-      path = ll.path;
+      origin = ll.origin;
       line = ll.line;
       offset = ll.offset;
     }
 
     LexLoc& operator=(const LexLoc& ll)
     {
-      path = ll.path;
+      origin = ll.origin;
       line = ll.line;
       offset = ll.offset;
       return *this;
@@ -98,7 +104,7 @@ namespace sherpa {
 
     LexLoc operator+(size_t sz) const
     {
-      return LexLoc(path, line, offset + sz);
+      return LexLoc(origin, line, offset + sz);
     }
 
     void updateWith(const std::string& s);
