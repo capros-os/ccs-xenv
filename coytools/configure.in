@@ -46,7 +46,7 @@ dnl Put libsherpa version information here so that it can be substituted in
 dnl where it is needed. When the VERSION bumps, reset the BUILD to 1 and
 dnl remove the "plNNN" suffix
 VERSION="0.3.1"
-BUILD="1"
+BUILD="2"
 
 AC_PROG_CXX
 AC_PROG_INSTALL
