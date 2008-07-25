@@ -114,7 +114,7 @@ parse_file(filesystem::path filePath)
 
   if (!fin.is_open()) {
     std::cerr << "Couldn't open input file \""
-	      << filePath
+	      << filePath.string()
 	      << "\"\n",
     exit(1);
   }
@@ -684,7 +684,7 @@ emit_hdr(ParseResult *pr, const filesystem::path& outBase)
 
   if (!out.is_open()) {
     std::cerr << "Couldn't open output file \""
-	      << hdrPath
+	      << hdrPath.string()
 	      << "\" -- "
 	      << strerror(errno)
 	      << "\n";
@@ -715,7 +715,7 @@ emit_src(ParseResult *pr, const filesystem::path& outBase)
 
   if (!out.is_open()) {
     std::cerr << "Couldn't open output file \""
-	      << srcPath
+	      << srcPath.string()
 	      << "\" -- "
 	      << strerror(errno)
 	      << "\n";
