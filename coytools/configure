@@ -6275,6 +6275,7 @@ _ACEOF
 fi
 
 
+echo BOOST_LDFLAGS=$BOOST_LDFLAGS
 
 
 # Check whether --with-boost-filesystem was given.
