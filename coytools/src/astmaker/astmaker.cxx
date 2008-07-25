@@ -502,7 +502,7 @@ do_emit_hdr(std::ostream& outStream, ParseResult *pr,
   out << "#endif /* AST_TOKEN_TYPE */" << '\n';
   out << '\n';
   out << "#ifndef AST_SUPERCLASS" << '\n';
-  out << "#define AST_SUPERCLASS ::boost::enable_shared_from_this<AST>" << '\n';
+  out << "#define AST_SUPERCLASS boost::enable_shared_from_this<AST>" << '\n';
   out << "#endif /* AST_SUPERCLASS */" << '\n';
   out << '\n';
 
@@ -735,9 +735,6 @@ emit_src(ParseResult *pr, const filesystem::path& outBase)
       << outBase.leaf()
       << ".hxx\"" << '\n';
 
-  out << '\n';
-
-  out << "using namespace sherpa;" << '\n';
   out << '\n';
 
   out << pr->sourceTop.str();
