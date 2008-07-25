@@ -75,9 +75,11 @@ AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h limits.h sys/file.h sys/time.h unistd.h paths.h)
 AC_CHECK_HEADERS(sys/vfs.h sys/statfs.h sys/param.h sys/mount.h)
 AC_CHECK_HEADERS(stdint.h inttypes.h)
+AC_CHECK_HEADERS(unicode/uchar.h)
 
 AX_BOOST_BASE(1.33.1)
 AX_BOOST_FILESYSTEM
+CHECK_LIBICUUC
 
 AC_LANG([C++])
 AC_CHECK_HEADERS([boost/shared_ptr.hpp] \

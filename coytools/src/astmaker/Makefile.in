@@ -64,7 +64,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 
 DEFS = @DEFS@
-LIBS = @LIBS@ @BOOST_FILESYSTEM_LIB@
+LIBS = @LIBS@
 
 CFLAGS = @CFLAGS@ 
 CXXFLAGS = @CXXFLAGS@ @BOOST_CPPFLAGS@
@@ -113,7 +113,7 @@ XCXXFLAGS = -Wall -Wreturn-type
 
 TARGET=astmaker
 OBJECTS=AMlexer.o AstInfo.o astmaker.o UCSLexer.o AMparser.o
-MORELIBS=../libsherpa/libsherpa.a
+MORELIBS=../libsherpa/libsherpa.a  @BOOST_FILESYSTEM_LIB@
 
 all: $(TARGET)
 
@@ -139,7 +139,7 @@ nodepend:
 	find $(TOPDIR) -name '*.m' -exec rm {} \;
 
 $(TARGET): $(OBJECTS) $(MORELIBS)
-	$(CXX) $(CFLAGS) -o $@ $(OBJECTS) $(MORELIBS) -licuuc
+	$(CXX) $(CFLAGS) -o $@ $(OBJECTS) $(MORELIBS) $(LIBS)
 
 # Set these to "true" if you aren't using GCC:
 C_DEP=@$(CC) $(INCLUDE) $(CFLAGS) $(XCFLAGS) -M -MT $@ -MF $(patsubst %.o,%.m,$@) $<
