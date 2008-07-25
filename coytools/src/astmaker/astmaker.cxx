@@ -103,7 +103,14 @@ toMacro(const std::string& s)
 ParseResult *
 parse_file(filesystem::path filePath)
 {
+#if (BOOST_VERSION < 103401)
+    // We are still supporting FC6. The last version of boost
+    // supported there was 1.33.1, which still used the deprecated
+    // native_string() method name:
+  std::ifstream fin(filePath.native_file_string().c_str());
+#else
   std::ifstream fin(filePath.file_string().c_str());
+#endif
 
   if (!fin.is_open()) {
     std::cerr << "Couldn't open input file \""
@@ -664,8 +671,16 @@ emit_hdr(ParseResult *pr, const filesystem::path& outBase)
   filesystem::path hdrPath = 
     filesystem::change_extension(outBase, ".hxx");
 
+#if (BOOST_VERSION < 103401)
+    // We are still supporting FC6. The last version of boost
+    // supported there was 1.33.1, which still used the deprecated
+    // native_string() method name:
+  std::ofstream out(hdrPath.native_file_string().c_str(),
+		    std::ios_base::out|std::ios_base::trunc);
+#else
   std::ofstream out(hdrPath.file_string().c_str(),
 		    std::ios_base::out|std::ios_base::trunc);
+#endif
 
   if (!out.is_open()) {
     std::cerr << "Couldn't open output file \""
@@ -687,8 +702,16 @@ emit_src(ParseResult *pr, const filesystem::path& outBase)
   std::vector<AstInfo *>& asts = pr->asts;
   filesystem::path srcPath = filesystem::change_extension(outBase, ".cxx");
 
+#if (BOOST_VERSION < 103401)
+    // We are still supporting FC6. The last version of boost
+    // supported there was 1.33.1, which still used the deprecated
+    // native_string() method name:
+  std::ofstream out(srcPath.native_file_string().c_str(),
+		    std::ios_base::out|std::ios_base::trunc);
+#else
   std::ofstream out(srcPath.file_string().c_str(),
 		    std::ios_base::out|std::ios_base::trunc);
+#endif
 
   if (!out.is_open()) {
     std::cerr << "Couldn't open output file \""
