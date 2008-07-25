@@ -48,7 +48,8 @@ other applications as well.
 %files -n libsherpa
 %defattr(-,root,root,-)
 %{_libdir}/libsherpa.a
-/usr/include/libsherpa/*.hxx
+%dir %{_includedir}/libsherpa
+%{_includedir}/libsherpa/*.hxx
 
 %package -n libsherpa-debuginfo
 Summary: Debug information for package libsherpa-debuginfo
@@ -76,7 +77,7 @@ compilers.
 
 %files -n astmaker
 %defattr(-,root,root,-)
-/usr/bin/astmaker
+%{_bindir}/astmaker
 
 %package -n astmaker-debuginfo
 Summary: Debug information for package libsherpa-debuginfo

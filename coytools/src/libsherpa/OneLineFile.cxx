@@ -41,7 +41,8 @@
 #include <dirent.h>
 
 #include <string>
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/path.hpp>
 
 #include <libsherpa/xfopen.hxx>
