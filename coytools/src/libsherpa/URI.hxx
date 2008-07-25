@@ -3,9 +3,8 @@
 
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -46,7 +45,7 @@
 ///    scheme://username@netloc:port/path
 /// @endverbatim
 
-#include "Path.hxx"
+#include <boost/filesystem/path.hpp>
 
 namespace sherpa {
 
@@ -61,7 +60,7 @@ namespace sherpa {
     unsigned   port;
     std::string netloc;		/* typically host */
     std::string user;
-    Path path;
+    boost::filesystem::path path;
 
     URI(std::string str);
 

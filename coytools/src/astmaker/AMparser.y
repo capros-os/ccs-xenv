@@ -1,6 +1,6 @@
 %{
 /*
- * Copyright (C) 2005, The EROS Group, LLC.
+ * Copyright (C) 2008, The EROS Group, LLC.
  *
  * This file is part of the EROS Operating System runtime library.
  *
@@ -170,7 +170,7 @@ definition: tk_GROUP tk_Ident '=' groupMembers ';' {
   aInfo->children = $4;
 
   check_ifbound(pr, aInfo);
-  pr->asts.append(aInfo);
+  pr->asts.push_back(aInfo);
 };
 
 definition: tk_AST tk_Ident '=' childList ';' {
@@ -178,7 +178,7 @@ definition: tk_AST tk_Ident '=' childList ';' {
   aInfo->children = $4;
 
   check_ifbound(pr, aInfo);
-  pr->asts.append(aInfo);
+  pr->asts.push_back(aInfo);
 };
 
 definition: tk_AST tk_Ident '(' tk_StringLiteral ')' '=' childList ';' {
@@ -186,41 +186,41 @@ definition: tk_AST tk_Ident '(' tk_StringLiteral ')' '=' childList ';' {
   aInfo->children = $7;
 
   check_ifbound(pr, aInfo);
-  pr->asts.append(aInfo);
+  pr->asts.push_back(aInfo);
 };
 
 definition: tk_LEAF tk_Ident ';' {
   AstInfo *aInfo = new AstInfo(dt_leaf, $2);
 
   check_ifbound(pr, aInfo);
-  pr->asts.append(aInfo);
+  pr->asts.push_back(aInfo);
 }
 
 definition: tk_LEAF tk_Ident '(' tk_StringLiteral ')' ';' {
   AstInfo *aInfo = new AstInfo(dt_leaf, $2, $4);
 
   check_ifbound(pr, aInfo);
-  pr->asts.append(aInfo);
+  pr->asts.push_back(aInfo);
 }
 
 groupMembers: tk_Ident {
   $$ = new ChildVec;
-  $$->append(new ChildNode($1));
+  $$->push_back(new ChildNode($1));
 };
 
 groupMembers: groupMembers '|' tk_Ident {
   $$ = $1;
-  $$->append(new ChildNode($3));
+  $$->push_back(new ChildNode($3));
 };
 
 childList: child {
   $$ = new ChildVec;
-  $$->append($1);
+  $$->push_back($1);
 };
 
 childList: childList child {
   $$ = $1;
-  $$->append($2);
+  $$->push_back($2);
 };
 
 child: ast {
@@ -249,7 +249,7 @@ ast : '(' groupMembers ')' {
   aInfo->children = $2;
 
   check_ifbound(pr, aInfo);
-  pr->asts.append(aInfo);
+  pr->asts.push_back(aInfo);
   $$ = sherpa::LToken(nm);
 }
 %%

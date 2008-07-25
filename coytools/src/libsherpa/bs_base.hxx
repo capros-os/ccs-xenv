@@ -39,7 +39,6 @@
  **************************************************************************/
 
 #include <streambuf>
-#include "ByteString.hxx"
 
 namespace sherpa {
   struct bs_base {

@@ -28,7 +28,7 @@
 // Trivially adapted by Jonathan Shapiro to put it into the sherpa namespace.
 // ============================================================================
 
-#include "gzstream.hxx"
+#include <libsherpa/gzstream.hxx>
 #include <iostream>
 #include <string.h>  // for memcpy
 

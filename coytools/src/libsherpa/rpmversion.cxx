@@ -46,9 +46,9 @@
 
 #include <string>
 
-#include "rpmversion.hxx"
-#include "util.hxx"
-#include "Logging.hxx"
+#include <libsherpa/rpmversion.hxx>
+#include <libsherpa/util.hxx>
+#include <libsherpa/Logging.hxx>
 
 namespace sherpa {
   /* The RPM version comparison logic is black magic, and ours may not

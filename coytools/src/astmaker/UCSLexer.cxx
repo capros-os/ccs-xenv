@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, The EROS Group, LLC.
+ * Copyright (C) 2008, The EROS Group, LLC.
  *
  * This file is part of the EROS Operating System runtime library.
  *
@@ -276,8 +276,8 @@ UCSLexer::ungetChar(ucs4_t c)
 }
 
 
-UCSLexer::UCSLexer(std::istream& _in, GCPtr<Path> inputPath)
-  :inStream(_in), errStream(std::cerr), here(inputPath, 1, 0)
+UCSLexer::UCSLexer(std::istream& _in, const std::string& origin)
+  :inStream(_in), errStream(std::cerr), here(origin, 1, 0)
 {
   inStream.unsetf(std::ios_base::skipws);
 

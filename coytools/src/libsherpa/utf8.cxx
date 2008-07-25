@@ -38,7 +38,7 @@
  **************************************************************************/
 
 #include <stdint.h>
-#include "utf8.hxx"
+#include <libsherpa/utf8.hxx>
 
 namespace sherpa {
 // Decode a UTF-8 character, returning the start of next character via

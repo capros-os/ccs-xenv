@@ -1,8 +1,7 @@
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -45,8 +44,8 @@
 
 #include <string>
 
-#include "UExcept.hxx"
-#include "URI.hxx"
+#include <libsherpa/UExcept.hxx>
+#include <libsherpa/URI.hxx>
 
 #define PARENT_DIR  1
 #define SAME_DIR    2
@@ -69,8 +68,17 @@
 #define SCHEME_HTTPS  "https"
 #define SCHEME_FTP    "ftp"
 
+using namespace boost;
 
 namespace sherpa {
+  static filesystem::path
+  canonical_path(const filesystem::path& p)
+  {
+    /// @bug This is a placeholder implementation for what used to be
+    /// Path(theRest).canonical(), which has no analogous operation in
+    /// the boost library.
+    return p;
+  }
 
   void
   URI::GuessPort()
@@ -113,7 +121,7 @@ namespace sherpa {
     if (scheme != SCHEME_FILE)
       outURI += format(":%d", port);
 
-    outURI += path.asString();
+    outURI += path.string();
 
     return outURI;
   }
@@ -158,11 +166,11 @@ namespace sherpa {
     if (colon == std::string::npos || // no colon
 	validScheme(theScheme) == false || // invalid scheme
 	theRest[0] != '/') {	// colon not followed by '/'
-      path = Path(theRest).canonical();
+      path = canonical_path(theRest);
       scheme = SCHEME_FILE;
       wellFormed = true;	
       uriString = toString();
-      relative = path.isRelative();
+      relative = !path.is_complete();
       return;
     }
 
@@ -209,9 +217,9 @@ namespace sherpa {
 	  uri->scheme, uri->port, uri->netloc, uri->username, uri->path);
 #endif 
   
-    path = path.canonical();
+    path = canonical_path(path);
 
-    if (path.isAbsolute())
+    if (path.is_complete())
       relative = false;
 
     /* When all done, restore the entire URI for future use:*/

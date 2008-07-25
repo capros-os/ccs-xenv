@@ -3,9 +3,8 @@
 
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -40,9 +39,12 @@
  *
  **************************************************************************/
 
+#include <boost/filesystem/path.hpp>
+
 namespace sherpa {
-  extern std::string ReadOneLineFile(Path path);
-  extern int WriteOneLineFile(Path path, std::string);
+  extern std::string ReadOneLineFile(const boost::filesystem::path& path);
+  extern int WriteOneLineFile(const boost::filesystem::path& path,
+			      const std::string&);
 } /* namespace sherpa */
 
 #endif /* LIBSHERPA_ONELINEFILE_HXX */

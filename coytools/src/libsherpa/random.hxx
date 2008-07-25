@@ -40,7 +40,7 @@
  *
  **************************************************************************/
 
-#include "ByteString.hxx"
+#include <libsherpa/ByteString.hxx>
 
 namespace sherpa {
   namespace rnd {

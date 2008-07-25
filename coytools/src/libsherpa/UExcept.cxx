@@ -41,7 +41,7 @@
 
 #include <stdint.h>
 #include <string>
-#include "UExcept.hxx"
+#include <libsherpa/UExcept.hxx>
 
 namespace sherpa {
 

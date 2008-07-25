@@ -1,6 +1,6 @@
 /* -*- Mode: c -*- */
 /*
- * Copyright (C) 2007, The EROS Group, LLC.
+ * Copyright (C) 2008, The EROS Group, LLC.
  * All rights reserved.
  *
  * This file is part of the EROS Operating System runtime library.
@@ -94,8 +94,8 @@ AMlexer::kwCheck(const char *s)
   return tk_Ident;
 }
 
-AMlexer::AMlexer(std::istream& _in, GCPtr<Path> inputPath)
-  : UCSLexer(_in, inputPath)
+AMlexer::AMlexer(std::istream& _in, const std::string& origin)
+  : UCSLexer(_in, origin)
 {
   percentIsIdentifier = true;
   outermostScope = true;

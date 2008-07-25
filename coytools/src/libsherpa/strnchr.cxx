@@ -42,7 +42,7 @@
 
 #include <string>
 
-#include "util.hxx"
+#include <libsherpa/util.hxx>
 
 const char *
 strnchr(const char *s, size_t len, char c)

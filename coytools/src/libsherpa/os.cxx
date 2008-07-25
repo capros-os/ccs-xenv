@@ -45,7 +45,7 @@
 #include <string.h>
 
 #include "../config.h"
-#include "os.hxx"
+#include <libsherpa/os.hxx>
 
 #if !(defined(__unix__) || defined(MAC_OS_X))
 #error "This source file provides UNIX-specific support."
@@ -93,9 +93,9 @@
 
 #include <string>
 
-#include "UExcept.hxx"
-#include "format.hxx"
-#include "os.hxx"
+#include <libsherpa/UExcept.hxx>
+#include <libsherpa/format.hxx>
+#include <libsherpa/os.hxx>
 
 namespace sherpa {
   namespace os {

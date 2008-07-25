@@ -40,7 +40,7 @@
  *
  **************************************************************************/
 
-#include "format.hxx"
+#include <libsherpa/format.hxx>
 
 namespace sherpa {
 

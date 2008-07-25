@@ -10,24 +10,28 @@
 
 #include <libsherpa/BigNum.hxx>
 
-using namespace sherpa;
+// using namespace sherpa;
 }
 
 %header {
 /* Stuff in a %header section will go inside the namespace
-   declaration in the header file, but before any other declarations. */
+   declaration in the header file, but before any other declarations.
+   
+   Macros should not go here, because they will not be indented 
+   properly. */
+
 struct LitValue {
   bool   b;     /* boolean Values */
-  BigNum bn;	/* large precision integers */
+  ::sherpa::BigNum bn;	/* large precision integers */
   double d;	/* doubles, floats          */
-  std::string s;     /* String Literals          */
+  ::std::string s;     /* String Literals          */
 };
 }
 
 %members {
 /* Stuff in a %members section will appear inside the class
    declaration. */
-  LitValue value;
+LitValue value;
 }
 
 %source {

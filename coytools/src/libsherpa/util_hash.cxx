@@ -39,28 +39,37 @@
 
 #include "../config.h"
 
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
 #include <stdint.h>
+#include <stdarg.h>
+#include <assert.h>
 
 #include <string>
-#include <vector>
 
-#include "UExcept.hxx"
-#include "Path.hxx"
-#include "CVector.hxx"
-#include "os.hxx"
-#include "random.hxx"
-#include "encode.hxx"
+#ifndef HAVE_OPENSSL
+  #error "Configure script did not locate OpenSSL"
+#endif
+
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <openssl/rand.h>
+
+#include <libsherpa/util.hxx>
+#include <libsherpa/sha1.hxx>
 
 namespace sherpa {
-  Path
-  Path::mkTmpName(const Path& dir, const char *base)
+  hash32_t
+  hash_string(std::string s)
   {
-    std::string s = base;
-    s += hex_encode(rnd::GetBytes(20));
+    OpenSHA sha(s);
+    hash32_t h = 0;
+    ByteString hd = sha.byteRepresentation();
+  
+    h |= ( ((hash32_t) hd[0]) << 24 );
+    h |= ( ((hash32_t) hd[1]) << 16 );
+    h |= ( ((hash32_t) hd[2]) << 8 );
+    h |= ( ((hash32_t) hd[3]) );
 
-    return dir + Path(s);
+    return h;
   }
-}
+
+} /* namespace sherpa */

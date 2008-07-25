@@ -3,7 +3,8 @@
 
 /**************************************************************************
  *
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -38,8 +39,8 @@
  *
  **************************************************************************/
 
+#include <vector>
 #include <libsherpa/LToken.hxx>
-#include <libsherpa/CVector.hxx>
 
 struct AstInfo;
 
@@ -60,7 +61,7 @@ struct ChildNode {
   ~ChildNode();
 };
 
-typedef sherpa::CVector<ChildNode *> ChildVec;
+typedef std::vector<ChildNode *> ChildVec;
 
 enum DeclType {
   dt_leaf,			// leaf ast type

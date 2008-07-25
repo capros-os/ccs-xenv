@@ -1,6 +1,7 @@
 /**************************************************************************
  *
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -51,14 +52,15 @@
 #include <cctype>
 
 #include <getopt.h>
+#include <libsherpa/INOstream.hxx>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/convenience.hpp>
 #include <langinfo.h>
-
-#include <libsherpa/Path.hxx>
 
 #include "AMlexer.hxx"
 
-using namespace sherpa;
 using namespace std;
+using namespace boost;
 
 bool showparse;			/* set from command line option */
 bool showlex;			/* set from command line option */
@@ -99,9 +101,9 @@ toMacro(const std::string& s)
 }
 
 ParseResult *
-parse_file(Path filePath)
+parse_file(filesystem::path filePath)
 {
-  std::ifstream fin(filePath.c_str());
+  std::ifstream fin(filePath.file_string().c_str());
 
   if (!fin.is_open()) {
     std::cerr << "Couldn't open input file \""
@@ -112,10 +114,10 @@ parse_file(Path filePath)
 
   ParseResult *pr = new ParseResult;
 
-  pr->asts.append(new AstInfo(dt_leaf, LToken("Null")));
-  pr->asts.append(new AstInfo(dt_leaf, LToken("AnyGroup")));
+  pr->asts.push_back(new AstInfo(dt_leaf, sherpa::LToken("Null")));
+  pr->asts.push_back(new AstInfo(dt_leaf, sherpa::LToken("AnyGroup")));
 
-  AMlexer lexer(fin, new Path(filePath));
+  AMlexer lexer(fin, filePath.string());
   if (showlex)
     lexer.setDebug(showlex);
 
@@ -129,19 +131,19 @@ parse_file(Path filePath)
   if (lexer.NumErrors() != 0u)
     exit(1);
 
-  // Resort aip so that all of the groups fall at the end.
-  CVector<AstInfo *> aipSorted;
+  // Re-order aip so that all of the groups fall at the end.
+  vector<AstInfo *> aipSorted;
 
   for (size_t i = 0; i < pr->asts.size(); i++) {
     if (pr->asts[i]->dt != dt_group) {
       pr->asts[i]->ndx = aipSorted.size();
-      aipSorted.append(pr->asts[i]);
+      aipSorted.push_back(pr->asts[i]);
     }
   }
   for (size_t i = 0; i < pr->asts.size(); i++) {
     if (pr->asts[i]->dt == dt_group) {
       pr->asts[i]->ndx = aipSorted.size();
-      aipSorted.append(pr->asts[i]);
+      aipSorted.push_back(pr->asts[i]);
     }
   }
 
@@ -230,9 +232,10 @@ emit_one_ast(std::ostream& out, const AstInfo *aip)
 }
 
 void 
-emit_ast(std::ostream& out, ParseResult *pr, const Path& outBase)
+emit_ast(std::ostream& out, ParseResult *pr, 
+	 const filesystem::path& outBase)
 {
-  sherpa::CVector<AstInfo *>& asts = pr->asts;
+  std::vector<AstInfo *>& asts = pr->asts;
 
   for (size_t i = 0; i < asts.size(); i++) {
     AstInfo *aip = asts[i];
@@ -244,7 +247,7 @@ emit_ast(std::ostream& out, ParseResult *pr, const Path& outBase)
 void
 check_asts(ParseResult *pr)
 {
-  sherpa::CVector<AstInfo *>&  asts = pr->asts;
+  std::vector<AstInfo *>& asts = pr->asts;
 
   // First, check that all referenced AST names are defined.
 
@@ -425,26 +428,14 @@ check_asts(ParseResult *pr)
 }
 
 void
-emit_hdr(ParseResult *pr, const Path& outBase)
+do_emit_hdr(std::ostream& outStream, ParseResult *pr, 
+	    const filesystem::path& outBase)
 {
-  sherpa::CVector<AstInfo *>&  asts = pr->asts;
+  std::vector<AstInfo *>& asts = pr->asts;
 
-  Path hdrPath = outBase;
-  hdrPath = hdrPath << ".hxx";
+  std::string hdrGuard = toMacro(outBase.string() + "_HXX");
 
-  std::string hdrGuard = toMacro(outBase.asString() + "_HXX");
-
-  std::ofstream out(hdrPath.c_str(),
-		    std::ios_base::out|std::ios_base::trunc);
-
-  if (!out.is_open()) {
-    std::cerr << "Couldn't open output file \""
-	      << hdrPath
-	      << "\" -- "
-	      << strerror(errno)
-	      << "\n";
-    exit(1);
-  }
+  sherpa::INOstream out(outStream);
 
   out << "#ifndef " << hdrGuard << '\n';
   out << "#define " << hdrGuard << '\n' << '\n';
@@ -452,9 +443,7 @@ emit_hdr(ParseResult *pr, const Path& outBase)
   out << '\n';
 
   out << "#include <string>" << '\n';
-  out << "#include <libsherpa/LToken.hxx>" << '\n';
-  out << "#include <libsherpa/CVector.hxx>" << '\n';
-  out << "#include <libsherpa/GCPtr.hxx>" << '\n';
+  out << "#include <vector>" << '\n';
   out << '\n';
 
   out << pr->include.str();
@@ -462,32 +451,67 @@ emit_hdr(ParseResult *pr, const Path& outBase)
 
   if (pr->nmspace.size()) {
     out << "namespace " << pr->nmspace << " {" << '\n';
-    out << '\n';
+    out.more();
   }
 
   out << pr->header.str();
   out << '\n';
-
   {
     out << "enum AstType {" << '\n';
+    out.more();
 
     AstInfo *aip = 0;
     for (size_t i = 0; i < asts.size(); i++) {
       aip = asts[i];
-      out << "    " << aip->tagName() << "," << '\n';
+      out << aip->tagName() << "," << '\n';
     }
+    out.less();
     out << "};" << '\n' << '\n';
 
-    out << "enum { at_NUM_ASTTYPE = " << aip->tagName() << "};" << '\n';
+    out << "enum { at_NUM_ASTTYPE = " << aip->tagName() << " };" << '\n';
+  }
+  out << '\n';
+
+  if (pr->nmspace.size()) {
+    out.less();
+    out << "} /* namespace " << pr->nmspace << " */\n";
+    out << '\n';
   }
 
-  out << "class AST : public Countable { " << '\n';
+  out << "#ifndef AST_SMART_PTR" << '\n';
+  out << "#include <boost/shared_ptr.hpp>" << '\n';
+  out << "#include <boost/enable_shared_from_this.hpp>" << '\n';
+  out << "#define AST_SMART_PTR boost::shared_ptr" << '\n';
+  out << "#endif /* AST_SMART_PTR */" << '\n';
+  out << '\n';
+  out << "#ifndef AST_LOCATION_TYPE" << '\n';
+  out << "#include <libsherpa/LexLoc.hxx>" << '\n';
+  out << "#define AST_LOCATION_TYPE sherpa::LexLoc" << '\n';
+  out << "#endif /* AST_LOCATION_TYPE */" << '\n';
+  out << '\n';
+  out << "#ifndef AST_TOKEN_TYPE" << '\n';
+  out << "#include <libsherpa/LToken.hxx>" << '\n';
+  out << "#define AST_TOKEN_TYPE sherpa::LToken" << '\n';
+  out << "#endif /* AST_TOKEN_TYPE */" << '\n';
+  out << '\n';
+  out << "#ifndef AST_SUPERCLASS" << '\n';
+  out << "#define AST_SUPERCLASS ::boost::enable_shared_from_this<AST>" << '\n';
+  out << "#endif /* AST_SUPERCLASS */" << '\n';
+  out << '\n';
+
+  if (pr->nmspace.size()) {
+    out << "namespace " << pr->nmspace << " {" << '\n';
+    out.more();
+    out << '\n';
+  }
+
+  out << "class AST :public AST_SUPERCLASS { " << '\n';
   out << "  bool isOneOf(AstType);" << '\n';
   out << "public:" << '\n';
   out << "  AstType        astType;" << '\n';
-  out << "  std::string    s;" << '\n';
-  out << "  sherpa::LexLoc loc;" << '\n';
-  out << "  sherpa::GCPtr< sherpa::CVector<sherpa::GCPtr<AST> > > children;" << '\n';
+  out << "  ::std::string    s;" << '\n';
+  out << "  AST_LOCATION_TYPE loc;" << '\n';
+  out << "  ::std::vector<AST_SMART_PTR<AST> > children;" << '\n';
   out << '\n';
 
   out << pr->members.str();
@@ -495,42 +519,125 @@ emit_hdr(ParseResult *pr, const Path& outBase)
 
   out << "  AST(const AstType at = at_Null);" << '\n';
   out << "  // for literals:" << '\n';
-  out << "  AST(const AstType at, const sherpa::LToken& tok);" << '\n';
-  out << "  AST(const AstType at, const sherpa::LexLoc &loc);" << '\n';
-  out << "  AST(const AstType at, const sherpa::LexLoc &loc," << '\n';
-  out << "      sherpa::GCPtr<AST> child1);" << '\n';
-  out << "  AST(const AstType at, const sherpa::LexLoc &loc," << '\n';
-  out << "      sherpa::GCPtr<AST> child1," << '\n';
-  out << "      sherpa::GCPtr<AST> child2);" << '\n';
-  out << "  AST(const AstType at, const sherpa::LexLoc &loc," << '\n';
-  out << "      sherpa::GCPtr<AST> child1," << '\n';
-  out << "      sherpa::GCPtr<AST> child2," << '\n';
-  out << "      sherpa::GCPtr<AST> child3);" << '\n';
-  out << "  AST(const AstType at, const sherpa::LexLoc &loc," << '\n';
-  out << "      sherpa::GCPtr<AST> child1," << '\n';
-  out << "      sherpa::GCPtr<AST> child2," << '\n';
-  out << "      sherpa::GCPtr<AST> child3," << '\n';
-  out << "      sherpa::GCPtr<AST> child4);" << '\n';
-  out << "  AST(const AstType at, const sherpa::LexLoc &loc," << '\n';
-  out << "      sherpa::GCPtr<AST> child1," << '\n';
-  out << "      sherpa::GCPtr<AST> child2," << '\n';
-  out << "      sherpa::GCPtr<AST> child3," << '\n';
-  out << "      sherpa::GCPtr<AST> child4," << '\n';
-  out << "      sherpa::GCPtr<AST> child5);" << '\n';
+  out << "  AST(const AstType at, const AST_TOKEN_TYPE& tok);" << '\n';
+  out << "  AST(const AstType at, const AST_LOCATION_TYPE &loc);" << '\n';
+  out << "  AST(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "      AST_SMART_PTR<AST> child1);" << '\n';
+  out << "  AST(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "      AST_SMART_PTR<AST> child1," << '\n';
+  out << "      AST_SMART_PTR<AST> child2);" << '\n';
+  out << "  AST(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "      AST_SMART_PTR<AST> child1," << '\n';
+  out << "      AST_SMART_PTR<AST> child2," << '\n';
+  out << "      AST_SMART_PTR<AST> child3);" << '\n';
+  out << "  AST(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "      AST_SMART_PTR<AST> child1," << '\n';
+  out << "      AST_SMART_PTR<AST> child2," << '\n';
+  out << "      AST_SMART_PTR<AST> child3," << '\n';
+  out << "      AST_SMART_PTR<AST> child4);" << '\n';
+  out << "  AST(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "      AST_SMART_PTR<AST> child1," << '\n';
+  out << "      AST_SMART_PTR<AST> child2," << '\n';
+  out << "      AST_SMART_PTR<AST> child3," << '\n';
+  out << "      AST_SMART_PTR<AST> child4," << '\n';
+  out << "      AST_SMART_PTR<AST> child5);" << '\n';
   out << "  ~AST();" << '\n';
   out << '\n';
-  out << "  sherpa::GCPtr<AST> & child(size_t i) const" << '\n';
+  out << "  // Helper quasi-constructors" << '\n';
+  out << "  static inline AST_SMART_PTR<AST>" << '\n';
+  out << "  make(const AstType at = at_Null)" << '\n';
   out << "  {" << '\n';
-  out << "    return children->elem(i);" << '\n';
+  out << "    AST *ast = new AST(at);" << '\n';
+  out << "    return AST_SMART_PTR<AST>(ast);" << '\n';
   out << "  }" << '\n';
   out << '\n';
-  out << "  void addChild(sherpa::GCPtr<AST> child);" << '\n';
-  out << "  std::string getTokenString();" << '\n';
+  out << "  static inline AST_SMART_PTR<AST>" << '\n';
+  out << "  make(const AstType at, const AST_TOKEN_TYPE& tok)" << '\n';
+  out << "  {" << '\n';
+  out << "    AST *ast = new AST(at, tok);" << '\n';
+  out << "    return AST_SMART_PTR<AST>(ast);" << '\n';
+  out << "  }" << '\n';
+  out << '\n';
+  out << "  static inline AST_SMART_PTR<AST>" << '\n';
+  out << "  make(const AstType at, const AST_LOCATION_TYPE &loc)" << '\n';
+  out << "  {" << '\n';
+  out << "    AST *ast = new AST(at, loc);" << '\n';
+  out << "    return AST_SMART_PTR<AST>(ast);" << '\n';
+  out << "  }" << '\n';
+  out << '\n';
+  out << "  static inline AST_SMART_PTR<AST>" << '\n';
+  out << "  make(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "       AST_SMART_PTR<AST> child1)" << '\n';
+  out << "  {" << '\n';
+  out << "    AST *ast = new AST(at, loc, child1);" << '\n';
+  out << "    return AST_SMART_PTR<AST>(ast);" << '\n';
+  out << "  }" << '\n';
+  out << '\n';
+  out << "  static inline AST_SMART_PTR<AST>" << '\n';
+  out << "  make(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child1," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child2)" << '\n';
+  out << "  {" << '\n';
+  out << "    AST *ast = new AST(at, loc, child1, child2);" << '\n';
+  out << "    return AST_SMART_PTR<AST>(ast);" << '\n';
+  out << "  }" << '\n';
+  out << '\n';
+  out << "  static inline AST_SMART_PTR<AST>" << '\n';
+  out << "  make(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child1," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child2," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child3)" << '\n';
+  out << "  {" << '\n';
+  out << "    AST *ast = new AST(at, loc, child1, child2," << '\n';
+  out << "                       child3);" << '\n';
+  out << "    return AST_SMART_PTR<AST>(ast);" << '\n';
+  out << "  }" << '\n';
+  out << '\n';
+  out << "  static inline AST_SMART_PTR<AST>" << '\n';
+  out << "  make(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child1," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child2," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child3," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child4)" << '\n';
+  out << "  {" << '\n';
+  out << "    AST *ast = new AST(at, loc, child1, child2," << '\n';
+  out << "                       child3, child4);" << '\n';
+  out << "    return AST_SMART_PTR<AST>(ast);" << '\n';
+  out << "  }" << '\n';
+  out << '\n';
+  out << "  static inline AST_SMART_PTR<AST>" << '\n';
+  out << "  make(const AstType at, const AST_LOCATION_TYPE &loc," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child1," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child2," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child3," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child4," << '\n';
+  out << "       const AST_SMART_PTR<AST>& child5)" << '\n';
+  out << "  {" << '\n';
+  out << "    AST *ast = new AST(at, loc, child1, child2," << '\n';
+  out << "                       child3, child4, child5);" << '\n';
+  out << "    return AST_SMART_PTR<AST>(ast);" << '\n';
+  out << "  }" << '\n';
+  out << '\n';
+  out << '\n';
+  out << "  AST_SMART_PTR<AST>" << '\n';
+  out << "  child(size_t i) const" << '\n';
+  out << "  {" << '\n';
+  out << "    return children[i];" << '\n';
+  out << "  }" << '\n';
+  out << '\n';
+  out << "  AST_SMART_PTR<AST>&" << '\n';
+  out << "  child(size_t i)" << '\n';
+  out << "  {" << '\n';
+  out << "    return children[i];" << '\n';
+  out << "  }" << '\n';
+  out << '\n';
+  out << "  void addChild(AST_SMART_PTR<AST> child);" << '\n';
+  out << "  ::std::string getTokenString();" << '\n';
   out << '\n';
   out << "  void" << '\n';
-  out << "  addChildrenFrom(sherpa::GCPtr<AST> other)" << '\n';
+  out << "  addChildrenFrom(AST_SMART_PTR<AST> other)" << '\n';
   out << "  {" << '\n';
-  out << "    for(size_t i = 0; i < other->children->size(); i++)" << '\n';
+  out << "    for(size_t i = 0; i < other->children.size(); i++)" << '\n';
   out << "      addChild(other->child(i));" << '\n';
   out << "  }" << '\n';
   out << '\n';
@@ -543,22 +650,44 @@ emit_hdr(ParseResult *pr, const Path& outBase)
   out << "};" << '\n' << '\n';
 
   if (pr->nmspace.size()) {
+    out.less();
     out << "} /* namespace " << pr->nmspace << " */" << '\n';
     out << '\n';
   }
 
   out << '\n' << "#endif /* " << hdrGuard << " */" << '\n';
+}
+
+void
+emit_hdr(ParseResult *pr, const filesystem::path& outBase)
+{
+  filesystem::path hdrPath = 
+    filesystem::change_extension(outBase, ".hxx");
+
+  std::ofstream out(hdrPath.file_string().c_str(),
+		    std::ios_base::out|std::ios_base::trunc);
+
+  if (!out.is_open()) {
+    std::cerr << "Couldn't open output file \""
+	      << hdrPath
+	      << "\" -- "
+	      << strerror(errno)
+	      << "\n";
+    exit(1);
+  }
+
+  do_emit_hdr(out, pr, outBase);
+
   out.close();
 }
 
 void
-emit_src(ParseResult *pr, const Path& outBase)
+emit_src(ParseResult *pr, const filesystem::path& outBase)
 {
-  sherpa::CVector<AstInfo *>&  asts = pr->asts;
-  Path srcPath = outBase;
-  srcPath = srcPath << ".cxx";
+  std::vector<AstInfo *>& asts = pr->asts;
+  filesystem::path srcPath = filesystem::change_extension(outBase, ".cxx");
 
-  std::ofstream out(srcPath.c_str(),
+  std::ofstream out(srcPath.file_string().c_str(),
 		    std::ios_base::out|std::ios_base::trunc);
 
   if (!out.is_open()) {
@@ -580,7 +709,7 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << "#include <string>" << '\n';
 
   out << "#include \""
-      << outBase.tail().asString()
+      << outBase.leaf()
       << ".hxx\"" << '\n';
 
   out << '\n';
@@ -596,6 +725,7 @@ emit_src(ParseResult *pr, const Path& outBase)
     out << '\n';
   }
 
+  out << '\n';
   out << "AST::~AST()" << '\n';
   out << "{" << '\n';
   out << "}" << '\n';
@@ -604,47 +734,42 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << "AST::AST(const AstType at)" << '\n';
   out << "{" << '\n';
   out << "  astType = at;" << '\n';
-  out << "  children = new CVector<sherpa::GCPtr<AST> >;" << '\n';
   out << pr->construct.str();
   out << "}" << '\n';
   out << '\n';
  
-  out << "AST::AST(const AstType at, const LToken& tok)" << '\n';
+  out << "AST::AST(const AstType at, const AST_TOKEN_TYPE& tok)" << '\n';
   out << "{" << '\n';
   out << "  astType = at;" << '\n';
-  out << "  children = new CVector<sherpa::GCPtr<AST> >;" << '\n';
   out << "  loc = tok.loc;" << '\n';
   out << "  s = tok.str;" << '\n';
   out << pr->construct.str();
   out << "}" << '\n';
   out << '\n';
 
-  out << "AST::AST(const AstType at, const LexLoc& _loc)" << '\n';
+  out << "AST::AST(const AstType at, const AST_LOCATION_TYPE& _loc)" << '\n';
   out << "{" << '\n';
   out << "  astType = at;" << '\n';
-  out << "  children = new CVector<sherpa::GCPtr<AST> >;" << '\n';
   out << "  loc = _loc;" << '\n';
   out << pr->construct.str();
   out << "}" << '\n';
   out << '\n';
 
-  out << "AST::AST(const AstType at, const LexLoc& _loc," << '\n';
-  out << "         sherpa::GCPtr<AST> child1)" << '\n';
+  out << "AST::AST(const AstType at, const AST_LOCATION_TYPE& _loc," << '\n';
+  out << "         AST_SMART_PTR<AST> child1)" << '\n';
   out << "{" << '\n';
   out << "  astType = at;" << '\n';
-  out << "  children = new CVector<sherpa::GCPtr<AST> >;" << '\n';
   out << "  loc = _loc;" << '\n';
   out << "  addChild(child1);" << '\n';
   out << pr->construct.str();
   out << "}" << '\n';
   out << '\n';
 
-  out << "AST::AST(const AstType at, const LexLoc& _loc," << '\n';
-  out << "         sherpa::GCPtr<AST> child1," << '\n';
-  out << "         sherpa::GCPtr<AST> child2)" << '\n';
+  out << "AST::AST(const AstType at, const AST_LOCATION_TYPE& _loc," << '\n';
+  out << "         AST_SMART_PTR<AST> child1," << '\n';
+  out << "         AST_SMART_PTR<AST> child2)" << '\n';
   out << "{" << '\n';
   out << "  astType = at;" << '\n';
-  out << "  children = new CVector<sherpa::GCPtr<AST> >;" << '\n';
   out << "  loc = _loc;" << '\n';
   out << "  addChild(child1);" << '\n';
   out << "  addChild(child2);" << '\n';
@@ -652,13 +777,12 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << "}" << '\n';
   out << '\n';
 
-  out << "AST::AST(const AstType at, const LexLoc& _loc," << '\n';
-  out << "         sherpa::GCPtr<AST> child1," << '\n';
-  out << "         sherpa::GCPtr<AST> child2," << '\n';
-  out << "         sherpa::GCPtr<AST> child3)" << '\n';
+  out << "AST::AST(const AstType at, const AST_LOCATION_TYPE& _loc," << '\n';
+  out << "         AST_SMART_PTR<AST> child1," << '\n';
+  out << "         AST_SMART_PTR<AST> child2," << '\n';
+  out << "         AST_SMART_PTR<AST> child3)" << '\n';
   out << "{" << '\n';
   out << "  astType = at;" << '\n';
-  out << "  children = new CVector<sherpa::GCPtr<AST> >;" << '\n';
   out << "  loc = _loc;" << '\n';
   out << "  addChild(child1);" << '\n';
   out << "  addChild(child2);" << '\n';
@@ -667,14 +791,13 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << "}" << '\n';
   out << '\n';
 
-  out << "AST::AST(const AstType at, const LexLoc& _loc," << '\n';
-  out << "         sherpa::GCPtr<AST> child1," << '\n';
-  out << "         sherpa::GCPtr<AST> child2," << '\n';
-  out << "         sherpa::GCPtr<AST> child3," << '\n';
-  out << "         sherpa::GCPtr<AST> child4)" << '\n';
+  out << "AST::AST(const AstType at, const AST_LOCATION_TYPE& _loc," << '\n';
+  out << "         AST_SMART_PTR<AST> child1," << '\n';
+  out << "         AST_SMART_PTR<AST> child2," << '\n';
+  out << "         AST_SMART_PTR<AST> child3," << '\n';
+  out << "         AST_SMART_PTR<AST> child4)" << '\n';
   out << "{" << '\n';
   out << "  astType = at;" << '\n';
-  out << "  children = new CVector<sherpa::GCPtr<AST> >;" << '\n';
   out << "  loc = _loc;" << '\n';
   out << "  addChild(child1);" << '\n';
   out << "  addChild(child2);" << '\n';
@@ -684,15 +807,14 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << "}" << '\n';
   out << '\n';
 
-  out << "AST::AST(const AstType at, const LexLoc& _loc," << '\n';
-  out << "         sherpa::GCPtr<AST> child1," << '\n';
-  out << "         sherpa::GCPtr<AST> child2," << '\n';
-  out << "         sherpa::GCPtr<AST> child3," << '\n';
-  out << "         sherpa::GCPtr<AST> child4," << '\n';
-  out << "         sherpa::GCPtr<AST> child5)" << '\n';
+  out << "AST::AST(const AstType at, const AST_LOCATION_TYPE& _loc," << '\n';
+  out << "         AST_SMART_PTR<AST> child1," << '\n';
+  out << "         AST_SMART_PTR<AST> child2," << '\n';
+  out << "         AST_SMART_PTR<AST> child3," << '\n';
+  out << "         AST_SMART_PTR<AST> child4," << '\n';
+  out << "         AST_SMART_PTR<AST> child5)" << '\n';
   out << "{" << '\n';
   out << "  astType = at;" << '\n';
-  out << "  children = new CVector<sherpa::GCPtr<AST> >;" << '\n';
   out << "  loc = _loc;" << '\n';
   out << "  addChild(child1);" << '\n';
   out << "  addChild(child2);" << '\n';
@@ -703,7 +825,7 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << "}" << '\n';
   out << '\n';
 
-  out << "std::string" << '\n';
+  out << "::std::string" << '\n';
   out << "AST::getTokenString()" << '\n';
   out << "{" << '\n';
   out << "  return s;" << '\n';
@@ -711,9 +833,9 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << '\n';
 
   out << "void" << '\n'; 
-  out << "AST::addChild(sherpa::GCPtr<AST> child)" << '\n';
+  out << "AST::addChild(AST_SMART_PTR<AST> child)" << '\n';
   out << "{" << '\n';
-  out << "  children->append(child);" << '\n';
+  out << "  children.push_back(child);" << '\n';
   out << "}" << '\n';
   out << '\n';
 
@@ -765,10 +887,10 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << "astChTypeError(const AST &myAst, const AstType exp_at," << '\n';
   out << "               const AstType act_at, size_t child)" << '\n';
   out << "{" << '\n';
-  out << "  std::cerr << myAst.loc.asString() << \": \" << myAst.astTypeName();" << '\n';
-  out << "  std::cerr << \" has incompatible Child# \" << child;" << '\n';
-  out << "  std::cerr << \". Expected \" << AST::tagName(exp_at) << \", \"; " << '\n';
-  out << "  std::cerr << \"Obtained \" << AST::tagName(act_at) << \".\" << std::endl;" << '\n';
+  out << "  ::std::cerr << myAst.loc.asString() << \": \" << myAst.astTypeName();" << '\n';
+  out << "  ::std::cerr << \" has incompatible Child# \" << child;" << '\n';
+  out << "  ::std::cerr << \". Expected \" << AST::tagName(exp_at) << \", \"; " << '\n';
+  out << "  ::std::cerr << \"Obtained \" << AST::tagName(act_at) << \".\" << ::std::endl;" << '\n';
   out << "}" << '\n';
   out << '\n';
 
@@ -776,10 +898,10 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << "astChNumError(const AST &myAst, const size_t exp_ch," << '\n';
   out << "               const size_t act_ch)" << '\n';
   out << "{" << '\n';
-  out << "  std::cerr << myAst.loc.asString() << \": \" << myAst.astTypeName();" << '\n';
-  out << "  std::cerr << \" has wrong number of children. \";" << '\n';
-  out << "  std::cerr << \"Expected \" << exp_ch << \", \";" << '\n';
-  out << "  std::cerr << \"Obtained \" << act_ch << \".\" << std::endl;" << '\n';
+  out << "  ::std::cerr << myAst.loc.asString() << \": \" << myAst.astTypeName();" << '\n';
+  out << "  ::std::cerr << \" has wrong number of children. \";" << '\n';
+  out << "  ::std::cerr << \"Expected \" << exp_ch << \", \";" << '\n';
+  out << "  ::std::cerr << \"Obtained \" << act_ch << \".\" << ::std::endl;" << '\n';
   out << "}" << '\n';
   out << '\n';
 
@@ -794,7 +916,7 @@ emit_src(ParseResult *pr, const Path& outBase)
 /******************************************************************/
   
   out << "void" << '\n';
-  out << "astWalker(sherpa::GCPtr<AST> ast)" << '\n';
+  out << "astWalker(AST_SMART_PTR<AST> ast)" << '\n';
   out << "{" << '\n';
   out << "  size_t c;" << '\n';
   out << "  switch(ast->astType) {" << '\n';
@@ -825,7 +947,7 @@ emit_src(ParseResult *pr, const Path& outBase)
 	  {
 	    out << "    // match " << cp->tokInfo->tagName() << "*" << '\n';
 	    out << "    c = " << cc << ";" << '\n';
-	    out << "    while (c < ast->children->size()) {" << '\n';
+	    out << "    while (c < ast->children.size()) {" << '\n';
 	    out << "      astWalker(ast->child(c));" << '\n';
 	    out << "      c++;" << '\n';
 	    out << "    }" << '\n';
@@ -837,7 +959,7 @@ emit_src(ParseResult *pr, const Path& outBase)
 	  {
 	    out << "    // match " << cp->tokInfo->tagName() << "+" << '\n';
 	    out << "    c = " << cc << ";" << '\n';
-	    out << "    while (c < ast->children->size()) {" << '\n';
+	    out << "    while (c < ast->children.size()) {" << '\n';
 	    out << "      astWalker(ast->child(c));" << '\n';
 	    out << "      c++;" << '\n';
 	    out << "    }" << '\n';
@@ -848,7 +970,7 @@ emit_src(ParseResult *pr, const Path& outBase)
 	case '?':
 	  {
 	    out << "    // match " << cp->tokInfo->tagName() << "?" << '\n';
-	    out << "    if (ast->children->size() > " << cc << ") {" << '\n';
+	    out << "    if (ast->children.size() > " << cc << ") {" << '\n';
 	    out << "      astWalker(ast->child(" << cc << "));" << '\n';
 	    c++;
 	    out << "    }" << '\n';
@@ -913,7 +1035,7 @@ emit_src(ParseResult *pr, const Path& outBase)
   out << "  size_t specNdx;" << '\n';
   out << "  bool errorsPresent = false;" << '\n';
   out << '\n';
-  out << "  for (c = 0; c < children->size(); c++) {" << '\n';
+  out << "  for (c = 0; c < children.size(); c++) {" << '\n';
   out << "    if (!child(c)->isValid())" << '\n';
   out << "      errorsPresent = true;" << '\n';
   out << "  }" << '\n';
@@ -930,8 +1052,8 @@ emit_src(ParseResult *pr, const Path& outBase)
     case dt_leaf:
       out << "  case " << aip->tagName() << ":";
       out << " // leaf AST:" << '\n';
-      out << "    if(children->size() != 0) {" << '\n';
-      out << "      astChNumError(*this, 0, children->size());" << '\n';
+      out << "    if(children.size() != 0) {" << '\n';
+      out << "      astChNumError(*this, 0, children.size());" << '\n';
       out << "      errorsPresent = true;" << '\n';
       out << "    }" << '\n';
       break;
@@ -945,8 +1067,8 @@ emit_src(ParseResult *pr, const Path& outBase)
 	case ' ':
 	  {
 	    out << "    // match " << cp->tokInfo->tagName() << '\n';
-	    out << "    if(c >= children->size()) {" << '\n';
-	    out << "      astChNumError(*this, c+1, children->size());" << '\n';
+	    out << "    if(c >= children.size()) {" << '\n';
+	    out << "      astChNumError(*this, c+1, children.size());" << '\n';
 	    out << "      errorsPresent = true;" << '\n';
 	    out << "      break;" << '\n';
 	    out << "    }" << '\n';
@@ -965,7 +1087,7 @@ emit_src(ParseResult *pr, const Path& outBase)
 	case '*':
 	  {
 	    out << "    // match " << cp->tokInfo->tagName() << "*" << '\n';
-	    out << "    while (c < children->size()) {" << '\n'
+	    out << "    while (c < children.size()) {" << '\n'
 		<< "      if (!ISSET(astMembers[" 
 		<< cp->tokInfo->tagName()
 		<< "], child(c)->astType))"
@@ -980,8 +1102,8 @@ emit_src(ParseResult *pr, const Path& outBase)
 	case '+':
 	  {
 	    out << "    // match " << cp->tokInfo->tagName() << "+" << '\n';
-	    out << "    if(c >= children->size()) {" << '\n';
-	    out << "      astChNumError(*this, c+1, children->size());" << '\n';
+	    out << "    if(c >= children.size()) {" << '\n';
+	    out << "      astChNumError(*this, c+1, children.size());" << '\n';
 	    out << "      errorsPresent = true;" << '\n';
 	    out << "      break;" << '\n';
 	    out << "    }" << '\n';
@@ -994,7 +1116,7 @@ emit_src(ParseResult *pr, const Path& outBase)
 	    out << "      errorsPresent = true;" << '\n';
 	    out << "    }" << '\n';
 
-	    out << "    while (c < children->size()) {" << '\n'
+	    out << "    while (c < children.size()) {" << '\n'
 		<< "      if (!ISSET(astMembers[" 
 		<< cp->tokInfo->tagName()
 		<< "], child(c)->astType))"
@@ -1009,7 +1131,7 @@ emit_src(ParseResult *pr, const Path& outBase)
 	case '?':
 	  {
 	    out << "    // match " << cp->tokInfo->tagName() << "?" << '\n';
-	    out << "    if ((c < children->size()) && ISSET(astMembers[" 
+	    out << "    if ((c < children.size()) && ISSET(astMembers[" 
 		<< cp->tokInfo->tagName() 
 		<< "], child(c)->astType)"
 		<< ")" << '\n';
@@ -1022,8 +1144,8 @@ emit_src(ParseResult *pr, const Path& outBase)
 	}
       }
 
-      out << "    if(c != children->size()) {" << '\n';
-      out << "      astChNumError(*this, c, children->size());" << '\n';
+      out << "    if(c != children.size()) {" << '\n';
+      out << "      astChNumError(*this, c, children.size());" << '\n';
       out << "      errorsPresent = true;" << '\n';
       out << "    }" << '\n';
       
@@ -1067,7 +1189,7 @@ main(int argc, char *argv[])
   bool wantHdr = false;
   bool wantSrc = false;
 
-  std::string outputFileName;
+  filesystem::path outputFileName;
 
 #if 0
   // Make sure that we are running in a UNICODE locale:
@@ -1135,14 +1257,15 @@ main(int argc, char *argv[])
     exit(0);
   }
 
-  ParseResult *pr = parse_file(Path(argv[0]));
+  ParseResult *pr = parse_file(filesystem::path(argv[0]));
 
   check_asts(pr);
 
-  if (outputFileName.size() == 0)
+  if (outputFileName.empty())
     outputFileName = argv[0];
 
-  Path outBase = Path(outputFileName).stem();
+  filesystem::path outBase = 
+    outputFileName.branch_path() / basename(outputFileName);
 
   //  emit_ast(pr, outBase);
   if (wantHdr) emit_hdr(pr, outBase);

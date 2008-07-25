@@ -3,9 +3,8 @@
 
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -40,8 +39,11 @@
  *
  **************************************************************************/
 
+#include <boost/filesystem/path.hpp>
+
 namespace sherpa {
-  FILE * do_xfopen(const Path&, const char mode, const char ftype, 
+  FILE * do_xfopen(const boost::filesystem::path&, 
+		   const char mode, const char ftype, 
 		   const char *file, unsigned line);
 
   void do_xfclose(FILE *, const char *file, unsigned line);

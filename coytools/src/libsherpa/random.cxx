@@ -50,8 +50,8 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
-#include "random.hxx"
-#include "UExcept.hxx"
+#include <libsherpa/random.hxx>
+#include <libsherpa/UExcept.hxx>
 
 namespace sherpa {
   namespace rnd {

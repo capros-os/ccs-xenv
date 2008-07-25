@@ -3,9 +3,8 @@
 
 /**************************************************************************
  *
- * Copyright (C) 2007, The EROS Group, LLC.
- * All rights reserved.
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC.
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -42,7 +41,6 @@
 
 #include "ParseType.hxx"
 #include "UCSLexer.hxx"
-#include "libsherpa/GCPtr.hxx"
 
 struct AMlexer : public UCSLexer {
   bool percentIsIdentifier;
@@ -50,7 +48,7 @@ struct AMlexer : public UCSLexer {
 
   unsigned parenDepth;
 
-  AMlexer(std::istream& in, sherpa::GCPtr<sherpa::Path> inputPath);
+  AMlexer(std::istream& in, const std::string& origin);
 
   int amlex(ParseType *yylvalp);
 

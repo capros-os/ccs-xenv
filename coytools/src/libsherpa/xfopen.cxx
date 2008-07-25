@@ -1,8 +1,7 @@
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -46,10 +45,11 @@
 
 #include <string>
 
-#include "UExcept.hxx"
-#include "Path.hxx"
-#include "Logging.hxx"
-#include "util.hxx"
+#include <libsherpa/UExcept.hxx>
+#include <libsherpa/Logging.hxx>
+#include <libsherpa/util.hxx>
+
+using namespace boost;
 
 namespace sherpa {
 
@@ -57,7 +57,7 @@ namespace sherpa {
   logger::LogType DbgFdLeak("FDLEAK", logger::LTY_trace);
 
   FILE *
-  do_xfopen(const Path& path, const char mode, const char ftype, 
+  do_xfopen(const filesystem::path& path, const char mode, const char ftype, 
 	    const char *file, unsigned line)
   {
     const char *fopen_mode;
@@ -78,11 +78,11 @@ namespace sherpa {
     else
       THROW(excpt::BadValue, "Unknown mode or ftype to xfopen");
 
-    f = fopen(path.c_str(), fopen_mode);
+    f = fopen(path.file_string().c_str(), fopen_mode);
     if (f == NULL)
       THROW(excpt::NoAccess,
 	    format("Could not open file %s, mode %s (errno %d)", 
-		   path.c_str(), fopen_mode, errno));
+		   path.string().c_str(), fopen_mode, errno));
 
     nOpenFile++;
     logger::trace(DbgFdLeak, "%d files now open at %s:%d\n", 

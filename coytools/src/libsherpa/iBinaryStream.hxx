@@ -39,8 +39,8 @@
  **************************************************************************/
 
 #include <iostream>
-#include "ByteString.hxx"
-#include "bs_base.hxx"
+#include <libsherpa/bs_base.hxx>
+#include <libsherpa/ByteString.hxx>
 
 namespace sherpa {
   class iBinaryStream {

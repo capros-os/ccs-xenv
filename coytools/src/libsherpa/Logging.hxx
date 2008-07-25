@@ -3,9 +3,8 @@
 
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -40,7 +39,7 @@
  *
  **************************************************************************/
 
-#include "Path.hxx"
+#include <boost/filesystem/path.hpp>
 
 namespace sherpa {
   extern std::string appName;
@@ -87,7 +86,7 @@ namespace sherpa {
     void setDebugging(const std::string& arg);
     void setServerMode();
 
-    void initDirectory(const Path& logDir);
+    void initDirectory(const boost::filesystem::path& logDir);
   } /* namespace logging */
 } /* namespace sherpa */
 

@@ -170,10 +170,10 @@ AMlexer.cxx: AMparser.cxx
 
 # A small test case:
 test.cxx: test.ast astmaker
-	astmaker -s test.ast
+	./astmaker -s test.ast
 
-test.hxx: test.ast /astmaker
-	astmaker -h test.ast
+test.hxx: test.ast astmaker
+	./astmaker -h test.ast
 
 test.o: test.cxx test.hxx
 	$(CXX_BUILD) 	

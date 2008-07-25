@@ -45,8 +45,8 @@ AC_CANONICAL_HOST
 dnl Put libsherpa version information here so that it can be substituted in
 dnl where it is needed. When the VERSION bumps, reset the BUILD to 1 and
 dnl remove the "plNNN" suffix
-VERSION="0.3.1"
-BUILD="2"
+VERSION="0.3.2"
+BUILD="0"
 
 AC_PROG_CXX
 AC_PROG_INSTALL
@@ -74,6 +74,8 @@ AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h limits.h sys/file.h sys/time.h unistd.h paths.h)
 AC_CHECK_HEADERS(sys/vfs.h sys/statfs.h sys/param.h sys/mount.h)
 AC_CHECK_HEADERS(stdint.h inttypes.h)
+
+AC_CHECK_HEADERS(boost/shared_ptr.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

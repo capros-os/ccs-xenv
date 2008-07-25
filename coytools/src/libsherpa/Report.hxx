@@ -40,7 +40,7 @@
  *
  **************************************************************************/
 
-#include "Logging.hxx"
+#include <libsherpa/Logging.hxx>
 
 namespace sherpa {
   unsigned long verbosity_lvl;

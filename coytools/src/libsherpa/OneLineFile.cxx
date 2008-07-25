@@ -1,8 +1,7 @@
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -42,15 +41,18 @@
 #include <dirent.h>
 
 #include <string>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
 
-#include "Path.hxx"
-#include "xfopen.hxx"
+#include <libsherpa/xfopen.hxx>
+
+using namespace boost;
 
 namespace sherpa {
   std::string
-  ReadOneLineFile(Path path)
+  ReadOneLineFile(const boost::filesystem::path& path)
   {
-    size_t len = path.fileLength();
+    uintmax_t len = filesystem::file_size(path);
     FILE *f = xfopen(path, 'r', 't');
     std::string buf;
 
@@ -69,7 +71,8 @@ namespace sherpa {
   }
 
   int
-  WriteOneLineFile(Path path, std::string s)
+  WriteOneLineFile(const filesystem::path& path, 
+		   const std::string& s)
   {
     int result;
     FILE *f = xfopen(path, 'c', 't');

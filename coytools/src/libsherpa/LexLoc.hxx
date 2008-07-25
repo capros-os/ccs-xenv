@@ -3,9 +3,8 @@
 
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -40,8 +39,6 @@
  *
  **************************************************************************/
 
-#include "Path.hxx"
-
 namespace sherpa {
 
   struct LexLoc {
@@ -58,13 +55,6 @@ namespace sherpa {
 
     ~LexLoc()
     {
-    }
-
-    LexLoc(GCPtr<Path> filePath, unsigned line, unsigned offset)
-    {
-      this->origin = filePath->asString();
-      this->line = line;
-      this->offset = offset;
     }
 
     LexLoc(const std::string& origin, unsigned line, unsigned offset)

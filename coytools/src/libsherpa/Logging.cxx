@@ -1,8 +1,7 @@
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -44,41 +43,52 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <dirent.h>
-
 #include <string>
+#include <map>
 
-#include "UExcept.hxx"
-#include "util.hxx"
-#include "Logging.hxx"
-#include "os.hxx"
-#include "xfopen.hxx"
-#include "avl.hxx"
+#include <libsherpa/UExcept.hxx>
+#include <libsherpa/util.hxx>
+#include <libsherpa/Logging.hxx>
+#include <libsherpa/os.hxx>
+#include <libsherpa/xfopen.hxx>
+
+using namespace boost;
 
 namespace sherpa {
   std::string appName = "Who Am I?";
   std::string appInvokedName = "Who Am I?";
 
   namespace logger {
-    typedef AvlMapNode<std::string,LogType*> LogMapNode;
-    static AvlMap<std::string,LogType*> logMap;
+    typedef std::map<std::string,LogType*> LogMap;
+
+    // You might think that this could just be the LogMap itself, but
+    // there is a constructor initialization ordering race between the
+    // logMap and the various LogTypes that are declared. Rather than
+    // hope for the best, we set it to zero here (which is a
+    // compile-time initialization), and hand-initialize it in
+    // LogType::do_init() when the first LogType record is registered.
+    LogMap *logMap = 0;
 
     /* Forward declaration: */
     static void do_log(FILE *chan, const char *prefix, 
 		       const char *fmt, va_list args);
 
-    void LogType::do_init(const std::string& s, TraceType tt, unsigned lvl)
+    void
+    LogType::do_init(const std::string& s, TraceType tt, unsigned lvl)
     {
+      if (!logMap) logMap = new LogMap;
+
       name = s;
       traceType = tt;
       level = lvl;
       shouldTrace = false;
 
-      if (logMap.contains(name)) {
+      if (logMap->find(name) != logMap->end()) {
 	syslog_error("Duplicate LogType %s\n", (char *) s.c_str());
 	exit(-1);
       }    
     
-      logMap.insert(name, this);
+      (*logMap)[name] = this;
     }
 
 #define LOG_TIME_STAMPS
@@ -195,11 +205,11 @@ namespace sherpa {
     } 
 
     void
-    initDirectory(Path logDir)
+    initDirectory(const filesystem::path& logDir)
     {
-      Path err_logFile = logDir + Path("error_log");
-      Path acc_logFile = logDir + Path("access_log");
-      Path trc_logFile = logDir + Path("trace_log");
+      filesystem::path err_logFile = logDir / filesystem::path("error_log");
+      filesystem::path acc_logFile = logDir / filesystem::path("access_log");
+      filesystem::path trc_logFile = logDir / filesystem::path("trace_log");
 
       FILE *f;
 
@@ -213,71 +223,48 @@ namespace sherpa {
 	trace_channel = f;
     }
 
-
-    static bool setVerbosityIterator(GCPtr<LogMapNode> nd,
-				     const void *vlevel)
-    {
-      long level = * ((long *)vlevel);
-
-      LogType *lt = nd->value;
-
-      if (lt->level != DebuggingTraceLevel)
-	lt->shouldTrace = (level > lt->level);
-
-      return true;
-    }
-
     void
     setVerbosity(unsigned long level)
     {
-      logMap.iterate(setVerbosityIterator, &level);
-    }
+      if (!logMap)
+	return;
 
-#if 0
-    static bool setDebuggingIterator(LogMapNode *nd,
-				     const void *vname)
-    {
-      const char *name = (const char *) vname;
-
-      LogType *lt = nd->value;
-
-      if (lt->level == DebuggingTraceLevel) {
-	if (strcasecmp(name, lt->name.c_str()) == 0)
-	  lt->shouldTrace = true;
+      LogMap::iterator iter;
+      for (iter = logMap->begin(); iter != logMap->end(); iter++) {
+	LogType *lt = iter->second;
+	if (lt->level != DebuggingTraceLevel)
+	  lt->shouldTrace = (level > lt->level);
       }
-
-      return true;
     }
-#endif
 
     void
     setDebugging(const std::string& arg)
     {
-      GCPtr<LogMapNode> nd = logMap.lookup(arg);
+      if (!logMap)
+	return;
 
-      if (!nd)
+      LogMap::iterator elem = logMap->find(arg);
+      if (elem == logMap->end())
 	THROW(excpt::BadValue, "Argument to -d was unrecognized");
 
-      nd->value->shouldTrace = true;
-    }
-
-    bool
-    helpDebuggingIterator(LogMapNode *nd, const void *aux)
-    {
-      LogType *lt = nd->value;
-
-      if (lt->level == DebuggingTraceLevel)
-	fprintf(stderr, "%s\n", strdowncase(lt->name).c_str());
-
-      return true;
+      elem->second->shouldTrace = true;
     }
 
     void
     helpDebugging(void)
     {
+      if (!logMap)
+	return;
+
       fprintf(stderr, "The following debugging flags are available:\n");
 
-      logMap.iterate(setVerbosityIterator);
+      LogMap::iterator iter;
+      for (iter = logMap->begin(); iter != logMap->end(); iter++) {
+	LogType *lt = iter->second;
+
+	if (lt->level == DebuggingTraceLevel)
+	  fprintf(stderr, "%s\n", strdowncase(lt->name).c_str());
+      }
     }
 
     bool

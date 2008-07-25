@@ -1,6 +1,7 @@
 /**************************************************************************
  *
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -53,7 +54,7 @@ AstInfo::AstInfo(DeclType _dt, const sherpa::LToken& _nm)
   printName = _nm.str;
   dt = _dt;
   members = 0;
-  children = new sherpa::CVector<ChildNode *>;
+  children = new ChildVec;
 
   if (dt == dt_group)
     printName = "{" + printName + "}";
@@ -66,12 +67,11 @@ AstInfo::AstInfo(DeclType _dt, const sherpa::LToken& _nm,
   printName = _printName.str;
   dt = _dt;
   members = 0;
-  children = new sherpa::CVector<ChildNode *>;
+  children = new ChildVec;
 }
 
 AstInfo::~AstInfo()
 {
-  children = 0;
   members = 0;
 }
 

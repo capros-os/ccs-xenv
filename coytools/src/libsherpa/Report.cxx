@@ -1,8 +1,7 @@
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -46,9 +45,8 @@
 
 #include <string>
 
-#include "Logging.hxx"
-#include "Path.hxx"
-#include "Report.hxx"
+#include <libsherpa/Logging.hxx>
+#include <libsherpa/Report.hxx>
 
 namespace sherpa {
   void

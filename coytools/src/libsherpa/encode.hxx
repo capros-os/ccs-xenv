@@ -40,7 +40,7 @@
  *
  **************************************************************************/
 
-#include "ByteString.hxx"
+#include <libsherpa/ByteString.hxx>
 
 namespace sherpa {
   std::string hex_encode(const ByteString&);

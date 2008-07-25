@@ -53,8 +53,8 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
-#include "util.hxx"
-#include "sha1.hxx"
+#include <libsherpa/util.hxx>
+#include <libsherpa/sha1.hxx>
 
 namespace sherpa {
   std::string

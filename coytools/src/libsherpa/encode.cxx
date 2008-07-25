@@ -44,9 +44,10 @@
 #include <string>
 #include <algorithm>
 
-#include "UExcept.hxx"
-#include "util.hxx"
-#include "encode.hxx"
+#include <libsherpa/UExcept.hxx>
+#include <libsherpa/util.hxx>
+#include <libsherpa/BigNum.hxx>
+#include <libsherpa/encode.hxx>
 
 namespace sherpa {
   const char b64chars[] = 

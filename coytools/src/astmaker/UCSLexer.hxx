@@ -2,7 +2,7 @@
 #define UCSLEXER_HXX
 
 /*
- * Copyright (C) 2007, The EROS Group, LLC.
+ * Copyright (C) 2008, The EROS Group, LLC.
  * All rights reserved.
  *
  * This file is part of the EROS Operating System runtime library.
@@ -24,9 +24,9 @@
 
 typedef long ucs4_t;
 
-#include <libsherpa/Path.hxx>
-#include <libsherpa/LexLoc.hxx>
 #include <iostream>
+
+#include <libsherpa/LexLoc.hxx>
 
 class UCSLexer {
   std::istream& inStream;
@@ -58,7 +58,7 @@ protected:
   bool   slurpCxxComment();
   bool   slurpCxxDocComment();
 
-  UCSLexer(std::istream& _in, sherpa::GCPtr<sherpa::Path> inputPath);
+  UCSLexer(std::istream& _in, const std::string& origin);
 
 public:
   static bool validIdentPunct(uint32_t ucs4);

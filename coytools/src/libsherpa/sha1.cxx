@@ -53,7 +53,7 @@
 
 #include <string>
 
-#include "sha1.hxx"
+#include <libsherpa/sha1.hxx>
 
 namespace sherpa {
 

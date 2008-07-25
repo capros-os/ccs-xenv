@@ -40,7 +40,7 @@
  *
  **************************************************************************/
 
-#include "ByteString.hxx"
+#include <libsherpa/ByteString.hxx>
 
 /* Thread-friendly implementation of sha-1 cryptographic hash
    algorithm. */

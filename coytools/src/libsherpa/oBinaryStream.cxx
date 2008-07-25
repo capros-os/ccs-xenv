@@ -36,7 +36,7 @@
  **************************************************************************/
 
 #include "../config.h"
-#include "oBinaryStream.hxx"
+#include <libsherpa/oBinaryStream.hxx>
 
 using namespace std;
 using namespace sherpa;

@@ -42,6 +42,8 @@ coytools/src/astmaker/AMparser.cxx
 coytools/src/astmaker/AMparser.hxx
 coytools/src/astmaker/AMparser.output
 coytools/src/astmaker/astmaker
+coytools/src/astmaker/test.cxx
+coytools/src/astmaker/test.hxx
 coytools/src/libsherpa/Makefile
 
 coytools/src/bntest/Makefile

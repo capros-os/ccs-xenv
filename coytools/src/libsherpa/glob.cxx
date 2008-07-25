@@ -1,8 +1,7 @@
 /**************************************************************************
  *
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
- * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
+ * Copyright (C) 2008, The EROS Group, LLC. 
+ * Copyright (C) 2006, Johns Hopkins University.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or
@@ -42,12 +41,19 @@
 #include <dirent.h>
 
 #include <string>
+#include <boost/filesystem.hpp>
 
-#include "glob.hxx"
-#include "Path.hxx"
+#include <libsherpa/glob.hxx>
+
+using namespace boost;
 
 /* Shell-style glob processing for client and server */
 namespace sherpa {
+
+  static inline bool
+  isDirSep(char c) {
+    return c == '/';
+  }
 
   static bool
   goodglob(const char *s)
@@ -179,7 +185,7 @@ namespace sherpa {
 	 potentially longer path: */
       if ((flags & GM_FS_COMPONENT) &&
 	  *pattern == 0 &&
-	  Path::isDirSep(*s))
+	  isDirSep(*s))
 	return s+1;		/* NOTE: skip the dir separator */
 
       if (*s != *pattern)
@@ -199,13 +205,13 @@ namespace sherpa {
       /* If matching FS component, * does not cross / in the
 	 string. Otherwise, try both strategies for advancing. */
 
-      if ((flags & GM_FS_COMPONENT) && Path::isDirSep(*s)) {
+      if ((flags & GM_FS_COMPONENT) && isDirSep(*s)) {
 	/* If this is the end of the pattern, then this is a successful
 	   match: */
 	if (pattern[1] == 0)
 	  return s + 1;		/* NOTE: skip the dir separator */
 
-	else if (Path::isDirSep(pattern[1]))
+	else if (isDirSep(pattern[1]))
 	  return do_glob_match(s, pattern+1, flags);
 
 	else

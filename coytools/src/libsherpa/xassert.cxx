@@ -43,8 +43,8 @@
 
 #include <string>
 
-#include "UExcept.hxx"
-#include "util.hxx"
+#include <libsherpa/UExcept.hxx>
+#include <libsherpa/util.hxx>
 
 namespace sherpa {
 
