@@ -101,6 +101,7 @@ sharemandir=$(findstring $(datadir)/man,$(wildcard $(datadir)/*))
 mandir = $(if $(sharemandir),$(sharemandir),@mandir@)
 
 #### End of system configuration section. ####
+ACLOCAL_AMFLAGS=-I aclocal
 
 FLAGS_TO_PASS = \
 	AR='$(AR)' \
