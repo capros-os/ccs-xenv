@@ -67,6 +67,24 @@ AC_ARG_WITH([boost-libdir],
         [ac_boost_lib_path=""]
 )
 
+dnl We are about to go looking for the library path, but this
+dnl may be a 64-bit target system. Autoconf does not provide any
+dnl way to get the name of the target's /usr/lib directory, so
+dnl there isn't a general solution to the problem at hand.
+dnl 
+dnl If the person running configure has graciously supplied us
+dnl with a --with-libdir argument, we can assume that the
+dnl basename of that indicates the naming convention for the
+dnl target machine.
+dnl
+dnl Conversely, if we have NOT been given --with-libdir, the value
+dnl of libdir will default to "${exec_prefix}/lib". The basename
+dnl of that is "lib", which is the right historical default.
+dnl
+dnl All of this can still be overridden using --with-boost-libdir.
+_libdir_leaf=`echo $libdir | sed 's/.*\///'`
+
+
 if test "x$want_boost" = "xyes"; then
 	boost_lib_version_req=ifelse([$1], ,1.20.0,$1)
 	boost_lib_version_req_shorten=`expr $boost_lib_version_req : '\([[0-9]]*\.[[0-9]]*\)'`
@@ -81,26 +99,26 @@ if test "x$want_boost" = "xyes"; then
 	succeeded=no
 
 	dnl first we check the system location for boost libraries
-	dnl this location ist chosen if boost libraries are installed with the --layout=system option
-	dnl or if you install boost with RPM
+	dnl this location ist chosen if boost libraries are installed 
+	dnl with the --layout=system option or if you install boost with RPM
 	if test "$ac_boost_path" != ""; then
-		BOOST_LDFLAGS="-L$ac_boost_path/lib"
+		BOOST_LDFLAGS="-L$ac_boost_path/$_libdir_leaf"
 		BOOST_CPPFLAGS="-I$ac_boost_path/include"
 	else
 		for ac_boost_path_tmp in /usr /usr/local /opt /opt/local ; do
 			if test -d "$ac_boost_path_tmp/include/boost" && test -r "$ac_boost_path_tmp/include/boost"; then
-				BOOST_LDFLAGS="-L$ac_boost_path_tmp/lib"
+				BOOST_LDFLAGS="-L$ac_boost_path_tmp/$_libdir_leaf"
 				BOOST_CPPFLAGS="-I$ac_boost_path_tmp/include"
 				break;
 			fi
 		done
 	fi
 
-    dnl overwrite ld flags if we have required special directory with
-    dnl --with-boost-libdir parameter
-    if test "$ac_boost_lib_path" != ""; then
-       BOOST_LDFLAGS="-L$ac_boost_lib_path"
-    fi
+	dnl overwrite ld flags if we have required special directory with
+	dnl --with-boost-libdir parameter
+	if test "$ac_boost_lib_path" != ""; then
+	  BOOST_LDFLAGS="-L$ac_boost_lib_path"
+	fi
 
 	CPPFLAGS_SAVED="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
@@ -163,11 +181,11 @@ if test "x$want_boost" = "xyes"; then
 			BOOST_CPPFLAGS="-I$best_path/include/boost-$VERSION_UNDERSCORE"
             if test "$ac_boost_lib_path" = ""
             then
-               BOOST_LDFLAGS="-L$best_path/lib"
+               BOOST_LDFLAGS="-L$best_path/$_libdir_leaf"
             fi
 
 	    		if test "x$BOOST_ROOT" != "x"; then
-				if test -d "$BOOST_ROOT" && test -r "$BOOST_ROOT" && test -d "$BOOST_ROOT/stage/lib" && test -r "$BOOST_ROOT/stage/lib"; then
+				if test -d "$BOOST_ROOT" && test -r "$BOOST_ROOT" && test -d "$BOOST_ROOT/stage/$_libdir_leaf" && test -r "$BOOST_ROOT/stage/$_libdir_leaf"; then
 					version_dir=`expr //$BOOST_ROOT : '.*/\(.*\)'`
 					stage_version=`echo $version_dir | sed 's/boost_//' | sed 's/_/./g'`
 			        	stage_version_shorten=`expr $stage_version : '\([[0-9]]*\.[[0-9]]*\)'`
@@ -175,7 +193,7 @@ if test "x$want_boost" = "xyes"; then
                     if test "$V_CHECK" = "1" -a "$ac_boost_lib_path" = "" ; then
 						AC_MSG_NOTICE(We will use a staged boost library from $BOOST_ROOT)
 						BOOST_CPPFLAGS="-I$BOOST_ROOT"
-						BOOST_LDFLAGS="-L$BOOST_ROOT/stage/lib"
+						BOOST_LDFLAGS="-L$BOOST_ROOT/stage/$_libdir_leaf"
 					fi
 				fi
 	    		fi
