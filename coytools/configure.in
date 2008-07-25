@@ -77,7 +77,6 @@ AC_CHECK_HEADERS(sys/vfs.h sys/statfs.h sys/param.h sys/mount.h)
 AC_CHECK_HEADERS(stdint.h inttypes.h)
 
 AX_BOOST_BASE(1.33.1)
-echo BOOST_LDFLAGS=$BOOST_LDFLAGS
 AX_BOOST_FILESYSTEM
 
 AC_LANG([C++])

@@ -334,6 +334,14 @@ DIST=.fc$(RELEASEVER)
 
 # I am absolutely certain that there must be a better way to do this, but
 # I don't know what it is.
+# 
+# Note: I used to run a make distclean and autoconf here, but that led
+# to an automatic re-run of the top level configure script, which broke
+# boost builds on 64-bit system. RPM does the right thing, but the
+# kludgy call to configure here is necessary to get that far.
+
+HOST_LIBDIR=$(firstword $(wildcard /usr/lib64 /usr/lib))
+
 rpms:
 	-rm -rf $(RPM_TARGET_DIR)
 	-rm -rf $(RPM_TOPDIR)
@@ -349,6 +357,7 @@ rpms:
 	cp -a . $(RPM_TARGET_DIR)
 	(cd $(RPM_TARGET_DIR); make distclean)
 	(cd $(RPM_TARGET_DIR); autoconf)
+	(cd $(RPM_TARGET_DIR); ./configure --libdir=$(HOST_LIBDIR))
 	(cd $(OUR_TMP); tar czf $(RPM_TOPDIR)/SOURCES/coytools-$(VERSION)-$(BUILD)$(DIST).tar.gz coytools-$(VERSION))
 	cp coytools.spec $(RPM_TOPDIR)/SPECS/coytools.spec
 	(cd $(RPM_TOPDIR)/SPECS; rpmbuild -ba --define "dist $(DIST)" --define "_topdir $(RPM_TOPDIR)" coytools.spec)
