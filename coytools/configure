@@ -6845,7 +6845,10 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
-for ac_header in boost/shared_ptr.hpp boost/enable_shared_from_this.hpp \
+
+for ac_header in boost/shared_ptr.hpp \
+                 boost/version.hpp \
+                 boost/enable_shared_from_this.hpp \
                  boost/filesystem/convenience.hpp \
                  boost/filesystem/operations.hpp \
                  boost/filesystem/path.hpp

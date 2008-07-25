@@ -80,7 +80,9 @@ AX_BOOST_BASE(1.33.1)
 AX_BOOST_FILESYSTEM
 
 AC_LANG([C++])
-AC_CHECK_HEADERS([boost/shared_ptr.hpp] [boost/enable_shared_from_this.hpp] \
+AC_CHECK_HEADERS([boost/shared_ptr.hpp] \
+                 [boost/version.hpp] \
+                 [boost/enable_shared_from_this.hpp] \
                  [boost/filesystem/convenience.hpp] \
                  [boost/filesystem/operations.hpp] \
                  [boost/filesystem/path.hpp] )
