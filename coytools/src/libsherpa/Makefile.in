@@ -102,6 +102,7 @@ mandir = $(if $(sharemandir),$(sharemandir),@mandir@)
 mkinstalldirs = $(top_srcdir)/mkinstalldirs
 
 #### End of system configuration section. ####
+CXXFLAGS += @BOOST_CPPFLAGS@
 
 default: all
 

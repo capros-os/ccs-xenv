@@ -42,6 +42,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 namespace sherpa {
 
@@ -119,8 +120,9 @@ namespace sherpa {
       nDigits = 1;
       oneDigit = (i < 0) ? -i : i;
     }
+    BigNum(int64_t i);
 
-    BigNum(const std::string& s, size_t radix = 0);
+    BigNum(const std::string& s, uint32_t radix = 0);
 
     BigNum(const BigNum&);
     
@@ -216,10 +218,10 @@ namespace sherpa {
       return *this;
     }
 
-    std::string asString(size_t radix = 10) const;
+    std::string asString(uint32_t radix = 10) const;
 
-    void toStream(std::ostream& strm, size_t radix = 10) const;
-    void fromStream(std::istream& strm, size_t radix = 10);
+    void toStream(std::ostream& strm, uint32_t radix = 10) const;
+    void fromStream(std::istream& strm, uint32_t radix = 10);
 
     inline uint32_t as_uint32() const
     {
@@ -231,32 +233,34 @@ namespace sherpa {
       return (getDigit(1) << 32) | getDigit(0);
     }
   };
+
+  // Curiously, if these are removed from the namespace then
+  // overloadin creap in very quickly.
+  inline
+  std::ostream& operator<<(std::ostream& strm, const sherpa::BigNum& bn)
+  {
+    if (strm.flags() & strm.hex)
+      bn.toStream(strm, 16);
+    else if (strm.flags() & strm.oct)
+      bn.toStream(strm, 8);
+    else
+      bn.toStream(strm, 10);
+
+    return strm;
+  }
+
+  inline
+  std::istream& operator>>(std::istream& strm, sherpa::BigNum& bn)
+  {
+    if (strm.flags() & strm.hex)
+      bn.fromStream(strm, 16);
+    else if (strm.flags() & strm.oct)
+      bn.fromStream(strm, 8);
+    else
+      bn.fromStream(strm, 10);
+
+    return strm;
+  }
 } /* namespace sherpa */
-
-inline
-std::ostream& operator<<(std::ostream& strm, const sherpa::BigNum& bn)
-{
-  if (strm.flags() & strm.hex)
-    bn.toStream(strm, 16);
-  else if (strm.flags() & strm.oct)
-    bn.toStream(strm, 8);
-  else
-    bn.toStream(strm, 10);
-
-  return strm;
-}
-
-inline
-std::istream& operator>>(std::istream& strm, sherpa::BigNum& bn)
-{
-  if (strm.flags() & strm.hex)
-    bn.fromStream(strm, 16);
-  else if (strm.flags() & strm.oct)
-    bn.fromStream(strm, 8);
-  else
-    bn.fromStream(strm, 10);
-
-  return strm;
-}
 
 #endif /* LIBSHERPA_BIGNUM_HXX */
