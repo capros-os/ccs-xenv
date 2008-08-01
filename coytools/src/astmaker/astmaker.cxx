@@ -626,19 +626,19 @@ do_emit_hdr(std::ostream& outStream, ParseResult *pr,
   out << "  }" << '\n';
   out << '\n';
   out << '\n';
-  out << "  AST_SMART_PTR<AST>" << '\n';
+  out << "  const AST_SMART_PTR<AST>" << '\n';
   out << "  child(size_t i) const" << '\n';
   out << "  {" << '\n';
   out << "    return children[i];" << '\n';
   out << "  }" << '\n';
   out << '\n';
-  out << "  AST_SMART_PTR<AST>" << '\n';
+  out << "  AST_SMART_PTR<AST>&" << '\n';
   out << "  child(size_t i)" << '\n';
   out << "  {" << '\n';
   out << "    return children[i];" << '\n';
   out << "  }" << '\n';
   out << '\n';
-  out << "  void addChild(AST_SMART_PTR<AST> child);" << '\n';
+  out << "  void addChild(AST_SMART_PTR<AST> cld);" << '\n';
   out << "  ::std::string getTokenString();" << '\n';
   out << '\n';
   out << "  void" << '\n';
@@ -853,9 +853,9 @@ emit_src(ParseResult *pr, const filesystem::path& outBase)
   out << '\n';
 
   out << "void" << '\n'; 
-  out << "AST::addChild(AST_SMART_PTR<AST> child)" << '\n';
+  out << "AST::addChild(AST_SMART_PTR<AST> cld)" << '\n';
   out << "{" << '\n';
-  out << "  children.push_back(child);" << '\n';
+  out << "  children.push_back(cld);" << '\n';
   out << "}" << '\n';
   out << '\n';
 
