@@ -58,8 +58,6 @@ namespace sherpa {
 
   typedef uint32_t hash32_t;
 
-  hash32_t hash_string(std::string s);
-
   extern const char * strnchr(const char *s, size_t len, char c);
   inline const unsigned char * 
   ustrnchr(const unsigned char *s, size_t len, unsigned char c) {

@@ -37,24 +37,17 @@
  *
  **************************************************************************/
 
-#include "../config.h"
-
 #include <stdint.h>
 #include <stdarg.h>
 #include <assert.h>
 
 #include <string>
 
-#ifndef HAVE_OPENSSL
-  #error "Configure script did not locate OpenSSL"
-#endif
-
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
-#include <libsherpa/util.hxx>
-#include <libsherpa/sha1.hxx>
+#include "util.hxx"
 
 namespace sherpa {
   std::string

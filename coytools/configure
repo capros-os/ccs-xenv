@@ -1844,7 +1844,7 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
 
-VERSION="0.3.2"
+VERSION="0.3.3"
 BUILD="1"
 
 ac_ext=cpp

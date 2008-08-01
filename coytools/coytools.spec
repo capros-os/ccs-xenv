@@ -1,6 +1,6 @@
 Summary: General-purpose utility library for C++
 Name: coytools
-Version: 0.3.2
+Version: 0.3.3
 Release: 1%{?dist}
 License: BSD
 Group: System Environment/Libraries
