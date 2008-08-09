@@ -227,6 +227,8 @@ AMlexer::amlex(ParseType *lvalp)
   case '*':
   case '+':
   case '?':
+  case '(':
+  case ')':
     goto single_character_token;
 
   case '%':
