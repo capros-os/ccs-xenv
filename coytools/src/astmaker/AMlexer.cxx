@@ -98,8 +98,6 @@ AMlexer::kwCheck(const char *s)
 AMlexer::AMlexer(std::istream& _in, const std::string& origin)
   : UCSLexer(_in, origin)
 {
-  percentIsIdentifier = true;
-  outermostScope = true;
 }
 
 #define BAD_TOKEN EOF
@@ -133,27 +131,24 @@ AMlexer::amlex(ParseType *lvalp)
     }
     ungetChar(c);
     c = '/';
-    goto single_char_token;
+
+    lvalp->tok = LToken(here, thisToken);
+    here.updateWith(thisToken);
+
+    // FIX: Malformed token
+    return BAD_TOKEN;
  
   case ' ':			// White space
   case '\t':
   case '\r':
   case '\n':
-    if (outermostScope) {
-      here.updateWith(thisToken);
-      goto startOver;
-    }
-
-    lvalp->tok = LToken(here, thisToken);
     here.updateWith(thisToken);
-    return tk_WhiteSpace;
+    goto startOver;
 
   case '{':
-    if (outermostScope) {
-      percentIsIdentifier = false;
-      outermostScope = false;
-
+    {
       here.updateWith(thisToken);
+      thisToken.clear();
 
       LexLoc codeStart = here;
 
@@ -161,145 +156,81 @@ AMlexer::amlex(ParseType *lvalp)
       ParseType tmp;
       std::string theCode;
 
-      do {
-	int tok = amlex(&tmp);
+      // This code originally called the lexer recursively, with the
+      // result that there were a lot of tokens recognized by the
+      // lexer that were completely unneeded and undesired. The reason
+      // for that horrible kludge was to get comment processing for
+      // free, but in hindsight the right thing to do here is just
+      // call the appropriate versions of slurpComment():
 
-	if (tok == EOF) {
-	  ReportParseError(here,
-			   "End of file in code fragment\n");
-	  curlyDepth = 0;
+      while (curlyDepth > 0) {
+	c = getChar();
+
+	if (c == EOF)
 	  break;
+
+	if (c == '{') curlyDepth++;
+	if (c == '}') {
+	  curlyDepth--;
+	  if (curlyDepth == 0) {
+	    // Back it out of thisToken temporarily, so that we can
+	    // capture theCode without it:
+	    ungetChar(c);
+
+	    theCode = thisToken;
+
+	    c = getChar();
+	    break;
+	  }
 	}
 
-	if (tok == '{')
-	  curlyDepth++;
-	else if (tok == '}')
-	  curlyDepth--;
+	if (c == '/') {
+	  /* Might be looking at a comment. Need to check. */
+	  c = getChar();
+	  if (c == '/') {
+	    bool more = slurpCxxComment();
+	    here = codeStart;
+	    if (!more)
+	      goto got_eof;
+	  }
+	  else if (c == '*') {
+	    bool more = slurpCComment();
+	    here = codeStart;
+	    if (!more)
+	      goto got_eof;
+	  }
+	  else
+	    ungetChar(c);
+	}
 
-	if (curlyDepth != 0)
-	  theCode.append(tmp.tok.str);
+	continue;
 
-      } while (curlyDepth > 0);
+      got_eof:
+	theCode = thisToken;
+	c = EOF;
+	curlyDepth = 0;
+	break;
+      }
 
-      percentIsIdentifier = true;
-      outermostScope = true;
+      if (c == EOF)
+	ReportParseError(here,
+			 "End of file in code fragment starting here.\n");
 
+      here.updateWith(thisToken);
       lvalp->tok = LToken(codeStart, theCode);
       return tk_CodeFragment;
     }
-    else
-      goto single_char_token;
 
-  case '%':
-    if (percentIsIdentifier)
-      goto identifier;
-
-  case '#':			/* preprocessor lines */
-  case ':':		// single character tokens
-  case '<':
-  case '>':
   case '=':
-  case '-':
-  case ',':
+  case '|':
   case ';':
-  case '.':
-  case '(':
-  case ')':
-  case '[':
-  case ']':
-  case '}':
   case '*':
   case '+':
-  case '|':
   case '?':
+    goto single_character_token;
 
-  single_char_token:
-    lvalp->tok = LToken(here, thisToken);
-    here.updateWith(thisToken);
-    return c;
-
-  case '"':			// String literal
-    {
-      do {
-	c = getChar();
-
-	if (c == '\\') 
-	  (void) getChar();	// just ignore it -- will validate later
-
-      }	while (c != '"');
-      
-      if (!validateString()) 
-	return BAD_TOKEN;
-
-      LexLoc tokStart = here;
-      here.updateWith(thisToken);
-      // lvalp->tok = LToken(here, thisToken.substr(1, thisToken.size()-2));
-      lvalp->tok = LToken(here, thisToken);
-      return tk_StringLiteral;
-    }
-
-
- case '\'':
-   {
-     // Recall that we do not intend to PROCESS the character!
-     do {
-       c = getChar();
-       if (c == '\\') 
-	 (void) getChar();
-     } while (c != '\'');
-
-     LexLoc tokStart = here;
-     here.updateWith(thisToken);
-     // lvalp->tok = LToken(here, thisToken.substr(1, thisToken.size()-2));
-     lvalp->tok = LToken(here, thisToken);
-     return tk_CharLiteral;
-   }
-    // We do not (currently) accept character constants.
-
-  case '0':			// Numbers
-    {
-      radix = 8;		// initial 0 -- until otherwise proven
-
-      c = getChar();
-      if (c == 'x' || c == 'X') {
-	radix = 16;
-
-	// 0x must be followed by digits. Check that here.
-
-	c = getChar();
-	ungetChar(c);
-
-	if (digitValue(c) < 0)
-	  return BAD_TOKEN;
-      }
-      else
-	ungetChar(c);
-
-      // FALL THROUGH
-    }
-
-  case '1':
-  case '2':
-  case '3':
-  case '4':
-  case '5':
-  case '6':
-  case '7':
-  case '8':
-  case '9':
-    {
-      do {
-	c = getChar();
-      } while (digitValue(c) >= 0);
-      ungetChar(c);
-
-      /* If we were accepting floating literals, we would check for
-	 decimal point here. */
-
-      lvalp->tok = LToken(here, thisToken);
-      here.updateWith(thisToken);
-      return tk_IntegerLiteral;
-    }
+  case '%':
+    goto identifier;
 
   case EOF:
     return EOF;
@@ -314,6 +245,11 @@ AMlexer::amlex(ParseType *lvalp)
     // FIX: Malformed token
     return BAD_TOKEN;
   }
+
+ single_character_token:
+  lvalp->tok = LToken(here, thisToken);
+  here.updateWith(thisToken);
+  return c;
 
  identifier:
   do {

@@ -43,9 +43,6 @@
 #include "UCSLexer.hxx"
 
 struct AMlexer : public UCSLexer {
-  bool percentIsIdentifier;
-  bool outermostScope;
-
   unsigned parenDepth;
 
   AMlexer(std::istream& in, const std::string& origin);
