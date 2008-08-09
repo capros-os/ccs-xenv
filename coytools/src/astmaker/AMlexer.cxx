@@ -231,6 +231,25 @@ AMlexer::amlex(ParseType *lvalp)
   case ')':
     goto single_character_token;
 
+  case '"':
+    {
+      do {
+	c = getChar();
+
+	if (c == '\\')
+	  (void) getChar();	// just ignore it -- will validate later
+
+      } while (c != '"' && c != EOF);
+
+      if (!validateString())
+	return BAD_TOKEN;
+
+      LexLoc tokStart = here;
+      here.updateWith(thisToken);
+      lvalp->tok = LToken(here, thisToken);
+      return tk_StringLiteral;
+    }
+
   case '%':
     goto identifier;
 
