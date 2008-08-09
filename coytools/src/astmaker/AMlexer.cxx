@@ -164,6 +164,13 @@ AMlexer::amlex(ParseType *lvalp)
       do {
 	int tok = amlex(&tmp);
 
+	if (tok == EOF) {
+	  ReportParseError(here,
+			   "End of file in code fragment\n");
+	  curlyDepth = 0;
+	  break;
+	}
+
 	if (tok == '{')
 	  curlyDepth++;
 	else if (tok == '}')
@@ -187,6 +194,7 @@ AMlexer::amlex(ParseType *lvalp)
     if (percentIsIdentifier)
       goto identifier;
 
+  case '#':			/* preprocessor lines */
   case ':':		// single character tokens
   case '<':
   case '>':
