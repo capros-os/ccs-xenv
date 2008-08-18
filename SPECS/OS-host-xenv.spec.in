@@ -24,7 +24,7 @@
 Summary: The %{CROSSOSNAME} Cross Environment
 Name: %{CROSSOS}-host-xenv
 Version: 0.1.3
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
@@ -42,6 +42,7 @@ Requires: osdoc
 Requires: libsherpa
 Requires: astmaker
 Requires: mtools
+Requires: boost-devel
 # The stripped-down installs at SoftLayer need these as well:
 Requires: zlib-devel
 Requires: openssl-devel
