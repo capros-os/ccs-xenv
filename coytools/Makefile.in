@@ -329,8 +329,10 @@ stamp-h: config.h.in config.status
 OUR_TMP=$(firstword $(TMPDIR) /tmp)
 RPM_TOPDIR=$(OUR_TMP)/RPM-TOP
 RPM_TARGET_DIR=$(OUR_TMP)/coytools-$(VERSION)
-RELEASEVER=$(shell sed 's/.*release \([0-9.]*\).*/\1/' /etc/redhat-release)
-DIST=.fc$(RELEASEVER)
+#RELEASEVER=$(shell sed 's/.*release \([0-9.]*\).*/\1/' /etc/redhat-release)
+#DIST=.fc$(RELEASEVER)
+DISTSUFFIX=$(shell ./getdistro.sh)
+DIST=.$(DISTSUFFIX)
 
 # I am absolutely certain that there must be a better way to do this, but
 # I don't know what it is.

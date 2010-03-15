@@ -39,6 +39,7 @@
  *
  **************************************************************************/
 
+#include <stdarg.h>
 #include <boost/filesystem/path.hpp>
 
 namespace sherpa {

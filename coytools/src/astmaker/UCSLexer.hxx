@@ -25,6 +25,7 @@
 typedef long ucs4_t;
 
 #include <iostream>
+#include <stdint.h>
 
 #include <libsherpa/LexLoc.hxx>
 

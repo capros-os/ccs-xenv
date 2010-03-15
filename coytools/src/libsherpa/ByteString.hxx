@@ -40,6 +40,8 @@
  *
  **************************************************************************/
 
+#include <stdint.h>  // for uint8_t
+#include <stdio.h>   // for EOF
 #include <string.h>  // for memcpy() and friends
 
 // Need a specialization of char_traits for this:

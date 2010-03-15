@@ -38,6 +38,7 @@
 
 #include "../config.h"
 
+#include <stdio.h>
 #include <dirent.h>
 
 #include <string>
