@@ -1,0 +1,193 @@
+##################################################################
+# NOTE: RPM really wasn't designed for cross builds.
+#
+# We don't want to use --target, because the output binaries
+# are supposed to get installed on the build host. Therefore,
+# I am exploiting a macro hack. This RPM is designed to be run
+# with a command line like:
+#
+#    rpmbuild --define "crossarch i386" --define "crossos coyotos"
+#
+# If the define is not provided, the build will default to
+# target i386.
+#
+##################################################################
+
+%define CROSSARCH i386
+%define CROSSOS coyotos
+%define CROSSOSNAME Coyotos
+
+%define CROSSTARGET %{CROSSARCH}-unknown-%{CROSSOS}
+%define CROSSROOT /%{CROSSOS}
+%define CROSSHOSTROOT %{CROSSROOT}/host
+%define CROSSSYSROOT %{CROSSROOT}/sysroot-%{CROSSARCH}
+
+%define debug_package %{nil}
+%define __os_install_post %{nil}
+
+Summary: A GNU collection of binary utilities.
+Name: %{CROSSOS}-%{CROSSARCH}-binutils
+Version: 2.20.1
+Release: 1%{?dist}
+License: GPL
+Group: Development/Tools
+URL: http://www.coyotos.org
+Source: binutils-%{version}.tar.bz2
+Patch0: capos-binutils-%{version}.patch
+Patch1: binutils-%{version}-coldfire-intouch-disasm.patch
+Patch2: binutils-%{version}-qnxtarget.patch
+
+Buildroot: %{_tmppath}/%{CROSSOS}-binutils-root
+#Since we are cross building, we don't actually need dejagnu
+#BuildRequires: texinfo >= 4.0, dejagnu, gettext, flex, bison
+BuildRequires: texinfo >= 4.0, gettext, flex, bison
+Conflicts: gcc-c++ < 4.0.0
+Requires: %{CROSSOS}-common-binutils
+Requires: %{CROSSOS}-%{CROSSARCH}-filesystem
+Prereq: /sbin/install-info
+
+%description
+Binutils is a collection of binary utilities, including ar (for
+creating, modifying and extracting from archives), as (a family of GNU
+assemblers), gprof (for displaying call graph profile data), ld (the
+GNU linker), nm (for listing symbols from object files), objcopy (for
+copying and translating object files), objdump (for displaying
+information from object files), ranlib (for generating an index for
+the contents of an archive), size (for listing the section sizes of an
+object or archive file), strings (for listing printable strings from
+files), strip (for discarding symbols), and addr2line (for converting
+addresses to file and line).
+
+# %%define _gnu %{nil}
+
+%prep
+%setup -q -n binutils-%{version}
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+
+%build
+%define optflags ""
+rm -rf ../build-binutils-%{CROSSARCH}
+mkdir ../build-binutils-%{CROSSARCH}
+
+##	--bindir=%{CROSSHOSTROOT}/bin
+##	--sbindir=%{CROSSHOSTROOT}/sbin
+##	--sysconfdir=%{CROSSHOSTROOT}/etc
+##	--datadir=%{CROSSHOSTROOT}/share
+##	--libexecdir=%{CROSSHOSTROOT}/libexec
+##	--localstatedir=%{CROSSHOSTROOT}/var
+##	--sharedstatedir=%{CROSSHOSTROOT}/include
+##	--includedir=%{CROSSSYSROOT}/include
+##	--libdir=%{CROSSSYSROOT}/lib
+
+(cd ../build-binutils-%{CROSSARCH}; ../binutils-%{version}/configure \
+	--prefix=%{CROSSHOSTROOT} \
+	--mandir=%{CROSSHOSTROOT}/share/man \
+	--infodir=%{CROSSHOSTROOT}/share/info \
+	--with-sysroot=%{CROSSSYSROOT} \
+	--target=%{CROSSTARGET})
+
+#make %{_smp_mflags} tooldir=%{_tooldir} all
+make -C ../build-binutils-%{CROSSARCH} tooldir=%{CROSSHOSTROOT} all
+
+#make -k check < /dev/null > check.log 2>&1 || :
+#echo ====================TESTING=========================
+#cat check.log
+#echo ====================TESTING END=====================
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}%{_prefix}
+
+# FIX: need destdir
+make -C ../build-binutils-%{CROSSARCH} DESTDIR=%{buildroot} install
+
+# on FC5, installinfo creates a directory file that we do not want.
+# strangely, this does not seem to happen on FC6
+rm -f %{buildroot}%{CROSSHOSTROOT}/share/info/dir
+
+# make prefix=%{buildroot}%{_prefix} infodir=%{buildroot}%{_infodir} install-info
+# gzip -q9f %{buildroot}%{_infodir}/*.info*
+
+# libiberty gets installed into the wrong location. Move it:
+# install -m 755 -d %{buildroot}%{CROSSHOSTROOT}/lib
+# mv %{buildroot}%{CROSSROOT}/lib/libiberty.a %{buildroot}%{CROSSHOSTROOT}/lib/libiberty.a
+
+# The cross-build process doesn't generate anything translated...
+#%find_lang binutils
+#%find_lang opcodes
+#%find_lang bfd
+#%find_lang gas
+#%find_lang ld
+#%find_lang gprof
+#cat opcodes.lang >> binutils.lang
+#cat bfd.lang >> binutils.lang
+#cat gas.lang >> binutils.lang
+#cat ld.lang >> binutils.lang
+#cat gprof.lang >> binutils.lang
+
+%clean
+rm -rf %{buildroot}
+
+#################################################################
+# HACK ALERT:
+#
+# I want to get out of this a single, target-neutral source
+# RPM that can be built for multiple, independent targets using
+# --target. The way I am accomplishing this at present is to
+# entirely suppress the creation of a main binary package,
+# and instead create a renamed subpackage that includes the
+# target architecture name as a component.
+#
+# An unfortunate consequence of this is that every target build
+# will independently create the common documentation package,
+# but I don't really know how to resolve that without a lot
+# more work than I am willing to do at the moment.
+#
+# The output package name will take the form
+#
+#   %{CROSSOS}-target-PACKAGE-VERSION.HOSTARCH.rpm
+#
+#################################################################
+
+## %package -n %{CROSSOS}-host-binutils
+## Summary: Cross-binutils host-specific files
+## Group: Development/Tools
+##
+## %description -n %{CROSSOS}-host-binutils 
+## Host-specific binutils files for all target platforms
+##
+## %files -n %{CROSSOS}-host-binutils
+## %{_prefix}/include/*
+## %{_prefix}/%{_lib}/lib*
+
+
+%package -n %{CROSSOS}-common-binutils
+Summary: Cross-binutils documentation and man pages, all targets
+Group: Development/Tools
+
+%description -n %{CROSSOS}-common-binutils 
+Documentation and common, shared content for the cross-binutils 
+package.
+
+%files -n %{CROSSOS}-common-binutils
+%{CROSSHOSTROOT}/share/locale/*/LC_MESSAGES/*
+%{CROSSHOSTROOT}/share/info/*info*
+%{CROSSHOSTROOT}/%{_lib}/libiberty.a
+
+## Cross-build does not generate translations:
+#%files -n %{CROSSOS}-%{_arch}-binutils -f binutils.lang
+%files
+%defattr(-,root,root)
+%doc README
+%{CROSSHOSTROOT}/bin/*
+%{CROSSHOSTROOT}/%{CROSSTARGET}/*
+%{CROSSHOSTROOT}/share/man/man1/*
+
+%changelog
+* Sat Oct  1 2005 Jonathan Shapiro <shap@eros-os.org> 2.16.1-2
+- Rebuilt to reflect new directory structure.
+
+* Sat Sep 27 2005 Jonathan Shapiro <shap@eros-os.org> 2.16.1-1
+- Initial RPM spec that appears to work.
