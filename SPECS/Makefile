@@ -4,7 +4,8 @@
 default: all
 
 FCRELEASEVER=$(shell sed 's/.*release \([0-9.]*\).*/\1/' /etc/redhat-release)
-FCDIST=.fc$(FCRELEASEVER)
+DISTSUFFIX=$(shell ./getdistro.sh)
+DIST=.${DISTSUFFIX}
 
 BINUTILS_VERSION=2.18
 BINUTILS_SPEC=OS-ARCH-binutils-$(BINUTILS_VERSION).spec
@@ -18,7 +19,7 @@ GCC_SPEC=OS-ARCH-gcc-$(GCC_VERSION).spec
 GCCMAJOR=gcc$(firstword $(subst ., ,$(GCC_VERSION)))
 #GCCMAJOR=gcc4
 
-BUILD_PLATFORM=`uname -i`
+BUILD_PLATFORM=`rpm --showrc | grep '^build arch' | sed 's/.*: //'`
 
 GDB_VERSION=6.8
 GDB_SPEC=OS-ARCH-gdb-$(GDB_VERSION).spec
@@ -95,7 +96,7 @@ specs: $(ALL_SPECS)
 filesystem: ../BUILD ../RPMS ../SRPMS $(FS_SPECS)
 	(set -x; for spec in $(FS_SPECS); do \
 	  $(RPMBUILD) -bb \
-		--define "dist $(FCDIST)" \
+		--define "dist $(DIST)" \
 		--define "_topdir $(PWD)/.." \
 		$${spec};\
 	done)
@@ -103,7 +104,7 @@ filesystem: ../BUILD ../RPMS ../SRPMS $(FS_SPECS)
 binutils: ../BUILD ../RPMS ../SRPMS $(BINUTILS_SPECS)
 	(set -x; for spec in $(BINUTILS_SPECS); do \
 	  $(RPMBUILD) -bb \
-		--define "dist $(FCDIST)" \
+		--define "dist $(DIST)" \
 		--define "_topdir $(PWD)/.." \
 		$${spec};\
 	done)
@@ -111,7 +112,7 @@ binutils: ../BUILD ../RPMS ../SRPMS $(BINUTILS_SPECS)
 gdb: ../BUILD ../RPMS ../SRPMS $(GDB_SPECS)
 	(set -x; for spec in $(GDB_SPECS); do \
 	  $(RPMBUILD) -bb \
-		--define "dist $(FCDIST)" \
+		--define "dist $(DIST)" \
 		--define "_topdir $(PWD)/.." \
 		$${spec};\
 	done)
@@ -119,7 +120,7 @@ gdb: ../BUILD ../RPMS ../SRPMS $(GDB_SPECS)
 newlib: ../BUILD ../RPMS ../SRPMS $(NEWLIB_SPECS)
 	(set -x; for spec in $(NEWLIB_SPECS); do \
 	  $(RPMBUILD) $(WITHGCC) -bb \
-		--define "dist $(FCDIST)" \
+		--define "dist $(DIST)" \
 		--define "_topdir $(PWD)/.." \
 		$${spec};\
 	done)
@@ -127,7 +128,7 @@ newlib: ../BUILD ../RPMS ../SRPMS $(NEWLIB_SPECS)
 gcc: ../BUILD ../RPMS ../SRPMS $(GCC_SPECS)
 	(set -x; for spec in $(GCC_SPECS); do \
 	  $(RPMBUILD) $(WITHGCC) -bb \
-		--define "dist $(FCDIST)" \
+		--define "dist $(DIST)" \
 		--define "_topdir $(PWD)/.." \
 		$${spec};\
 	done)
@@ -135,7 +136,7 @@ gcc: ../BUILD ../RPMS ../SRPMS $(GCC_SPECS)
 crtfiles: ../BUILD ../RPMS ../SRPMS $(CRTFILES_SPECS)
 	(set -x; for spec in $(CRTFILES_SPECS); do \
 	  $(RPMBUILD) $(WITHGCC) -bb \
-		--define "dist $(FCDIST)" \
+		--define "dist $(DIST)" \
 		--define "_topdir $(PWD)/.." \
 		$${spec};\
 	done)
@@ -143,7 +144,7 @@ crtfiles: ../BUILD ../RPMS ../SRPMS $(CRTFILES_SPECS)
 pregcc: ../BUILD ../RPMS ../SRPMS $(GCC_SPECS)
 	(set -x; for spec in $(GCC_SPECS); do \
 	  $(RPMBUILD) $(WITHGCC) --without headers -bb \
-		--define "dist $(FCDIST)" \
+		--define "dist $(DIST)" \
 		--define "_topdir $(PWD)/.." \
 		$${spec};\
 	done)
@@ -151,7 +152,7 @@ pregcc: ../BUILD ../RPMS ../SRPMS $(GCC_SPECS)
 host_xenv: ../BUILD ../RPMS ../SRPMS $(HOST_XENV_SPECS)
 	(set -x; for spec in $(HOST_XENV_SPECS); do \
 	  $(RPMBUILD) -bb \
-		--define "dist $(FCDIST)" \
+		--define "dist $(DIST)" \
 		--define "_topdir $(PWD)/.." \
 		$${spec};\
 	done)
@@ -159,7 +160,7 @@ host_xenv: ../BUILD ../RPMS ../SRPMS $(HOST_XENV_SPECS)
 xenv: ../BUILD ../RPMS ../SRPMS $(XENV_SPECS)
 	(set -x; for spec in $(XENV_SPECS); do \
 	  $(RPMBUILD) $(WITHGCC) -bb \
-		--define "dist $(FCDIST)" \
+		--define "dist $(DIST)" \
 		--define "_topdir $(PWD)/.." \
 		$${spec};\
 	done)
