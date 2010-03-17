@@ -40,6 +40,8 @@
  *
  **************************************************************************/
 
+#include <stdint.h>
+
 namespace sherpa {
   std::string strdowncase(const std::string&);
 

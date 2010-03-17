@@ -1940,7 +1940,7 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
 VERSION="0.3.5"
-BUILD="1"
+BUILD="2"
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'

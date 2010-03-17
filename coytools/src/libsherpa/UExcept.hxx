@@ -40,6 +40,7 @@
  *
  **************************************************************************/
 
+#include <stdint.h>
 #include <libsherpa/format.hxx>
 
 namespace sherpa {
