@@ -1,0 +1,53 @@
+diff -ruN baseline-gdb-7.0.1/bfd/config.bfd gdb-7.0.1/bfd/config.bfd
+--- baseline-gdb-7.0.1/bfd/config.bfd	2009-08-06 10:38:00.000000000 -0700
++++ gdb-7.0.1/bfd/config.bfd	2010-03-15 23:52:09.597102305 -0700
+@@ -498,6 +498,21 @@
+     targ_defvec=bfd_elf32_i386_vec
+     targ_selvecs=i386coff_vec
+     ;;
++  arm-*-coyotos* | arm-*-capros*)
++    targ_defvec=bfd_elf32_bigarm_vec
++    targ_selvecs=bfd_elf32_littlearm_vec
++    ;;
++  i[3-7]86-*-coyotos* | i[3-7]86-*-capros*)
++    targ_defvec=bfd_elf32_i386_vec
++    ;;
++  m68k-*-coyotos* | m68k-*-capros*)
++    targ_defvec=bfd_elf32_m68k_vec
++    targ_selvecs="ieee_vec"
++    ;;
++  x86_64-*-coyotos* | x86_64-*-capros*)
++    targ_defvec=bfd_elf64_x86_64_vec
++    targ_selvecs="bfd_elf32_i386_vec"
++    ;;
+   i[3-7]86-*-solaris2*)
+     targ_defvec=bfd_elf32_i386_vec
+     targ_selvecs=i386coff_vec
+diff -ruN baseline-gdb-7.0.1/config.sub gdb-7.0.1/config.sub
+--- baseline-gdb-7.0.1/config.sub	2009-08-16 21:10:29.000000000 -0700
++++ gdb-7.0.1/config.sub	2010-03-15 23:52:09.599605253 -0700
+@@ -1296,6 +1296,12 @@
+ 	      | -skyos* | -haiku* | -rdos* | -toppers* | -drops*)
+ 	# Remember, each alternative MUST END IN *, to match a version number.
+ 		;;
++	-capros*)
++		os=-capros
++		;;
++	-coyotos*)
++		os=-coyotos
++		;;
+ 	-qnx*)
+ 		case $basic_machine in
+ 		    x86-* | i*86-*)
+diff -ruN baseline-gdb-7.0.1/gdb/configure.tgt gdb-7.0.1/gdb/configure.tgt
+--- baseline-gdb-7.0.1/gdb/configure.tgt	2009-08-06 03:28:38.000000000 -0700
++++ gdb-7.0.1/gdb/configure.tgt	2010-03-15 23:52:09.599605253 -0700
+@@ -280,7 +280,7 @@
+ 	gdb_sim=../sim/m68hc11/libsim.a
+ 	;;
+ 
+-m68*-*-aout* | m68*-*-coff* | m68*-*-elf* | m68*-*-rtems* | m68*-*-uclinux* | \
++m68*-*-aout* | m68*-*-coff* | m68*-*-elf* | m68*-*-capros* | m68*-*-coyotos* | m68*-*-rtems* | m68*-*-uclinux* | \
+ fido-*-elf*)
+ 	# Target: Motorola m68k embedded (e.g. bug monitors)
+ 	gdb_target_obs="m68k-tdep.o monitor.o dbug-rom.o dsrec.o"

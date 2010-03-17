@@ -11,18 +11,18 @@ DIST=.${DISTSUFFIX}
 BINUTILS_VERSION=2.20.1
 BINUTILS_SPEC=OS-ARCH-binutils-$(BINUTILS_VERSION).spec
 
-#NEWLIB_VERSION=1.15.0
-NEWLIB_VERSION=1.16.0
+#NEWLIB_VERSION=1.16.0
+NEWLIB_VERSION=1.18.0
 NEWLIB_SPEC=OS-ARCH-newlib-$(NEWLIB_VERSION).spec
 
-GCC_VERSION=4.2.3
+GCC_VERSION=4.4.3
 GCC_SPEC=OS-ARCH-gcc-$(GCC_VERSION).spec
 GCCMAJOR=gcc$(firstword $(subst ., ,$(GCC_VERSION)))
 #GCCMAJOR=gcc4
 
 BUILD_PLATFORM=`rpm --showrc | grep '^build arch' | sed 's/.*: //'`
 
-GDB_VERSION=6.8
+GDB_VERSION=7.0.1
 GDB_SPEC=OS-ARCH-gdb-$(GDB_VERSION).spec
 
 WITHGCC=--with $(GCCMAJOR)
@@ -191,4 +191,4 @@ build:
 
 clean:
 	-rm -f $(foreach os,$(ALL_OS),$(patsubst OS-%,$(os)-%,OS-*.spec)) *~
-	-rm -rf ../BUILD ../SRPMS ../RPMS
+	-rm -rf ../BUILD ../SRPMS ../RPMS ../BUILDROOT
