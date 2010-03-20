@@ -1,15 +1,15 @@
 Summary: General-purpose utility library for C++
 Name: coytools
 Version: 0.3.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: System Environment/Libraries
 Source0: %{name}-%{version}-%{release}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: libsherpa
 Requires: astmaker
-Requires: boost
-BuildRequires: libicu-devel boost-devel
+Requires: boost > 1.33.1
+BuildRequires: libicu-devel boost-devel >= 1.33.1
 
 %define debug_package %{nil}
 
