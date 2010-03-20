@@ -80,14 +80,7 @@ namespace sherpa {
     else
       THROW(excpt::BadValue, "Unknown mode or ftype to xfopen");
 
-#if (BOOST_VERSION < 103401)
-    // We are still supporting FC6. The last version of boost
-    // supported there was 1.33.1, which still used the deprecated
-    // native_string() method name:
-    f = fopen(path.native_file_string().c_str(), fopen_mode);
-#else
     f = fopen(path.file_string().c_str(), fopen_mode);
-#endif
     if (f == NULL)
       THROW(excpt::NoAccess,
 	    format("Could not open file %s, mode %s (errno %d)", 
