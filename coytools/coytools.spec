@@ -8,8 +8,8 @@ Source0: %{name}-%{version}-%{release}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: libsherpa
 Requires: astmaker
-Requires: boost > 1.33.1
-BuildRequires: libicu-devel boost-devel > 1.33.1
+Requires: boost >= 1.34.1
+BuildRequires: libicu-devel boost-devel >= 1.34.1
 
 %define debug_package %{nil}
 
