@@ -114,6 +114,10 @@ rm %{buildroot}%{CROSSHOSTROOT}/share/info/standards.info
 # Following conflict with binutils:
 rm %{buildroot}%{CROSSHOSTROOT}/share/locale/es/LC_MESSAGES/bfd.mo
 rm %{buildroot}%{CROSSHOSTROOT}/share/locale/es/LC_MESSAGES/opcodes.mo
+rm %{buildroot}%{CROSSHOSTROOT}/share/locale/fr/LC_MESSAGES/bfd.mo
+rm %{buildroot}%{CROSSHOSTROOT}/share/locale/fr/LC_MESSAGES/opcodes.mo
+rm %{buildroot}%{CROSSHOSTROOT}/share/locale/fi/LC_MESSAGES/bfd.mo
+rm %{buildroot}%{CROSSHOSTROOT}/share/locale/fi/LC_MESSAGES/opcodes.mo
 
 # The cross-build process doesn't generate anything translated...
 #%find_lang binutils
