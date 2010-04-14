@@ -188,6 +188,7 @@ build:
 	$(MAKE) crtfiles
 	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*crtfiles*.rpm
 	$(MAKE) gdb
+	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*gdb*.rpm
 
 clean:
 	-rm -f $(foreach os,$(ALL_OS),$(patsubst OS-%,$(os)-%,OS-*.spec)) *~
