@@ -1,6 +1,6 @@
 diff -ruN baseline-gcc-4.4.3/config.sub gcc-4.4.3/config.sub
 --- baseline-gcc-4.4.3/config.sub	2009-11-22 15:09:41.000000000 -0800
-+++ gcc-4.4.3/config.sub	2010-03-15 17:25:52.505631457 -0700
++++ gcc-4.4.3/config.sub	2010-04-13 20:19:09.542094332 -0700
 @@ -1302,6 +1302,8 @@
  	      | -skyos* | -haiku* | -rdos* | -toppers* | -drops* | -es*)
  	# Remember, each alternative MUST END IN *, to match a version number.
@@ -12,7 +12,7 @@ diff -ruN baseline-gcc-4.4.3/config.sub gcc-4.4.3/config.sub
  		    x86-* | i*86-*)
 diff -ruN baseline-gcc-4.4.3/gcc/config/arm/capros.h gcc-4.4.3/gcc/config/arm/capros.h
 --- baseline-gcc-4.4.3/gcc/config/arm/capros.h	1969-12-31 16:00:00.000000000 -0800
-+++ gcc-4.4.3/gcc/config/arm/capros.h	2010-03-15 17:25:52.505631457 -0700
++++ gcc-4.4.3/gcc/config/arm/capros.h	2010-04-13 20:19:09.542094332 -0700
 @@ -0,0 +1,30 @@
 +/* Definitions for ARM running CapROS-based systems with ELF format.
 +   Copyright (C) 2007, The EROS Group LLC.
@@ -46,7 +46,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config/arm/capros.h gcc-4.4.3/gcc/config/arm/ca
 +
 diff -ruN baseline-gcc-4.4.3/gcc/config/arm/coyotos.h gcc-4.4.3/gcc/config/arm/coyotos.h
 --- baseline-gcc-4.4.3/gcc/config/arm/coyotos.h	1969-12-31 16:00:00.000000000 -0800
-+++ gcc-4.4.3/gcc/config/arm/coyotos.h	2010-03-15 17:25:52.505631457 -0700
++++ gcc-4.4.3/gcc/config/arm/coyotos.h	2010-04-13 20:19:09.543580848 -0700
 @@ -0,0 +1,30 @@
 +/* Definitions for ARM running Coyotos-based systems with ELF format.
 +   Copyright (C) 2007, The EROS Group LLC.
@@ -80,7 +80,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config/arm/coyotos.h gcc-4.4.3/gcc/config/arm/c
 +
 diff -ruN baseline-gcc-4.4.3/gcc/config/capros.h gcc-4.4.3/gcc/config/capros.h
 --- baseline-gcc-4.4.3/gcc/config/capros.h	1969-12-31 16:00:00.000000000 -0800
-+++ gcc-4.4.3/gcc/config/capros.h	2010-03-15 17:25:52.509208526 -0700
++++ gcc-4.4.3/gcc/config/capros.h	2010-04-13 20:19:09.543580848 -0700
 @@ -0,0 +1,90 @@
 +/* Configuration common to all targets running CapROS. 
 +   Copyright (C) 2007, The EROS Group LLC.
@@ -174,7 +174,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config/capros.h gcc-4.4.3/gcc/config/capros.h
 +#define TARGET_C99_FUNCTIONS 1
 diff -ruN baseline-gcc-4.4.3/gcc/config/coyotos.h gcc-4.4.3/gcc/config/coyotos.h
 --- baseline-gcc-4.4.3/gcc/config/coyotos.h	1969-12-31 16:00:00.000000000 -0800
-+++ gcc-4.4.3/gcc/config/coyotos.h	2010-03-15 17:25:52.509208526 -0700
++++ gcc-4.4.3/gcc/config/coyotos.h	2010-04-13 20:19:09.543580848 -0700
 @@ -0,0 +1,90 @@
 +/* Configuration common to all targets running Coyotos. 
 +   Copyright (C) 2007, The EROS Group LLC.
@@ -268,7 +268,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config/coyotos.h gcc-4.4.3/gcc/config/coyotos.h
 +#define TARGET_C99_FUNCTIONS 1
 diff -ruN baseline-gcc-4.4.3/gcc/config/i386/capros.h gcc-4.4.3/gcc/config/i386/capros.h
 --- baseline-gcc-4.4.3/gcc/config/i386/capros.h	1969-12-31 16:00:00.000000000 -0800
-+++ gcc-4.4.3/gcc/config/i386/capros.h	2010-03-15 17:25:52.509208526 -0700
++++ gcc-4.4.3/gcc/config/i386/capros.h	2010-04-13 20:19:09.543580848 -0700
 @@ -0,0 +1,30 @@
 +/* Definitions for Intel 386 running CapROS-based systems with ELF format.
 +   Copyright (C) 2007, The EROS Group LLC.
@@ -302,7 +302,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config/i386/capros.h gcc-4.4.3/gcc/config/i386/
 +
 diff -ruN baseline-gcc-4.4.3/gcc/config/i386/coyotos.h gcc-4.4.3/gcc/config/i386/coyotos.h
 --- baseline-gcc-4.4.3/gcc/config/i386/coyotos.h	1969-12-31 16:00:00.000000000 -0800
-+++ gcc-4.4.3/gcc/config/i386/coyotos.h	2010-03-15 17:25:52.509208526 -0700
++++ gcc-4.4.3/gcc/config/i386/coyotos.h	2010-04-13 20:19:09.543580848 -0700
 @@ -0,0 +1,30 @@
 +/* Definitions for Intel 386 running Coyotos-based systems with ELF format.
 +   Copyright (C) 2007, The EROS Group LLC.
@@ -336,7 +336,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config/i386/coyotos.h gcc-4.4.3/gcc/config/i386
 +
 diff -ruN baseline-gcc-4.4.3/gcc/config/m68k/capros.h gcc-4.4.3/gcc/config/m68k/capros.h
 --- baseline-gcc-4.4.3/gcc/config/m68k/capros.h	1969-12-31 16:00:00.000000000 -0800
-+++ gcc-4.4.3/gcc/config/m68k/capros.h	2010-03-15 17:25:52.523125492 -0700
++++ gcc-4.4.3/gcc/config/m68k/capros.h	2010-04-13 20:19:09.544685995 -0700
 @@ -0,0 +1,30 @@
 +/* Definitions for Motorolla 68k running CapROS-based systems with ELF format.
 +   Copyright (C) 2007, The EROS Group LLC.
@@ -370,7 +370,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config/m68k/capros.h gcc-4.4.3/gcc/config/m68k/
 +
 diff -ruN baseline-gcc-4.4.3/gcc/config/m68k/coyotos.h gcc-4.4.3/gcc/config/m68k/coyotos.h
 --- baseline-gcc-4.4.3/gcc/config/m68k/coyotos.h	1969-12-31 16:00:00.000000000 -0800
-+++ gcc-4.4.3/gcc/config/m68k/coyotos.h	2010-03-15 17:25:52.523125492 -0700
++++ gcc-4.4.3/gcc/config/m68k/coyotos.h	2010-04-13 20:19:09.544685995 -0700
 @@ -0,0 +1,30 @@
 +/* Definitions for Motorolla 68k running Coyotos-based systems with ELF format.
 +   Copyright (C) 2007, The EROS Group LLC.
@@ -404,7 +404,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config/m68k/coyotos.h gcc-4.4.3/gcc/config/m68k
 +
 diff -ruN baseline-gcc-4.4.3/gcc/config/m68k/t-coyotos gcc-4.4.3/gcc/config/m68k/t-coyotos
 --- baseline-gcc-4.4.3/gcc/config/m68k/t-coyotos	1969-12-31 16:00:00.000000000 -0800
-+++ gcc-4.4.3/gcc/config/m68k/t-coyotos	2010-03-16 10:33:05.776008725 -0700
++++ gcc-4.4.3/gcc/config/m68k/t-coyotos	2010-04-13 20:19:09.544685995 -0700
 @@ -0,0 +1,10 @@
 +# Select only ColdFire-specific CPUs.
 +
@@ -418,7 +418,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config/m68k/t-coyotos gcc-4.4.3/gcc/config/m68k
 +MULTILIB_EXTRA_OPTS += Wa,-mno-mac
 diff -ruN baseline-gcc-4.4.3/gcc/config.build gcc-4.4.3/gcc/config.build
 --- baseline-gcc-4.4.3/gcc/config.build	2008-02-21 11:55:39.000000000 -0800
-+++ gcc-4.4.3/gcc/config.build	2010-03-15 17:25:52.523125492 -0700
++++ gcc-4.4.3/gcc/config.build	2010-04-13 20:19:09.545387493 -0700
 @@ -94,6 +94,10 @@
      # 80386 running SCO Open Server 5
      build_install_headers_dir=install-headers-cpio
@@ -432,14 +432,15 @@ diff -ruN baseline-gcc-4.4.3/gcc/config.build gcc-4.4.3/gcc/config.build
      ;;
 diff -ruN baseline-gcc-4.4.3/gcc/config.gcc gcc-4.4.3/gcc/config.gcc
 --- baseline-gcc-4.4.3/gcc/config.gcc	2010-01-04 07:13:08.000000000 -0800
-+++ gcc-4.4.3/gcc/config.gcc	2010-03-16 12:01:33.653647948 -0700
-@@ -1014,6 +1014,48 @@
++++ gcc-4.4.3/gcc/config.gcc	2010-04-13 20:20:07.140581241 -0700
+@@ -1014,6 +1014,49 @@
  	use_collect2=yes
  	gas=yes
  	;;
 +arm*-*-capros*)
 +	tm_file="dbxelf.h elfos.h arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/capros.h capros.h"
 +	tmake_file=arm/t-arm arm/t-arm-elf
++	extra_parts="crtbegin.o crtend.o"
 +	use_fixproto=yes
 +	;;
 +arm*-*-coyotos*)
@@ -484,7 +485,7 @@ diff -ruN baseline-gcc-4.4.3/gcc/config.gcc gcc-4.4.3/gcc/config.gcc
  
 diff -ruN baseline-gcc-4.4.3/libgcc/config.host gcc-4.4.3/libgcc/config.host
 --- baseline-gcc-4.4.3/libgcc/config.host	2009-04-17 04:58:41.000000000 -0700
-+++ gcc-4.4.3/libgcc/config.host	2010-03-16 02:11:43.711163201 -0700
++++ gcc-4.4.3/libgcc/config.host	2010-04-13 20:19:09.545387493 -0700
 @@ -192,6 +192,10 @@
  	;;
  arm-*-coff* | armel-*-coff*)
