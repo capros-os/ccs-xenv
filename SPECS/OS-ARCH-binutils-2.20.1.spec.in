@@ -28,7 +28,7 @@
 Summary: A GNU collection of binary utilities.
 Name: %{CROSSOS}-%{CROSSARCH}-binutils
 Version: 2.20.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
@@ -89,7 +89,7 @@ mkdir ../build-binutils-%{CROSSARCH}
 	--target=%{CROSSTARGET})
 
 #make %{_smp_mflags} tooldir=%{_tooldir} all
-make -C ../build-binutils-%{CROSSARCH} tooldir=%{CROSSHOSTROOT} all
+make -C ../build-binutils-%{CROSSARCH} all
 
 #make -k check < /dev/null > check.log 2>&1 || :
 #echo ====================TESTING=========================
