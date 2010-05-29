@@ -439,13 +439,13 @@ diff -ruN baseline-gcc-4.4.3/gcc/config.gcc gcc-4.4.3/gcc/config.gcc
  	;;
 +arm*-*-capros*)
 +	tm_file="dbxelf.h elfos.h arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/capros.h capros.h"
-+	tmake_file=arm/t-arm arm/t-arm-elf
++	tmake_file="arm/t-arm arm/t-arm-elf"
 +	extra_parts="crtbegin.o crtend.o"
 +	use_fixproto=yes
 +	;;
 +arm*-*-coyotos*)
 +	tm_file="dbxelf.h elfos.h arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/coyotos.h coyotos.h"
-+	tmake_file=arm/t-arm arm/t-arm-elf
++	tmake_file="arm/t-arm arm/t-arm-elf"
 +	extra_parts="crtbegin.o crtend.o"
 +	use_fixproto=yes
 +	;;

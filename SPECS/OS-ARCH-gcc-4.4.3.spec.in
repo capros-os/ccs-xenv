@@ -34,7 +34,7 @@
 Summary: Various compilers (C, C++, Objective-C, Java, ...)
 Name: %{CROSSOS}-%{CROSSARCH}-%{GCCMAJOR}
 Version: 4.4.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://www.coyotos.org
@@ -260,6 +260,15 @@ done
 # strangely, this does not seem to happen on FC6
 rm -f %{buildroot}%{CROSSHOSTROOT}/share/info/dir
 
+# ARM target publishes crti/crtn for normal and thumb configurations.
+# We are going to supply those in crtfiles, so clobber them here.
+%if %{defined crosstarget_arm}
+rm %{buildroot}%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/crti.o
+rm %{buildroot}%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/crtn.o
+rm %{buildroot}%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crti.o
+rm %{buildroot}%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crtn.o
+%endif
+
 # rm %{buildroot}%{_prefix}/%{_lib}/libiberty.a
 # rm %{buildroot}%{_mandir}/man7/fsf-funding.7
 
@@ -329,13 +338,13 @@ rm -rf %{buildroot}
 ## NOT IN GCC-4.4.3
 ## ARM target includes some thumb support, and also crti/crtn. Not clear 
 ## why crti/crtn are called for. I need to look in to that.
-#%if %{defined crosstarget_arm}
-#%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb
-#%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crtbegin.o
-#%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crtend.o
-#%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/libgcc.a
-#%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/libgcov.a
-#%endif
+%if %{defined crosstarget_arm}
+%dir %{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crtbegin.o
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/crtend.o
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/libgcc.a
+%{CROSSHOSTROOT}/lib/gcc/%{CROSSTARGET}/%{version}/thumb/libgcov.a
+%endif
 
 # m68k is a multilibs target, so we need to include all of
 # the variants. As of the config for gcc-4.4.3, we are now building
