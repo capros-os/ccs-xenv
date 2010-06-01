@@ -12,6 +12,7 @@
 # PARTICULAR PURPOSE.
 
 m4_include([aclocal/ax_boost_base.m4])
+m4_include([aclocal/ax_boost_system.m4])
 m4_include([aclocal/ax_boost_filesystem.m4])
 m4_include([aclocal/check_ssl.m4])
 m4_include([aclocal/check_libicuuc.m4])

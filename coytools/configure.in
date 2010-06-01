@@ -1,4 +1,5 @@
 dnl Copyright (c) 2006, The EROS Group, LLC.
+dnl Copyright (c) 2010, Jonathan S. Shapiro
 dnl All rights reserved.
 dnl 
 dnl This software was developed to support the EROS secure operating
@@ -47,7 +48,7 @@ dnl Put libsherpa version information here so that it can be substituted in
 dnl where it is needed. When the VERSION bumps, reset the BUILD to 1 and
 dnl remove the "plNNN" suffix
 VERSION="0.3.6"
-BUILD="1"
+BUILD="2"
 
 AC_PROG_CXX
 AC_PROG_INSTALL
@@ -78,6 +79,7 @@ AC_CHECK_HEADERS(stdint.h inttypes.h)
 AC_CHECK_HEADERS(unicode/uchar.h)
 
 AX_BOOST_BASE(1.34.1)
+AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 CHECK_LIBICUUC
 
