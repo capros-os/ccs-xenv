@@ -115,7 +115,9 @@ XCXXFLAGS = -Wall -Wreturn-type
 
 TARGET=astmaker
 OBJECTS=AMlexer.o AstInfo.o astmaker.o UCSLexer.o AMparser.o
-MORELIBS=../libsherpa/libsherpa.a  @BOOST_FILESYSTEM_LIB@
+MORELIBS=../libsherpa/libsherpa.a
+MORELIBS+=@BOOST_FILESYSTEM_LIB@
+MORELIBS+=@BOOST_SYSTEM_LIB@
 
 all: $(TARGET)
 
