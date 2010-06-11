@@ -34,12 +34,12 @@
 Summary: The newlib embedded C library
 Name: %{CROSSOS}-%{CROSSARCH}-newlib
 Version: 1.18.0
-Release: 2.cvs20100315%{?dist}
+Release: 3.cvs20100601%{?dist}
 License: GPL
 Group: Development/Tools
 URL: http://www.coyotos.org
 Source: newlib-%{version}.tar.bz2
-Patch0: newlib-cvs20100315.patch.bz2
+Patch0: newlib-cvs20100601.patch.bz2
 Patch1: capos-newlib-%{version}.patch
 
 Buildroot: %{_tmppath}/%{CROSSOS}-newlib-root
