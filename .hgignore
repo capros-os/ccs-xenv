@@ -8,6 +8,7 @@ syntax: regexp
 ^SOURCES/gdb-[0-9]+(\.[0-9]+)+$
 ^SOURCES/glibc-[0-9]+(\.[0-9]+)+$
 ^SOURCES/newlib-[0-9]+(\.[0-9]+)+$
+^SOURCES/newlib-cvs[0-9]+([0-9]+)+$
 
 syntax: glob
 
