@@ -15,23 +15,22 @@ CROSSSYSROOT=$(CROSSROOT)/sysroot-$(CROSSARCH)
 
 ##################################################################
 #
-#  Tool Versions. GCC4 does not work for m68k target, so we are
-#  currently using gcc3.4.6
+#  Tool Versions.
 #
 ##################################################################
-BINUTILS_VERSION=2.18
+BINUTILS_VERSION=2.20.1
 BINUTILS_PATCHES=$(wildcard SOURCES/binutils-$(BINUTILS_VERSION)*.patch)
 
-GCC_VERSION=4.2.3
+GCC_VERSION=4.2.4
 GCC_PATCHES=$(wildcard SOURCES/gcc-$(GCC_VERSION)*.patch)
 
-NEWLIB_VERSION=1.16.0
-NEWLIB_CVS_PATCH=newlib-cvs20080407.patch.bz2
+NEWLIB_VERSION=1.18.0
+NEWLIB_CVS_PATCH=newlib-cvs20100601.patch.bz2
 NEWLIB_PATCHES=$(wildcard SOURCES/newlib-$(NEWLIB_VERSION)*.patch)
 
 CRTFILES_VERSION=0.1.0
 
-GDB_VERSION=6.8
+GDB_VERSION=7.0.1
 GDB_PATCHES=$(wildcard SOURCES/gdb-$(GDB_VERSION)*.patch)
 
 ##################################################################
