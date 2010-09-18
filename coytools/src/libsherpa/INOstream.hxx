@@ -10,19 +10,19 @@
  * without modification, are permitted provided that the following
  * conditions are met:
  *
- *   - Redistributions of source code must contain the above 
+ *   - Redistributions of source code must contain the above
  *     copyright notice, this list of conditions, and the following
- *     disclaimer. 
+ *     disclaimer.
  *
  *   - Redistributions in binary form must reproduce the above
  *     copyright notice, this list of conditions, and the following
- *     disclaimer in the documentation and/or other materials 
+ *     disclaimer in the documentation and/or other materials
  *     provided with the distribution.
  *
  *   - Neither the names of the copyright holders nor the names of any
  *     of any contributors may be used to endorse or promote products
  *     derived from this software without specific prior written
- *     permission. 
+ *     permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -50,21 +50,29 @@
 
 namespace sherpa {
 
-// This is a completely sleazy way of making an automatically indenting 
+// This is a completely sleazy way of making an automatically indenting
 // stream.
 struct INOstream {
   size_t depth;
   size_t col;
   bool needIndent;
   std::ostream &ostrm;
-  //void doIndent();
 
-  INOstream(std::ostream &os) 
+  // Following is useful for emitting block comments. Note that this
+  // is inserted AFTER indentation occurs
+  std::string postIndent;
+
+  INOstream(std::ostream &os)
     :ostrm(os)
   {
     depth = 0;
     col = 0;
     needIndent = true;
+  }
+
+  void setPostindent(const std::string& s) 
+  {
+    postIndent = s;
   }
 
   inline void indent(int i)
@@ -110,6 +118,7 @@ struct INOstream {
 	ostrm << ' ';
 	col++;
       }
+      ostrm << postIndent;
     }
     needIndent = false;
   }
@@ -146,7 +155,7 @@ struct INOstream {
   }
 
   // This is where the magic happens. The way that a C++ stream recognizes
-  // things like std::endl is by overloading this argument type. std::endl 
+  // things like std::endl is by overloading this argument type. std::endl
   // is actually a procedure!
   //
   // Note, however, that INOstream does not forward the endl. We need

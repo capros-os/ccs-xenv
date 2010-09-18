@@ -112,7 +112,7 @@ namespace sherpa {
   }
 
   int
-  compare_rpm_versions(std::string s1, std::string s2)
+  compare_rpm_versions(const std::string& s1, const std::string& s2)
   {
     const char *v1 = s1.c_str();
     const char *v2 = s2.c_str();

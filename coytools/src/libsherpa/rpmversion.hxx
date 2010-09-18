@@ -41,7 +41,7 @@
  **************************************************************************/
 
 namespace sherpa {
-  int compare_rpm_versions(std::string s1, std::string s2);
+  int compare_rpm_versions(const std::string& s1, const std::string& s2);
 } /* namespace sherpa */
 
 #endif /* LIBSHERPA_RPMVERSION_HXX */

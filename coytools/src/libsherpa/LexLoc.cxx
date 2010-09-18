@@ -1,7 +1,7 @@
 /**************************************************************************
  *
  * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, The EROS
- *   Group, LLC. 
+ *   Group, LLC.
  * Copyright (C) 2004, 2005, 2006, Johns Hopkins University.
  * All rights reserved.
  *
@@ -9,19 +9,19 @@
  * without modification, are permitted provided that the following
  * conditions are met:
  *
- *   - Redistributions of source code must contain the above 
+ *   - Redistributions of source code must contain the above
  *     copyright notice, this list of conditions, and the following
- *     disclaimer. 
+ *     disclaimer.
  *
  *   - Redistributions in binary form must reproduce the above
  *     copyright notice, this list of conditions, and the following
- *     disclaimer in the documentation and/or other materials 
+ *     disclaimer in the documentation and/or other materials
  *     provided with the distribution.
  *
  *   - Neither the names of the copyright holders nor the names of any
  *     of any contributors may be used to endorse or promote products
  *     derived from this software without specific prior written
- *     permission. 
+ *     permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -46,6 +46,7 @@
 #include <stdlib.h>  // for strtoul()
 
 #include <libsherpa/LexLoc.hxx>
+#include <libsherpa/utf8.hxx>
 
 namespace sherpa {
   std::string
@@ -67,15 +68,17 @@ namespace sherpa {
     return asString().c_str();
   }
 
-  // Implementation of this lives in LTokString.cxx, along with all of
-  // the other decoding logic.
   void
-  LexLoc::updateWith(const std::string& s)
+  LexLoc::updateWith(const std::string& str)
   {
-    size_t i = 0;
+    const char *s = str.c_str();
+    const char *snext = s;
 
-    for (i = 0; i < s.size(); i++) {
-      switch(s[i]) {
+    while (*s) {
+      uint32_t c = utf8_decode(s, &snext);
+      s = snext;
+
+      switch(c) {
       case '\n':
 	{
 	  line++;
@@ -87,8 +90,10 @@ namespace sherpa {
 	  line++;
 	  offset = 0;
 	  // Check for CR LF:
-	  if ((i + 1) < s.size() && s[i+1] == '\n')
-	    i++;
+          if (*snext && *snext == '\n') {
+            (void) utf8_decode(s, &snext);
+            s = snext;
+          }
 	  break;
 	}
       default:
@@ -99,4 +104,44 @@ namespace sherpa {
     }
   }
 
+  LexLoc
+  LexLoc::with(const std::string& str)
+  {
+    const char *s = str.c_str();
+    const char *snext = s;
+
+    unsigned theLine = line;
+    unsigned theOffset = offset;
+
+    while (*s) {
+      uint32_t c = utf8_decode(s, &snext);
+      s = snext;
+
+      switch(c) {
+      case '\n':
+	{
+	  theLine++;
+	  theOffset = 0;
+	  break;
+	}
+      case '\r':
+	{
+	  theLine++;
+	  theOffset = 0;
+	  // Check for CR LF:
+          if (*snext && *snext == '\n') {
+            (void) utf8_decode(s, &snext);
+            s = snext;
+          }
+	  break;
+	}
+      default:
+	{
+	  theOffset++;
+	}
+      }
+    }
+
+    return LexLoc(origin, theLine, theOffset);
+  }
 } /* namespace sherpa */
