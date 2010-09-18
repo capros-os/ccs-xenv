@@ -40,6 +40,7 @@ coytools/Makefile
 coytools/src/Makefile
 
 coytools/src/astmaker/Makefile
+coytools/src/astmaker/config.h
 coytools/src/astmaker/AMparser.cxx
 coytools/src/astmaker/AMparser.hxx
 coytools/src/astmaker/AMparser.output

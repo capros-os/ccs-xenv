@@ -714,8 +714,17 @@ do_emit_hdr(std::ostream& outStream, ParseResult *pr,
   out << "  }" << '\n';
   out << '\n';
   out << "  static const char *tagName(const AstType at);" << '\n';
-  out << "  const char *astTypeName() const;" << '\n';
-  out << "  const char *astName() const;" << '\n';
+  out << "  static const char *nodeName(const AstType at);" << '\n';
+  out << "  static const char *printName(const AstType at);" << '\n';
+  out << '\n';
+  out << "  inline const char *tagName() const" << '\n';
+  out << "  { return tagName(astType); }" << '\n';
+  out << '\n';
+  out << "  inline const char *nodeName() const" << '\n';
+  out << "  { return nodeName(astType); }" << '\n';
+  out << '\n';
+  out << "  inline const char *printName() const" << '\n';
+  out << "  { return printName(astType); }" << '\n';
   out << '\n';
   out << "  bool isMemberOfType(AstType) const;" << '\n';
   out << "  bool isValid() const;" << '\n';
@@ -991,16 +1000,26 @@ emit_src(ParseResult *pr, const filesystem::path& outBase)
   out << '\n';
 
   out << "const char *" << '\n';
-  out << "AST::astTypeName() const" << '\n';
+  out << "AST::nodeName(const AstType at)" << '\n';
   out << "{" << '\n';
-  out << "  return tagName(astType);" << '\n';
+  out << "  switch(at) {" << '\n';
+
+  for (size_t i = 0; i < asts.size(); i++) {
+    AstInfo *aip = asts[i];
+    out << "  case " << aip->tagName() << ":" << '\n';
+    out << "    return \"" << aip->nm.str << "\";" << '\n';
+  }
+
+  out << "  default:" << '\n';
+  out << "    return \"<unknown>\";" << '\n';
+  out << "  }" << '\n';
   out << "}" << '\n';
   out << '\n';
 
   out << "const char *" << '\n';
-  out << "AST::astName() const" << '\n';
+  out << "AST::printName(const AstType at)" << '\n';
   out << "{" << '\n';
-  out << "  switch(astType) {" << '\n';
+  out << "  switch(at) {" << '\n';
 
   for (size_t i = 0; i < asts.size(); i++) {
     AstInfo *aip = asts[i];
@@ -1021,7 +1040,7 @@ emit_src(ParseResult *pr, const filesystem::path& outBase)
   out << "astChTypeError(const AST &myAst, const AstType exp_at," << '\n';
   out << "               const AstType act_at, size_t child)" << '\n';
   out << "{" << '\n';
-  out << "  ::std::cerr << myAst.loc.asString() << \": \" << myAst.astTypeName();" << '\n';
+  out << "  ::std::cerr << myAst.loc.asString() << \": \" << myAst.tagName();" << '\n';
   out << "  ::std::cerr << \" has incompatible Child# \" << child;" << '\n';
   out << "  ::std::cerr << \". Expected \" << AST::tagName(exp_at) << \", \"; " << '\n';
   out << "  ::std::cerr << \"Obtained \" << AST::tagName(act_at) << \".\" << ::std::endl;" << '\n';
@@ -1032,7 +1051,7 @@ emit_src(ParseResult *pr, const filesystem::path& outBase)
   out << "astChNumError(const AST &myAst, const size_t exp_ch," << '\n';
   out << "               const size_t act_ch)" << '\n';
   out << "{" << '\n';
-  out << "  ::std::cerr << myAst.loc.asString() << \": \" << myAst.astTypeName();" << '\n';
+  out << "  ::std::cerr << myAst.loc.asString() << \": \" << myAst.tagName();" << '\n';
   out << "  ::std::cerr << \" has wrong number of children. \";" << '\n';
   out << "  ::std::cerr << \"Expected \" << exp_ch << \", \";" << '\n';
   out << "  ::std::cerr << \"Obtained \" << act_ch << \".\" << ::std::endl;" << '\n';

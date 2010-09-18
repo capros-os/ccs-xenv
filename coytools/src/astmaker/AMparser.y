@@ -33,7 +33,9 @@
 #include <string>
 #include <sstream>
 
+#include "config.h"
 #include "ParseType.hxx"
+#include <libsherpa/rpmversion.hxx>
 
 extern bool showparse;	/* global debugging flag */
 
@@ -90,6 +92,7 @@ check_ifbound(ParseResult *pr, AstInfo *aInfo)
 %token <tok>      tk_MEMBERS;
 %token <tok>      tk_CONSTRUCT;
 %token <tok>      tk_COPYRIGHT;
+%token <tok>      tk_ASTMAKER;
 %token <tok>      tk_SOURCE;
 %token <tok>      tk_SOURCETOP;
 %token <tok>      tk_HEADER;
@@ -104,6 +107,7 @@ check_ifbound(ParseResult *pr, AstInfo *aInfo)
 
 %token <tok>      tk_StringLiteral
 %token <tok>      tk_Ident
+%token <tok>      tk_Version
 %token <tok>      tk_AST
 %token <tok>      tk_GROUP
 %token <tok>      tk_LEAF
@@ -135,6 +139,30 @@ definition: tk_NAMESPACE tk_Ident {
     exit(1);
   }
   pr->nmspace = $2.str;
+};
+
+definition: tk_ASTMAKER tk_Version {
+  if (pr->needsAstVersion.size()) {
+    std::cerr << $1.loc.asString();
+    std::cerr << ": Error: the required astmaker version should be" 
+              << std::endl
+	      << "   specified in at most one location." 
+              << std::endl;
+    exit(1);
+  }
+
+  if (sherpa::compare_rpm_versions(ASTMAKER_VERSION, $2.str) < 0) {
+    std::cerr << $1.loc.asString();
+    std::cerr << ": Error: This is astmaker version " 
+              << ASTMAKER_VERSION << std::endl;
+    std::cerr << "  The input file requires astmaker version >= "
+              << $2.str
+	      << std::endl
+              << "  Consider checking for astmaker updates."
+              << std::endl;
+    exit(1);
+  }
+  pr->needsAstVersion = $2.str;
 };
 
 definition: tk_COPYRIGHT tk_CodeFragment {
@@ -174,7 +202,8 @@ definition: tk_GROUP tk_Ident '=' groupMembers ';' {
 };
 
 definition: tk_AST tk_Ident '=' childList ';' {
-  AstInfo *aInfo = new AstInfo(dt_ast, $2);
+  sherpa::LToken astName($2.loc, "<" + $2.str + ">");
+  AstInfo *aInfo = new AstInfo(dt_ast, $2, astName);
   aInfo->children = $4;
 
   check_ifbound(pr, aInfo);
@@ -190,7 +219,8 @@ definition: tk_AST tk_Ident '(' tk_StringLiteral ')' '=' childList ';' {
 };
 
 definition: tk_LEAF tk_Ident ';' {
-  AstInfo *aInfo = new AstInfo(dt_leaf, $2);
+  sherpa::LToken astName($2.loc, "<" + $2.str + ">");
+  AstInfo *aInfo = new AstInfo(dt_leaf, $2, astName);
 
   check_ifbound(pr, aInfo);
   pr->asts.push_back(aInfo);

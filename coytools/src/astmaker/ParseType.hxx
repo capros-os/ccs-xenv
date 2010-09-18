@@ -63,6 +63,7 @@ struct ParseResult {
   std::ostringstream             sourceTop;
   std::ostringstream             header;
   std::ostringstream             include;
+  std::string                    needsAstVersion;
 
   ParseResult()
   {

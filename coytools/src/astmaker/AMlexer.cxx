@@ -40,6 +40,7 @@ struct KeyWord {
   const char *nm;
   int  tokValue;
 } keywords[] = {
+  { "%astmaker",   tk_ASTMAKER },
   { "%construct",  tk_CONSTRUCT },
   { "%copyright",  tk_COPYRIGHT },
   { "%header",     tk_HEADER },
@@ -99,6 +100,12 @@ AMlexer::kwCheck(const char *s)
 AMlexer::AMlexer(std::istream& _in, const std::string& origin)
   : UCSLexer(_in, origin)
 {
+}
+
+static bool 
+isDigitChar(char c)
+{
+  return (c >= '0' && c <= '9');
 }
 
 #define BAD_TOKEN EOF
@@ -247,7 +254,7 @@ AMlexer::amlex(ParseType *lvalp)
 
       LexLoc tokStart = here;
       here.updateWith(thisToken);
-      lvalp->tok = LToken(here, thisToken);
+      lvalp->tok = LToken(here, thisToken.substr(1, thisToken.size()-2));
       return tk_StringLiteral;
     }
 
@@ -258,6 +265,9 @@ AMlexer::amlex(ParseType *lvalp)
     return EOF;
 
   default:
+    if (isDigitChar(c))
+      goto version_number;
+
     if (validIdentStart(c))
       goto identifier;
 
@@ -282,4 +292,24 @@ AMlexer::amlex(ParseType *lvalp)
   lvalp->tok = LToken(here, thisToken);
   here.updateWith(thisToken);
   return kwCheck(thisToken.c_str());
+
+ version_number:                /* nn.nn.nn...nn */
+  do {
+    c = getChar();
+  } while (isDigitChar(c));
+
+  if (c == '.') {
+    c = getChar();
+    if (isDigitChar(c))
+      goto version_number;      /* get more */
+
+    ungetChar(c);
+    ungetChar('.');
+  }
+  else
+    ungetChar(c);
+
+  lvalp->tok = LToken(here, thisToken);
+  here.updateWith(thisToken);
+  return tk_Version;
 }
