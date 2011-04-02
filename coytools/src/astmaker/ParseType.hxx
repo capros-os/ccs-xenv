@@ -45,6 +45,7 @@
 
 #include <vector>
 #include <sstream>
+#include <boost/filesystem/path.hpp>
 
 struct FieldDecl {
   std::string name;
@@ -65,8 +66,11 @@ struct ParseResult {
   std::ostringstream             include;
   std::string                    needsAstVersion;
 
-  ParseResult()
+  boost::filesystem::path        outBase;
+
+  ParseResult(const boost::filesystem::path& _outBase)
   {
+    outBase = _outBase;
   }
 };
 
