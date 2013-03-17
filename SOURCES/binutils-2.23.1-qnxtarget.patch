@@ -1,0 +1,15 @@
+diff -ruN binutils-2.23.1-baseline/bfd/elf32-arm.c binutils-2.23.1/bfd/elf32-arm.c
+--- binutils-2.23.1-baseline/bfd/elf32-arm.c	2012-09-04 05:53:41.000000000 -0700
++++ binutils-2.23.1/bfd/elf32-arm.c	2013-03-16 21:42:25.804792753 -0700
+@@ -15631,11 +15631,7 @@
+ #define ELF_ARCH			bfd_arch_arm
+ #define ELF_TARGET_ID			ARM_ELF_DATA
+ #define ELF_MACHINE_CODE		EM_ARM
+-#ifdef __QNXTARGET__
+ #define ELF_MAXPAGESIZE			0x1000
+-#else
+-#define ELF_MAXPAGESIZE			0x8000
+-#endif
+ #define ELF_MINPAGESIZE			0x1000
+ #define ELF_COMMONPAGESIZE		0x1000
+ 
