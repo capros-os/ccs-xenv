@@ -24,7 +24,8 @@ GCCMAJOR=gcc$(firstword $(subst ., ,$(GCC_VERSION)))
 
 BUILD_PLATFORM=`rpm --showrc | grep '^build arch' | sed 's/.*: //'`
 
-GDB_VERSION=7.0.1
+#GDB_VERSION=7.0.1
+GDB_VERSION=7.5.1
 GDB_SPEC=OS-ARCH-gdb-$(GDB_VERSION).spec
 
 WITHGCC=--with $(GCCMAJOR)
