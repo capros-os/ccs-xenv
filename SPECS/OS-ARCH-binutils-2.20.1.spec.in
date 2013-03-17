@@ -44,7 +44,7 @@ BuildRequires: texinfo >= 4.0, gettext, flex, bison
 Conflicts: gcc-c++ < 4.0.0
 Requires: %{CROSSOS}-common-binutils
 Requires: %{CROSSOS}-%{CROSSARCH}-filesystem
-Prereq: /sbin/install-info
+Requires: /sbin/install-info
 
 %description
 Binutils is a collection of binary utilities, including ar (for

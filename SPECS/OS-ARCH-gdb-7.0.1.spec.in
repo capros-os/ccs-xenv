@@ -46,7 +46,7 @@ Buildroot: %{_tmppath}/%{CROSSOS}-gdb-root
 BuildRequires: texinfo >= 4.0, gettext
 BuildRequires: ncurses-devel
 Requires: %{CROSSOS}-common-gdb
-Prereq: /sbin/install-info
+Requires: /sbin/install-info
 
 %description
 GDB, the GNU debugger, allows you to debug programs written in C, C++,
