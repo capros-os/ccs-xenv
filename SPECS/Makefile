@@ -168,29 +168,35 @@ xenv: ../BUILD ../RPMS ../SRPMS $(XENV_SPECS)
 		$${spec};\
 	done)
 
+# In order to run this as non-root, add yourself to group "wheel" by:
+#
+#    usermod -G wheel shap
+#
+# and then use visudo to uncomment the line in /etc/sudoers that allows
+# members of group "wheel" to run commands without a password.
 build:
 	(COYPKGS=`rpm -q -a |egrep '(coyotos|capros)'`; \
 	if [ "$${COYPKGS}" != "" ]; then \
-	  rpm -e $${COYPKGS}; \
+	  sudo rpm -e $${COYPKGS}; \
 	fi)
 	$(MAKE) host_xenv
 	$(MAKE) xenv
 	$(MAKE) filesystem
-	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*filesystem*.rpm
+	sudo rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*filesystem*.rpm
 	$(MAKE) binutils
-	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*binutils*.rpm
+	sudo rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*binutils*.rpm
 	$(MAKE) pregcc
-	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*$(GCCMAJOR)*.rpm
+	sudo rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*$(GCCMAJOR)*.rpm
 	$(MAKE) newlib
-	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*newlib*.rpm;
+	sudo rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*newlib*.rpm;
 	# Deinstall in reverse order because of dependencies:
-	rpm -e `rpm -q -a | egrep '(coyotos|capros)' |grep $(GCCMAJOR)`
+	sudo rpm -e `rpm -q -a | egrep '(coyotos|capros)' |grep $(GCCMAJOR)`
 	$(MAKE) gcc
-	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*$(GCCMAJOR)*.rpm
+	sudo rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*$(GCCMAJOR)*.rpm
 	$(MAKE) crtfiles
-	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*crtfiles*.rpm
+	sudo rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*crtfiles*.rpm
 	$(MAKE) gdb
-	rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*gdb*.rpm
+	sudo rpm -ivh ../RPMS/$(BUILD_PLATFORM)/*gdb*.rpm
 
 clean:
 	-rm -f $(foreach os,$(ALL_OS),$(patsubst OS-%,$(os)-%,OS-*.spec)) *~
