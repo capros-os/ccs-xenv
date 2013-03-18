@@ -172,8 +172,6 @@ package.
 %files -n %{CROSSOS}-common-gdb
 %dir %{CROSSHOSTROOT}/include/gdb
 %{CROSSHOSTROOT}/include/gdb/jit-reader.h
-%{CROSSHOSTROOT}/share/locale/*/LC_MESSAGES/*
-%{CROSSHOSTROOT}/share/info/*info*
 %dir %{CROSSHOSTROOT}/share/gdb/python/gdb
 %{CROSSHOSTROOT}/share/gdb/python/gdb/*.py
 %dir %{CROSSHOSTROOT}/share/gdb/python/gdb/command
@@ -181,6 +179,7 @@ package.
 %dir %{CROSSHOSTROOT}/share/gdb/syscalls
 %{CROSSHOSTROOT}/share/gdb/syscalls/*.xml
 %{CROSSHOSTROOT}/share/gdb/syscalls/*.dtd
+%{CROSSHOSTROOT}/share/info/*info*
 
 # Cross-build does not generate translations:
 %files
