@@ -1,0 +1,451 @@
+diff -ruN baseline-binutils-2.35.1/bfd/config.bfd binutils-2.35.1/bfd/config.bfd
+--- baseline-binutils-2.35.1/bfd/config.bfd	2020-10-09 20:02:44.198036508 +1100
++++ binutils-2.35.1/bfd/config.bfd	2020-10-09 20:14:12.620988581 +1100
+@@ -559,6 +559,21 @@
+     targ_defvec=i386_elf32_vec
+     targ_selvecs="iamcu_elf32_vec i386_coff_vec"
+     ;;
++  arm-*-coyotos* | arm-*-capros*)
++    targ_defvec=arm_elf32_be_vec
++    targ_selvecs=arm_elf32_le_vec
++    ;;
++  i[3-7]86-*-coyotos* | i[3-7]86-*-capros*)
++    targ_defvec=i386_elf32_vec
++    ;;
++  m68k-*-coyotos* | m68k-*-capros*)
++    targ_defvec=m68k_elf32_vec
++    targ_selvecs="ieee_vec"
++    ;;
++  x86_64-*-coyotos* | x86_64-*-capros*)
++    targ_defvec=x86_64_elf64_vec
++    targ_selvecs="i386_elf32_vec"
++    ;;
+   i[3-7]86-*-solaris2*)
+     targ_defvec=i386_elf32_sol2_vec
+     targ_selvecs="iamcu_elf32_vec i386_coff_vec i386_pei_vec"
+diff -ruN baseline-binutils-2.35.1/config.sub binutils-2.35.1/config.sub
+--- baseline-binutils-2.35.1/config.sub	2020-10-09 20:02:38.982048089 +1100
++++ binutils-2.35.1/config.sub	2020-10-09 20:16:01.844803129 +1100
+@@ -2,7 +2,7 @@
+ # Configuration validation subroutine script.
+ #   Copyright 1992-2020 Free Software Foundation, Inc.
+ 
+-timestamp='2020-01-01'
++timestamp='2020-10-09'
+ 
+ # This file is free software; you can redistribute it and/or modify it
+ # under the terms of the GNU General Public License as published by
+@@ -1369,6 +1369,8 @@
+ 	     | nsk* | powerunix)
+ 	# Remember, each alternative MUST END IN *, to match a version number.
+ 		;;
++	coyotos* | capros*)
++		;;
+ 	qnx*)
+ 		case $cpu in
+ 		    x86 | i*86)
+diff -ruN baseline-binutils-2.35.1/gas/configure.tgt binutils-2.35.1/gas/configure.tgt
+--- baseline-binutils-2.35.1/gas/configure.tgt	2020-10-09 20:02:40.962043694 +1100
++++ binutils-2.35.1/gas/configure.tgt	2020-10-09 20:20:09.952357993 +1100
+@@ -139,6 +139,7 @@
+ 
+   arm-*-phoenix*)			fmt=elf ;;
+   arm-*-elf)				fmt=elf ;;
++  arm-*-coyotos* | arm-*-capros*)	fmt=elf ;;
+   arm-*-eabi* | arm-*-rtems*)		fmt=elf em=armeabi ;;
+   arm-*-symbianelf*)			fmt=elf em=symbian ;;
+   arm-*-kaos*)				fmt=elf ;;
+@@ -217,6 +218,7 @@
+   i386-*-beospe*)			fmt=coff em=pe ;;
+   i386-*-beos*)				fmt=elf ;;
+   i386-*-elfiamcu)			fmt=elf arch=iamcu ;;
++  i386-*-coyotos* | i386-*-capros*)	fmt=elf ;;
+   i386-*-elf*)				fmt=elf ;;
+   i386-*-fuchsia*)			fmt=elf ;;
+   i386-*-bsd*)				fmt=aout em=386bsd ;;
+@@ -279,6 +281,7 @@
+   m68hc11-*-* | m6811-*-*)		fmt=elf ;;
+   m68hc12-*-* | m6812-*-*)		fmt=elf ;;
+ 
++  m86k-*-coyotos* | m68k-*-capros*)	fmt=elf ;;
+   m68k-*-elf*)				fmt=elf ;;
+   m68k-*-sysv4*)			fmt=elf em=svr4 ;;
+   m68k-*-linux-*)			fmt=elf em=linux ;;
+diff -ruN baseline-binutils-2.35.1/ld/configure.tgt binutils-2.35.1/ld/configure.tgt
+--- baseline-binutils-2.35.1/ld/configure.tgt	2020-10-09 20:02:39.734046420 +1100
++++ binutils-2.35.1/ld/configure.tgt	2020-10-09 20:24:20.063967794 +1100
+@@ -128,6 +128,9 @@
+ arm-*-pe)		targ_emul=armpe
+ 			targ_extra_ofiles="deffilep.o pe-dll.o"
+ 			;;
++arm-*-coyotos* | arm-*-capros*)
++	       		targ_emul=armelf_coyotos
++			targ_extra_emuls="armelf_coyotos_small" ;;
+ arm*b-*-freebsd*)	targ_emul=armelfb_fbsd
+ 			targ_extra_emuls="armelf_fbsd armelf"
+ 			;;
+@@ -327,6 +330,9 @@
+ i[3-7]86-*-redox*)	targ_emul=elf_i386
+ 			targ_extra_emuls=elf_x86_64
+ 			;;
++i[3-7]86-*-coyotos* | i[3-7]86-*-capros*)
++			targ_emul=elf_i386_coyotos
++			targ_extra_emuls="elf_i386_coyotos_small" ;;
+ i[3-7]86-*-sysv[45]*)	targ_emul=elf_i386
+ 			targ_extra_emuls=elf_iamcu
+ 			;;
+@@ -447,6 +453,9 @@
+ m68hc12-*-*|m6812-*-*)	targ_emul=m68hc12elf
+ 			targ_extra_emuls="m68hc12elfb m68hc11elf m68hc11elfb"
+ 			;;
++m68*-*-coyotos* | m68*-*-capros*)
++			targ_emul=m68kelf_coyotos
++			targ_extra_emuls="m68kelf_coyotos_small" ;;
+ m68*-*-netbsdelf*)	targ_emul=m68kelfnbsd
+ 			;;
+ m68*-*-*)		targ_emul=m68kelf
+@@ -913,6 +922,11 @@
+ 			;;
+ visium-*-elf)		targ_emul=elf32visium
+ 			;;
++x86_64-*-coyotos* | x86_64-*-capros*)
++			targ_emul=elf_x86_64
++			targ_extra_emuls="elf32_x86_64 elf_i386"
++			targ_extra_libpath="elf32_x86_64 elf_i386"
++			tdir_elf_i386=`echo ${targ_alias} | sed -e 's/x86_64/i386/'` ;;
+ x86_64-*-rdos*)		targ_emul=elf64rdos
+ 			;;
+ x86_64-*-cloudabi*)	targ_emul=elf_x86_64_cloudabi
+diff -ruN baseline-binutils-2.35.1/ld/emulparams/armelf_coyotos.sh binutils-2.35.1/ld/emulparams/armelf_coyotos.sh
+--- baseline-binutils-2.35.1/ld/emulparams/armelf_coyotos.sh	1970-01-01 10:00:00.000000000 +1000
++++ binutils-2.35.1/ld/emulparams/armelf_coyotos.sh	2020-10-14 12:35:22.933372204 +1100
+@@ -0,0 +1,59 @@
++MACHINE=
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-littlearm"
++BIG_OUTPUT_FORMAT="elf32-bigarm"
++LITTLE_OUTPUT_FORMAT="elf32-littlearm"
++TEXT_START_ADDR=0x8000
++TEMPLATE_NAME=elf
++EXTRA_EM_FILE=armelf
++OTHER_TEXT_SECTIONS='*(.glue_7t) *(.glue_7) *(.vfp11_veneer) *(.v4_bx)'
++OTHER_BSS_SYMBOLS="__bss_start__ = .;"
++OTHER_BSS_END_SYMBOLS="_bss_end__ = .; __bss_end__ = .;"
++OTHER_END_SYMBOLS="$__end__ = .;"
++OTHER_SECTIONS='
++.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
++/* This section contains data that is not initialised during load
++   *or* application reset.  */
++ .noinit (NOLOAD) :
++ {
++   . = ALIGN(2);
++   PROVIDE (__noinit_start = .);
++   *(.noinit)
++   . = ALIGN(2);
++   PROVIDE (__noinit_end = .);
++ }
++'
++ATTRS_SECTIONS='.ARM.attributes 0 : { KEEP (*(.ARM.attributes)) KEEP (*(.gnu.attributes)) }'
++OTHER_READONLY_SECTIONS="
++  .ARM.extab ${RELOCATING-0} : { *(.ARM.extab${RELOCATING+* .gnu.linkonce.armextab.*}) }
++  .ARM.exidx ${RELOCATING-0} :
++    {
++      ${RELOCATING+PROVIDE_HIDDEN (__exidx_start = .);}
++      *(.ARM.exidx${RELOCATING+* .gnu.linkonce.armexidx.*})
++      ${RELOCATING+PROVIDE_HIDDEN (__exidx_end = .);}
++    }"
++
++DATA_START_SYMBOLS="__data_start = . ;"
++
++# NOT FOR NOW
++#
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_SHLIB_SCRIPT=
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_PIE_SCRIPT=
++
++ARCH=arm
++MACHINE=
++MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
++ENTRY=_start
++EMBEDDED=yes
++
++# We do not set STACK_ADDR for Coyotos.
++# STACK_ADDR=0x80000
++
++# ARM does not support .s* sections.
++NO_SMALL_DATA=yes
+diff -ruN baseline-binutils-2.35.1/ld/emulparams/elf_i386_coyotos.sh binutils-2.35.1/ld/emulparams/elf_i386_coyotos.sh
+--- baseline-binutils-2.35.1/ld/emulparams/elf_i386_coyotos.sh	1970-01-01 10:00:00.000000000 +1000
++++ binutils-2.35.1/ld/emulparams/elf_i386_coyotos.sh	2020-10-13 17:08:10.687389117 +1100
+@@ -0,0 +1,43 @@
++# Derived from elf_i386.sh
++
++source_sh ${srcdir}/emulparams/plt_unwind.sh
++source_sh ${srcdir}/emulparams/extern_protected_data.sh
++source_sh ${srcdir}/emulparams/dynamic_undefined_weak.sh
++source_sh ${srcdir}/emulparams/call_nop.sh
++source_sh ${srcdir}/emulparams/cet.sh
++#source_sh ${srcdir}/emulparams/static.sh
++
++SCRIPT_NAME=elf
++#Link rules variant for Coytos/EROS. This should be the same as elf_i386,
++#except that start address is moved to 0x08000000 so that it will align
++# naturally at a page directory and GPT boundary.
++#
++# I have temporarily disabled PIE and SHLIB, because we aren't using those 
++# and I do not have them debugged.
++NO_RELA_RELOCS=yes
++TEXT_START_ADDR=0x0800000
++MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
++COMMONPAGESIZE="CONSTANT (COMMONPAGESIZE)"
++ARCH=i386
++MACHINE=
++TEMPLATE_NAME=elf
++EXTRA_EM_FILE="elf-x86"
++OUTPUT_FORMAT="elf32-i386"
++DATA_START_SYMBOLS="__data_start = . ;"
++
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_SHLIB_SCRIPT=
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_PIE_SCRIPT=
++NO_SMALL_DATA=yes
++SEPARATE_GOTPLT="SIZEOF (.got.plt) >= 12 ? 12 : 0"
++IREL_IN_PLT=
++# These sections are placed right after .plt section.
++OTHER_PLT_SECTIONS="
++.plt.got      ${RELOCATING-0} : { *(.plt.got) }
++.plt.sec      ${RELOCATING-0} : { *(.plt.sec) }
++"
+diff -ruN baseline-binutils-2.35.1/ld/emulparams/elf_i386_coyotos_small.sh bivnutils-2.35.1/ld/emulparams/elf_i386_coyotos_small.sh
+--- baseline-binutils-2.35.1/ld/emulparams/elf_i386_coyotos_small.sh	1970-01-01 10:00:00.000000000 +1000
++++ binutils-2.35.1/ld/emulparams/elf_i386_coyotos_small.sh	2020-10-13 17:09:44.347351565 +1100
+@@ -0,0 +1,5 @@
++# Link rules variant for Coyotos/EROS when compiling for small processes.
++
++source_sh ${srcdir}/emulparams/elf_i386_coyotos.sh
++
++TEXT_START_ADDR = 0x2000
+diff -ruN baseline-binutils-2.35.1/ld/emulparams/m68kelf_coyotos.sh binutils-2.35.1/ld/emulparams/m68kelf_coyotos.sh
+--- baseline-binutils-2.35.1/ld/emulparams/m68kelf_coyotos.sh	1970-01-01 10:00:00.000000000 +1000
++++ binutils-2.35.1/ld/emulparams/m68kelf_coyotos.sh	2020-10-14 12:03:07.341349784 +1100
+@@ -0,0 +1,24 @@
++# Derived from m68kelf.sh
++
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-m68k"
++NO_REL_RELOCS=yes
++TEXT_START_ADDR=0x80000000
++MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
++COMMONPAGESIZE="CONSTANT (COMMONPAGESIZE)"
++ARCH=m68k
++MACHINE=
++NOP=0x4e714e71
++TEMPLATE_NAME=elf
++EXTRA_EM_FILE=m68kelf
++DATA_START_SYMBOLS="__data_start = . ;"
++
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_SHLIB_SCRIPT=
++# If this is set to an nonempty string, genscripts.sh will invoke the
++# scripttempl script an extra time to create a shared library script.
++#
++# GENERATE_PIE_SCRIPT=
++NO_SMALL_DATA=yes
+diff -ruN baseline-binutils-2.35.1/ld/emulparams/m68kelf_coyotos_small.sh binutils-2.35.1/ld/emulparams/m68kelf_coyotos_small.sh
+--- baseline-binutils-2.35.1/ld/emulparams/m68kelf_coyotos_small.sh	1970-01-01 10:00:00.000000000 +1000
++++ binutils-2.35.1/ld/emulparams/m68kelf_coyotos_small.sh	2020-10-14 12:10:07.392288316 +1100
+@@ -0,0 +1,3 @@
++# Link rules variant for Coyotos/EROS when compiling for small processes.
++
++. ${srcdir}/emulparams/m68kelf_coyotos.sh
+diff -ruN baseline-binutils-2.35.1/ld/Makefile.am binutils-2.35.1/ld/Makefile.am
+--- baseline-binutils-2.35.1/ld/Makefile.am	2020-10-09 20:02:40.830043987 +1100
++++ binutils-2.35.1/ld/Makefile.am	2020-10-14 12:56:15.063602905 +1100
+@@ -165,6 +165,8 @@
+ 	earclinux_nps.c \
+ 	earm_wince_pe.c \
+ 	earmelf.c \
++	earmelf_coyotos.c \
++	earmelf_coyotos_small.c \
+ 	earmelf_fbsd.c \
+ 	earmelf_fuchsia.c \
+ 	earmelf_linux.c \
+@@ -282,6 +284,8 @@
+ 	eelf32z80.c \
+ 	eelf_i386.c \
+ 	eelf_i386_be.c \
++	eelf_i386_coyotos.c \
++	eelf_i386_coyotos_small.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_ldso.c \
+ 	eelf_i386_sol2.c \
+@@ -322,6 +326,8 @@
+ 	em68hc12elf.c \
+ 	em68hc12elfb.c \
+ 	em68kelf.c \
++	em68kelf_coyotos.c \
++	em68kelf_coyotos_small.c \
+ 	em68kelfnbsd.c \
+ 	em9s12zelf.c \
+ 	emcorepe.c \
+@@ -651,6 +657,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earclinux_nps.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earm_wince_pe.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_coyotos.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_coyotos_small.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fuchsia.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux.Pc@am__quote@
+@@ -768,6 +776,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32z80.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_coyotos.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_coyotos_small.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_ldso.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_sol2.Pc@am__quote@
+@@ -808,6 +818,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68hc12elf.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68hc12elfb.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf_coyotos.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf_coyotos_small.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelfnbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em9s12zelf.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emcorepe.Pc@am__quote@
+diff -ruN baseline-binutils-2.35.1/ld/Makefile.in binutils-2.35.1/ld/Makefile.in
+--- baseline-binutils-2.35.1/ld/Makefile.in	2020-10-09 20:02:39.730046429 +1100
++++ binutils-2.35.1/ld/Makefile.in	2020-10-14 13:12:46.218128904 +1100
+@@ -648,6 +649,8 @@
+ 	earclinux_nps.c \
+ 	earm_wince_pe.c \
+ 	earmelf.c \
++	earmelf_coyotos.c \
++	earmelf_coyotos_small.c \
+ 	earmelf_fbsd.c \
+ 	earmelf_fuchsia.c \
+ 	earmelf_linux.c \
+@@ -765,6 +768,8 @@
+ 	eelf32z80.c \
+ 	eelf_i386.c \
+ 	eelf_i386_be.c \
++	eelf_i386_coyotos.c \
++	eelf_i386_coyotos_small.c \
+ 	eelf_i386_fbsd.c \
+ 	eelf_i386_ldso.c \
+ 	eelf_i386_sol2.c \
+@@ -805,6 +810,8 @@
+ 	em68hc12elf.c \
+ 	em68hc12elfb.c \
+ 	em68kelf.c \
++	em68kelf_coyotos.c \
++	em68kelf_coyotos_small.c \
+ 	em68kelfnbsd.c \
+ 	em9s12zelf.c \
+ 	emcorepe.c \
+@@ -1201,6 +1208,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earcv2elfx.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earm_wince_pe.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_coyotos.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_coyotos_small.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fuchsia.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux.Po@am__quote@
+@@ -1368,6 +1377,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64tilegx_be.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_coyotos.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_coyotos_small.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_ldso.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_sol2.Po@am__quote@
+@@ -1418,6 +1429,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68hc12elf.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68hc12elfb.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf_coyotos.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf_coyotos_small.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelfnbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em9s12zelf.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emcorepe.Po@am__quote@
+@@ -2246,6 +2259,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earclinux_nps.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earm_wince_pe.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_coyotos.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_coyotos_small.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fuchsia.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux.Pc@am__quote@
+@@ -2363,6 +2378,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32z80.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_coyotos.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_coyotos_small.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_ldso.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_sol2.Pc@am__quote@
+@@ -2403,6 +2420,8 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68hc12elf.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68hc12elfb.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf_coyotos.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf_coyotos_small.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelfnbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em9s12zelf.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emcorepe.Pc@am__quote@
+diff -ruN baseline-binutils-2.35.1/ld/ldfile.c binutils-2.35.1/ld/ldfile.c
+--- baseline-binutils-2.35.1/ld/ldfile.c	2021-03-08 17:01:27.602317235 +1100
++++ binutils-2.35.1/ld/ldfile.c	2020-11-23 20:30:00.123441156 +1100
+@@ -535,9 +535,16 @@
+ {
+   char *dir;
+ 
++  if (verbose)
++    info_msg (_("Configuration options:\n  BINDIR: %s\n  TOOLBINDIR: %s\n SCRIPTDIR: %s\n"), BINDIR, TOOLBINDIR, SCRIPTDIR);
++
++
+   dir = make_relative_prefix (program_name, BINDIR, SCRIPTDIR);
+   if (dir)
+     {
++      if (verbose)
++        info_msg (_("Checking script dir %s\n"), dir);
++
+       if (check_for_scripts_dir (dir))
+ 	return dir;
+       free (dir);
+@@ -553,6 +546,8 @@
+   dir = make_relative_prefix (program_name, TOOLBINDIR, SCRIPTDIR);
+   if (dir)
+     {
++      if (verbose)
++        info_msg (_("Checking script dir %s\n"), dir);
+       if (check_for_scripts_dir (dir))
+ 	return dir;
+       free (dir);
+@@ -564,6 +555,8 @@
+   dir = make_relative_prefix (program_name, ".", ".");
+   if (dir)
+     {
++      if (verbose)
++        info_msg (_("Checking script dir %s\n"), dir);
+       if (check_for_scripts_dir (dir))
+ 	return dir;
+       free (dir);
