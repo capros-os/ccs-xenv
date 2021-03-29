@@ -1,3 +1,4 @@
+# -*- mode: makefile-gmake -*-
 THISMAKEFILE := $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 
 ##################################################################
@@ -18,14 +19,13 @@ CROSSSYSROOT=$(CROSSROOT)/sysroot-$(CROSSARCH)
 #  Tool Versions.
 #
 ##################################################################
-BINUTILS_VERSION=2.20.1
+BINUTILS_VERSION=2.35.1
 BINUTILS_PATCHES=$(wildcard SOURCES/binutils-$(BINUTILS_VERSION)*.patch)
 
-GCC_VERSION=4.2.4
+GCC_VERSION=10.2.0
 GCC_PATCHES=$(wildcard SOURCES/gcc-$(GCC_VERSION)*.patch)
 
-NEWLIB_VERSION=1.18.0
-NEWLIB_CVS_PATCH=newlib-cvs20100601.patch.bz2
+NEWLIB_VERSION=3.3.0
 NEWLIB_PATCHES=$(wildcard SOURCES/newlib-$(NEWLIB_VERSION)*.patch)
 
 CRTFILES_VERSION=0.1.0
@@ -88,7 +88,7 @@ BUILD:
 # unpack binutils, apply patches
 BUILD/binutils-$(BINUTILS_VERSION): | BUILD
 	@echo "Unpacking binutils-$(BINUTILS_VERSION)"
-	(cd BUILD; tar xjf ../SOURCES/binutils-$(BINUTILS_VERSION).tar.bz2)
+	(cd BUILD; tar xaf ../SOURCES/binutils-$(BINUTILS_VERSION).tar.xz)
 	(cd BUILD; patch -p0 < ../SOURCES/capos-binutils-$(BINUTILS_VERSION).patch)
 	if [ "" != "$(BINUTILS_PATCHES)" ]; then \
 	for patch in $(BINUTILS_PATCHES); do \
@@ -99,8 +99,7 @@ BUILD/binutils-$(BINUTILS_VERSION): | BUILD
 # unpack newlib, apply patches
 BUILD/newlib-$(NEWLIB_VERSION): | BUILD
 	@echo "Unpacking newlib-$(NEWLIB_VERSION)"
-	(cd BUILD; tar xjf ../SOURCES/newlib-$(NEWLIB_VERSION).tar.bz2)
-	(cd BUILD; bzcat ../SOURCES/$(NEWLIB_CVS_PATCH) | patch -p0)
+	(cd BUILD; tar xaf ../SOURCES/newlib-$(NEWLIB_VERSION).tar.*)
 	(cd BUILD; patch -p0 < ../SOURCES/capos-newlib-$(NEWLIB_VERSION).patch)
 	if [ "" != "$(NEWLIB_PATCHES)" ]; then \
 	for patch in $(NEWLIB_PATCHES); do \
@@ -111,8 +110,7 @@ BUILD/newlib-$(NEWLIB_VERSION): | BUILD
 # unpack gcc, apply patches
 BUILD/gcc-$(GCC_VERSION): | BUILD
 	@echo "Unpacking gcc-$(GCC_VERSION)"
-	(cd BUILD; tar xjf ../SOURCES/gcc-core-$(GCC_VERSION).tar.bz2)
-	(cd BUILD; tar xjf ../SOURCES/gcc-g++-$(GCC_VERSION).tar.bz2)
+	(cd BUILD; tar xaf ../SOURCES/gcc-$(GCC_VERSION).tar.xz)
 	(cd BUILD; patch -p0 < ../SOURCES/capos-gcc-$(GCC_VERSION).patch)
 	if [ "" != "$(GCC_PATCHES)" ]; then \
 	for patch in $(GCC_PATCHES); do \
@@ -177,7 +175,8 @@ binutils:
 	     --with-sysroot=$(CROSSSYSROOT) \
 	     --target ${CROSSTARGET})
 	$(MAKE) -C BUILD/build-binutils-$(CROSSARCH) tooldir=$(CROSSHOSTROOT) all
-	$(MAKE) -C BUILD/build-binutils-$(CROSSARCH) install
+	$(MAKE) -C BUILD/build-binutils-$(CROSSARCH) tooldir=$(CROSSHOSTROOT) install
+	rm -f $(CROSSHOSTROOT)/bin/{ar,as,nm,objcopy,objdump,ranlib,readelf,strip}
 
 ##################################################################
 #
@@ -211,7 +210,7 @@ pregcc:
 	rm -rf BUILD/build-gcc-$(CROSSARCH)	
 	mkdir BUILD/build-gcc-$(CROSSARCH)
 	(cd BUILD/build-gcc-$(CROSSARCH); \
-	  PATH=$(CROSSHOSTROOT)/bin:$(PATH) CC="$(CCACHE) gcc" \
+	  PATH=$(PATH):$(CROSSHOSTROOT)/bin CC="$(CCACHE) gcc" \
 	    ../gcc-$(GCC_VERSION)/configure \
 	      $(CONFIGDIRS) \
 	      --with-local-prefix=$(CROSSSYSROOT) \
@@ -220,13 +219,15 @@ pregcc:
 	      --with-sysroot=$(CROSSSYSROOT) \
 	      --disable-libmudflap \
 	      --enable-languages=c \
-	      --target $(CROSSTARGET))
-	PATH=$(CROSSHOSTROOT)/bin:$(PATH) \
+	      --target $(CROSSTARGET) \
+	      --with-as=$(CROSSHOSTROOT)/bin/$(CROSSTARGET)-as \
+	      --with-ld=$(CROSSHOSTROOT)/bin/$(CROSSTARGET)-ld)
+	PATH=PATH=$(PATH):$(CROSSHOSTROOT)/bin \
 	  $(MAKE) -C BUILD/build-gcc-$(CROSSARCH) \
-	    gcc_tooldir=$(CROSSHOSTROOT) all-gcc
-	PATH=$(CROSSHOSTROOT)/bin:$(PATH) \
+	    gcc_tooldir=$(CROSSHOSTROOT) all-gcc all-target-libgcc
+	PATH=PATH=$(PATH):$(CROSSHOSTROOT)/bin \
 	  $(MAKE) -C BUILD/build-gcc-$(CROSSARCH) \
-	    gcc_tooldir=$(CROSSHOSTROOT) install-gcc
+	    gcc_tooldir=$(CROSSHOSTROOT) install-gcc install-target-libgcc
 	rm -f $(CROSSHOSTROOT)/lib/gcc/$(CROSSTARGET)/$(GCC_VERSION)/crti.o
 	rm -f $(CROSSHOSTROOT)/lib/gcc/$(CROSSTARGET)/$(GCC_VERSION)/crtn.o
 	rm -f $(CROSSHOSTROOT)/lib/gcc/$(CROSSTARGET)/$(GCC_VERSION)/thumb/crti.o
@@ -238,21 +239,30 @@ pregcc:
 #
 # Get the per-target newlib built and installed
 #
+# n.b. we put the crossroot later on the path because newlib tries to
+# use the native compiler for configure and documentation and it will
+# need to find its `as`.
+#
 ##################################################################
 newlib: | BUILD/newlib-$(NEWLIB_VERSION)
 newlib:
 	rm -rf BUILD/build-newlib-$(CROSSARCH)	
 	mkdir BUILD/build-newlib-$(CROSSARCH)
 	(cd BUILD/build-newlib-$(CROSSARCH); \
-	  PATH=$(CROSSHOSTROOT)/bin:$(PATH) \
+	  PATH=$(PATH):$(CROSSHOSTROOT)/bin \
+	  CFLAGS=$(CFLAGS)" -nostdlib -lgcc" \
 	    ../newlib-$(NEWLIB_VERSION)/configure \
 	      $(CONFIGDIRS) \
+              --with-newlib \
 	      --with-local-prefix=$(CROSSSYSROOT) \
-	      --target $(CROSSTARGET))
-	PATH=$(CROSSHOSTROOT)/bin:$(PATH) \
+              --build x86_64-linux-gnu \
+	      --host $(CROSSTARGET) \
+	      --target $(CROSSTARGET) \
+              CC_FOR_BUILD=x86_64-linux-gnu-gcc )
+	PATH=$(PATH):$(CROSSHOSTROOT)/bin \
 	  $(MAKE) -C BUILD/build-newlib-$(CROSSARCH) \
 	    tooldir=$(CROSSSYSROOT)/usr STAGE_CC_WRAPPER="$(CCACHE)" all
-	PATH=$(CROSSHOSTROOT)/bin:$(PATH) \
+	PATH=$(PATH):$(CROSSHOSTROOT)/bin \
 	  $(MAKE) -C BUILD/build-newlib-$(CROSSARCH) \
 	    tooldir=$(CROSSSYSROOT)/usr STAGE_CC_WRAPPER="$(CCACHE)" install
 
@@ -268,7 +278,7 @@ gcc:
 	rm -rf BUILD/build-gcc-$(CROSSARCH)	
 	mkdir BUILD/build-gcc-$(CROSSARCH)
 	(cd BUILD/build-gcc-$(CROSSARCH); \
-	  PATH=$(CROSSHOSTROOT)/bin:$(PATH) CC="$(CCACHE) gcc" \
+	  PATH=$(PATH):$(CROSSHOSTROOT)/bin CC="$(CCACHE) gcc" \
 	    ../gcc-$(GCC_VERSION)/configure \
 	      $(CONFIGDIRS) \
 	      --with-local-prefix=$(CROSSSYSROOT) \
@@ -277,11 +287,13 @@ gcc:
 	      --with-headers=$(CROSSSYSROOT)/usr/include \
 	      --disable-libmudflap \
 	      --enable-languages="c,c++" \
-	      --target $(CROSSTARGET))
-	PATH=$(CROSSHOSTROOT)/bin:$(PATH) \
+	      --target $(CROSSTARGET) \
+	      --with-as=$(CROSSHOSTROOT)/bin/$(CROSSTARGET)-as \
+	      --with-ld=$(CROSSHOSTROOT)/bin/$(CROSSTARGET)-ld)
+	PATH=$(PATH):$(CROSSHOSTROOT)/bin \
 	  $(MAKE) -C BUILD/build-gcc-$(CROSSARCH) \
 	    gcc_tooldir=$(CROSSHOSTROOT) all-gcc all-target-libstdc++-v3
-	PATH=$(CROSSHOSTROOT)/bin:$(PATH) \
+	PATH=$(PATH):$(CROSSHOSTROOT)/bin \
 	  $(MAKE) -C BUILD/build-gcc-$(CROSSARCH) \
 	    gcc_tooldir=$(CROSSHOSTROOT) install-gcc install-target-libstdc++-v3
 	rm -f $(CROSSHOSTROOT)/lib/gcc/$(CROSSTARGET)/$(GCC_VERSION)/crti.o
