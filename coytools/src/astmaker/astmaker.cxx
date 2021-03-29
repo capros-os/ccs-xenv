@@ -104,7 +104,7 @@ return out;
 ParseResult *
 parse_file(filesystem::path filePath, const boost::filesystem::path& outBase)
 {
-std::ifstream fin(filePath.file_string().c_str());
+std::ifstream fin(filePath.string().c_str());
 
 if (!fin.is_open()) {
 std::cerr << "Couldn't open input file \""
@@ -813,7 +813,7 @@ emit_hdr(ParseResult *pr)
   filesystem::path hdrPath = 
     filesystem::change_extension(pr->outBase, ".hxx");
 
-  std::ofstream out(hdrPath.file_string().c_str(),
+  std::ofstream out(hdrPath.string().c_str(),
 		    std::ios_base::out|std::ios_base::trunc);
 
   if (!out.is_open()) {
@@ -836,7 +836,7 @@ emit_src(ParseResult *pr)
   std::vector<AstInfo *>& asts = pr->asts;
   filesystem::path srcPath = filesystem::change_extension(pr->outBase, ".cxx");
 
-  std::ofstream out(srcPath.file_string().c_str(),
+  std::ofstream out(srcPath.string().c_str(),
 		    std::ios_base::out|std::ios_base::trunc);
 
   if (!out.is_open()) {
