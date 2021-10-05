@@ -85,6 +85,8 @@ check_ifbound(ParseResult *pr, AstInfo *aInfo)
 
 %}
 
+
+%lex-param {AMlexer *lexer}
 %pure-parser
 %parse-param {AMlexer *lexer}
 %parse-param {ParseResult *pr}

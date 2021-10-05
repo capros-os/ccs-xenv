@@ -80,7 +80,7 @@ namespace sherpa {
     else
       THROW(excpt::BadValue, "Unknown mode or ftype to xfopen");
 
-    f = fopen(path.file_string().c_str(), fopen_mode);
+    f = fopen(path.string().c_str(), fopen_mode);
     if (f == NULL)
       THROW(excpt::NoAccess,
 	    format("Could not open file %s, mode %s (errno %d)", 
