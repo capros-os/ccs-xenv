@@ -103,6 +103,7 @@ mkinstalldirs = $(top_srcdir)/mkinstalldirs
 
 #### End of system configuration section. ####
 CXXFLAGS += @BOOST_CPPFLAGS@
+CXXFLAGS += -DBOOST_SYSTEM_NO_DEPRECATED
 
 default: all
 
