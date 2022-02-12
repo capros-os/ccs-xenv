@@ -1,0 +1,6 @@
+*.m
+*.o
+coytools/autom4te.cache
+coytools/**/Makefile
+coytools/config.h
+BUILD/
