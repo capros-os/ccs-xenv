@@ -456,44 +456,50 @@ diff -ruN baseline-gcc-10.2.0/gcc/config.gcc gcc-10.2.0/gcc/config.gcc
  *-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu | *-*-uclinuxfdpiceabi)
    extra_options="$extra_options gnu-user.opt"
    gas=yes
-@@ -1838,6 +1838,49 @@
+@@ -1838,6 +1838,55 @@
  		dwarf2=no
  	fi
  	;;
 +arm*-*-capros*)
-+	tm_file="arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/capros.h"
-+	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h capros.h"
++	tm_file="dbxelf.h elfos.h"
++	tm_file="${tm_file} arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/capros.h"
++	tm_file="${tm_file} newlib-stdint.h capros.h"
 +	tmake_file="arm/t-arm arm/t-arm-elf"
 +	use_fixproto=yes
 +	;;
 +arm*-*-coyotos*)
-+	tm_file="arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/coyotos.h"
-+	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h coyotos.h"
++	tm_file="dbxelf.h elfos.h"
++	tm_file="${tm_file} arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/coyotos.h"
++	tm_file="${tm_file} newlib-stdint.h coyotos.h"
 +	tmake_file="arm/t-arm arm/t-arm-elf"
 +	use_fixproto=yes
 +	;;
 +i[34567]86-*-capros*)
++	tm_file="${tm_file} dbxelf.h elfos.h"
 +	tm_file="${tm_file} i386/unix.h i386/att.h i386/i386elf.h i386/capros.h"
-+	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h capros.h"
++	tm_file="${tm_file} newlib-stdint.h capros.h"
 +	tmake_file="i386/t-i386elf t-svr4"
 +	use_fixproto=yes
 +	;;
 +i[34567]86-*-coyotos*)
++	tm_file="${tm_file} dbxelf.h elfos.h"
 +	tm_file="${tm_file} i386/unix.h i386/att.h i386/i386elf.h i386/coyotos.h"
-+	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h coyotos.h"
++	tm_file="${tm_file} newlib-stdint.h coyotos.h"
 +	tmake_file="${tmake_file} i386/t-i386elf t-svr4"
 +	use_fixproto=yes
 +	;;
 +m68k-*-capros*)
-+	tm_file="m68k/m68k.h m68k/m68k-none.h m68k/m68kelf.h m68k/m68020-elf.h m68k/capros.h"
-+	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h capros.h"
++	tm_file="dbxelf.h elfos.h"
++	tm_file="${tm_file} m68k/m68k.h m68k/m68k-none.h m68k/m68kelf.h m68k/m68020-elf.h m68k/capros.h"
++	tm_file="${tm_file} newlib-stdint.h capros.h"
 +	tmake_file=m68k/t-m68kelf
 +	tm_defines="MOTOROLA USE_GAS"
 +	use_fixproto=yes
 +	;;
 +m68k-*-coyotos*)
++	tm_file="${tm_file} dbxelf.h elfos.h"
 +	tm_file="${tm_file} m68k/m68k-none.h m68k/m68kelf.h m68k/m68kemb.h m68k/m68020-elf.h m68k/coyotos.h"
-+	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h coyotos.h"
++	tm_file="${tm_file} newlib-stdint.h coyotos.h"
 +	extra_options="${extra_options} m68k/ieee.opt"
 +	tm_defines="${tm_defines} MOTOROLA=1"
 +	tmake_file="${tmake_file} m68k/t-floatlib m68k/t-coyotos m68k/t-mlibs"
