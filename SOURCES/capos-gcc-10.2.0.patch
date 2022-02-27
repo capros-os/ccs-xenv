@@ -21,7 +21,7 @@ diff -ruN baseline-gcc-10.2.0/config.sub gcc-10.2.0/config.sub
  		    x86 | i*86)
 --- baseline-gcc-10.2.0/gcc/config/arm/capros.h	1969-12-31 16:00:00.000000000 -0800
 +++ gcc-10.2.0/gcc/config/arm/capros.h	2010-04-13 20:19:09.542094332 -0700
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,36 @@
 +/* Definitions for ARM running CapROS-based systems with ELF format.
 +   Copyright (C) 2007, The EROS Group LLC.
 +
@@ -48,6 +48,12 @@ diff -ruN baseline-gcc-10.2.0/config.sub gcc-10.2.0/config.sub
 +
 +/* If ELF is the default format, we should not use /lib/elf.  */
 +
++#define TARGET_ENDIAN_DEFAULT 0
++#define TARGET_ENDIAN_OPTION "mbig-endian"
++#define TARGET_DEFAULT_FLOAT_ABI ARM_FLOAT_ABI_SOFT
++
++#undef  MULTILIB_DEFAULTS
++
 +#undef	LINK_SPEC
 +#define LINK_SPEC "%{small-space:-m armelf_coyotos_small} \
 +  %{static:-static}"
@@ -55,7 +61,7 @@ diff -ruN baseline-gcc-10.2.0/config.sub gcc-10.2.0/config.sub
 diff -ruN baseline-gcc-10.2.0/gcc/config/arm/coyotos.h gcc-10.2.0/gcc/config/arm/coyotos.h
 --- baseline-gcc-10.2.0/gcc/config/arm/coyotos.h	1969-12-31 16:00:00.000000000 -0800
 +++ gcc-10.2.0/gcc/config/arm/coyotos.h	2010-04-13 20:19:09.543580848 -0700
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,36 @@
 +/* Definitions for ARM running Coyotos-based systems with ELF format.
 +   Copyright (C) 2007, The EROS Group LLC.
 +
@@ -81,6 +87,12 @@ diff -ruN baseline-gcc-10.2.0/gcc/config/arm/coyotos.h gcc-10.2.0/gcc/config/arm
 +   things in low(er) memory.  */
 +
 +/* If ELF is the default format, we should not use /lib/elf.  */
++
++#define TARGET_ENDIAN_DEFAULT 0
++#define TARGET_ENDIAN_OPTION "mbig-endian"
++#define TARGET_DEFAULT_FLOAT_ABI ARM_FLOAT_ABI_SOFT
++
++#undef  MULTILIB_DEFAULTS
 +
 +#undef	LINK_SPEC
 +#define LINK_SPEC "%{small-space:-m armelf_coyotos_small} \
@@ -456,15 +468,22 @@ diff -ruN baseline-gcc-10.2.0/gcc/config.gcc gcc-10.2.0/gcc/config.gcc
  *-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu | *-*-uclinuxfdpiceabi)
    extra_options="$extra_options gnu-user.opt"
    gas=yes
-@@ -1838,6 +1838,55 @@
+@@ -1838,6 +1838,62 @@
  		dwarf2=no
  	fi
  	;;
 +arm*-*-capros*)
-+	tm_file="dbxelf.h elfos.h"
-+	tm_file="${tm_file} arm/unknown-elf.h arm/elf.h arm/aout.h arm/arm.h arm/capros.h"
-+	tm_file="${tm_file} newlib-stdint.h capros.h"
-+	tmake_file="arm/t-arm arm/t-arm-elf"
++	case ${target} in
++	arm*eb-*-eabi*)
++	  tm_defines="${tm_defines} TARGET_BIG_ENDIAN_DEFAULT=1"
++	esac
++	default_use_cxa_atexit=yes
++	tm_file="dbxelf.h elfos.h arm/unknown-elf.h arm/elf.h arm/bpabi.h"
++	tmake_file="${tmake_file} arm/t-arm arm/t-arm-elf"
++       tmake_file="${tmake_file} arm/t-bpapi"
++	tm_file="${tm_file} arm/aout.h arm/arm.h"
++	tm_file="${tm_file} newlib-stdint.h capros.h arm/capros.h"
++	target_cpu_cname="generic-armv7-a"
 +	use_fixproto=yes
 +	;;
 +arm*-*-coyotos*)
