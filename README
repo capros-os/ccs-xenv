@@ -1,3 +1,39 @@
+WHAT YOU CAN BUILD
+
+GNU tools are identified by a Target Triplet with three fields:
+  Architecture-Vendor-OS
+Here we always use "unknown" for the Vendor.
+Architectures and OS's allowed by this code are shown in Makefile.xenv.
+
+In the build system here, a TARGET is of the form OS-Architecture.
+
+The built tools will be placed in a top-level directory with the name of the OS.
+
+
+HOW TO BUILD
+
+First you need some overall setup:
+
+sudo apt install build-essential lib{ssl,icu,z,mpfr,gmp,mpc}-dev bison flex
+sudo apt install libboost{,-filesystem,-system}-dev
+
+and some setup for each OS you will build (substitute for terms in angle brackets)
+
+sudo mkdir /<OS>
+sudo chown <YourUserName>:plugdev /<OS>
+
+Then build with these commands:
+
+cd <Directory with your ccs-xenv repository>
+make -f Makefile.xenv TARGETS="<list of TARGETs to build>"
+
+For example:
+cd ccs-xenv
+make -f Makefile.xenv TARGETS="capros-i386 capros-arm"
+
+
+NOTES ON THE BUILD
+
 Building a cross compile tool chain is a serious pain in the neck. The
 main issue is that there is a circular dependency between gcc and
 libc. Because of this circular dependency, the build MUST proceed in
