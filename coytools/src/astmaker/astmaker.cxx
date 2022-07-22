@@ -102,7 +102,7 @@ return out;
 }
 
 ParseResult *
-parse_file(filesystem::path filePath, const boost::filesystem::path& outBase)
+parse_file(boost::filesystem::path filePath, const boost::filesystem::path& outBase)
 {
 std::ifstream fin(filePath.string().c_str());
 
@@ -235,7 +235,7 @@ out << ";"
 
 void 
 emit_ast(std::ostream& out, ParseResult *pr, 
- const filesystem::path& outBase)
+ const boost::filesystem::path& outBase)
 {
 std::vector<AstInfo *>& asts = pr->asts;
 
@@ -810,8 +810,8 @@ out << "  template <class T>" << '\n';
 void
 emit_hdr(ParseResult *pr)
 {
-  filesystem::path hdrPath = 
-    filesystem::change_extension(pr->outBase, ".hxx");
+  boost::filesystem::path hdrPath = 
+    boost::filesystem::change_extension(pr->outBase, ".hxx");
 
   std::ofstream out(hdrPath.string().c_str(),
 		    std::ios_base::out|std::ios_base::trunc);
@@ -834,7 +834,7 @@ void
 emit_src(ParseResult *pr)
 {
   std::vector<AstInfo *>& asts = pr->asts;
-  filesystem::path srcPath = filesystem::change_extension(pr->outBase, ".cxx");
+  boost::filesystem::path srcPath = boost::filesystem::change_extension(pr->outBase, ".cxx");
 
   std::ofstream out(srcPath.string().c_str(),
 		    std::ios_base::out|std::ios_base::trunc);
@@ -1410,7 +1410,7 @@ main(int argc, char *argv[])
   bool wantHdr = false;
   bool wantSrc = false;
 
-  filesystem::path outputFileName;
+  boost::filesystem::path outputFileName;
 
 #if 0
   // Make sure that we are running in a UNICODE locale:
@@ -1492,10 +1492,10 @@ main(int argc, char *argv[])
   if (outputFileName.empty())
     outputFileName = argv[0];
 
-  filesystem::path outBase = 
+  boost::filesystem::path outBase = 
     outputFileName.branch_path() / basename(outputFileName);
 
-  ParseResult *pr = parse_file(filesystem::path(argv[0]), outBase);
+  ParseResult *pr = parse_file(boost::filesystem::path(argv[0]), outBase);
 
   check_asts(pr);
 
