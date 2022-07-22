@@ -463,7 +463,7 @@ diff -ruN baseline-gcc-10.2.0/gcc/config.gcc gcc-10.2.0/gcc/config.gcc
    ;;
 +*-*-coyotos* | *-*-capros*)
 +  extra_options="${extra_options} capos.opt"
-+  use_gcc_stdint=provide
++  use_gcc_stdint=wrap
 +  ;;
  *-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu | *-*-uclinuxfdpiceabi)
    extra_options="$extra_options gnu-user.opt"
