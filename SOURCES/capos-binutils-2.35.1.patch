@@ -80,7 +80,7 @@ diff -ruN baseline-binutils-2.35.1/ld/configure.tgt binutils-2.35.1/ld/configure
  			;;
 +arm-*-coyotos* | arm-*-capros*)
 +	       		targ_emul=armelf_coyotos
-+			targ_extra_emuls="armelf_coyotos_small" ;;
++			targ_extra_emuls="armelf_coyotos_small armelf armelfb" ;;
  arm*b-*-freebsd*)	targ_emul=armelfb_fbsd
  			targ_extra_emuls="armelf_fbsd armelf"
  			;;
@@ -90,7 +90,7 @@ diff -ruN baseline-binutils-2.35.1/ld/configure.tgt binutils-2.35.1/ld/configure
  			;;
 +i[3-7]86-*-coyotos* | i[3-7]86-*-capros*)
 +			targ_emul=elf_i386_coyotos
-+			targ_extra_emuls="elf_i386_coyotos_small" ;;
++			targ_extra_emuls="elf_i386_coyotos_small elf_i386" ;;
  i[3-7]86-*-sysv[45]*)	targ_emul=elf_i386
  			targ_extra_emuls=elf_iamcu
  			;;
@@ -100,7 +100,7 @@ diff -ruN baseline-binutils-2.35.1/ld/configure.tgt binutils-2.35.1/ld/configure
  			;;
 +m68*-*-coyotos* | m68*-*-capros*)
 +			targ_emul=m68kelf_coyotos
-+			targ_extra_emuls="m68kelf_coyotos_small" ;;
++			targ_extra_emuls="m68kelf_coyotos_small m68kelf" ;;
  m68*-*-netbsdelf*)	targ_emul=m68kelfnbsd
  			;;
  m68*-*-*)		targ_emul=m68kelf
