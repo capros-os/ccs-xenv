@@ -21,9 +21,10 @@ diff -ruN baseline-gcc-10.2.0/config.sub gcc-10.2.0/config.sub
  		    x86 | i*86)
 --- baseline-gcc-10.2.0/gcc/config/arm/capros.h	1969-12-31 16:00:00.000000000 -0800
 +++ gcc-10.2.0/gcc/config/arm/capros.h	2010-04-13 20:19:09.542094332 -0700
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,46 @@
 +/* Definitions for ARM running CapROS-based systems with ELF format.
 +   Copyright (C) 2007, The EROS Group LLC.
++   Copyright (C) 2017-2020 Free Software Foundation, Inc.
 +
 +This file is part of GCC.
 +
@@ -52,7 +53,16 @@ diff -ruN baseline-gcc-10.2.0/config.sub gcc-10.2.0/config.sub
 +#define TARGET_ENDIAN_OPTION "mbig-endian"
 +#define TARGET_DEFAULT_FLOAT_ABI ARM_FLOAT_ABI_SOFT
 +
-+#undef  MULTILIB_DEFAULTS
++/* Use the BPABI builtins and the generic OS builtins.  */
++#undef  TARGET_SUB_OS_CPP_BUILTINS
++#define TARGET_SUB_OS_CPP_BUILTINS() 		\
++  TARGET_BPABI_CPP_BUILTINS()
++
++/* Use the AAPCS ABI by default.  */
++#undef ARM_DEFAULT_ABI
++#define ARM_DEFAULT_ABI ARM_ABI_AAPCS
++
++#define ARM_TARGET2_DWARF_FORMAT (DW_EH_PE_pcrel | DW_EH_PE_indirect)
 +
 +#undef	LINK_SPEC
 +#define LINK_SPEC "%{small-space:-m armelf_coyotos_small} \
@@ -101,7 +111,7 @@ diff -ruN baseline-gcc-10.2.0/gcc/config/arm/coyotos.h gcc-10.2.0/gcc/config/arm
 diff -ruN baseline-gcc-10.2.0/gcc/config/capros.h gcc-10.2.0/gcc/config/capros.h
 --- baseline-gcc-10.2.0/gcc/config/capros.h	1969-12-31 16:00:00.000000000 -0800
 +++ gcc-10.2.0/gcc/config/capros.h	2010-04-13 20:19:09.543580848 -0700
-@@ -0,0 +1,92 @@
+@@ -0,0 +1,93 @@
 +/* Configuration common to all targets running CapROS. 
 +   Copyright (C) 2007, The EROS Group LLC.
 +
@@ -191,13 +201,14 @@ diff -ruN baseline-gcc-10.2.0/gcc/config/capros.h gcc-10.2.0/gcc/config/capros.h
 +#undef LINK_GCC_C_SEQUENCE_SPEC
 +#define LINK_GCC_C_SEQUENCE_SPEC "--start-group %G %L --end-group"
 +
-+#if defined(HAVE_LD_EH_FRAME_HDR)
-+#define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
-+#endif
++// Don't ask for --eh-frame-hdr if we don't have shlib_script.
++// #if defined(HAVE_LD_EH_FRAME_HDR)
++// #define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
++// #endif
 diff -ruN baseline-gcc-10.2.0/gcc/config/coyotos.h gcc-10.2.0/gcc/config/coyotos.h
 --- baseline-gcc-10.2.0/gcc/config/coyotos.h	1969-12-31 16:00:00.000000000 -0800
 +++ gcc-10.2.0/gcc/config/coyotos.h	2010-04-13 20:19:09.543580848 -0700
-@@ -0,0 +1,92 @@
+@@ -0,0 +1,93 @@
 +/* Configuration common to all targets running Coyotos. 
 +   Copyright (C) 2007, The EROS Group LLC.
 +
@@ -287,9 +298,10 @@ diff -ruN baseline-gcc-10.2.0/gcc/config/coyotos.h gcc-10.2.0/gcc/config/coyotos
 +#undef LINK_GCC_C_SEQUENCE_SPEC
 +#define LINK_GCC_C_SEQUENCE_SPEC "--start-group %G %L --end-group"
 +
-+#if defined(HAVE_LD_EH_FRAME_HDR)
-+#define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
-+#endif
++// Don't ask for --eh-frame-hdr if we don't have shlib_script.
++// #if defined(HAVE_LD_EH_FRAME_HDR)
++// #define LINK_EH_SPEC "%{!static:--eh-frame-hdr} "
++// #endif
 diff -ruN baseline-gcc-10.2.0/gcc/config/i386/capros.h gcc-10.2.0/gcc/config/i386/capros.h
 --- baseline-gcc-10.2.0/gcc/config/i386/capros.h	1969-12-31 16:00:00.000000000 -0800
 +++ gcc-10.2.0/gcc/config/i386/capros.h	2010-04-13 20:19:09.543580848 -0700
@@ -457,18 +469,19 @@ diff -ruN baseline-gcc-10.2.0/gcc/config.build gcc-10.2.0/gcc/config.build
 diff -ruN baseline-gcc-10.2.0/gcc/config.gcc gcc-10.2.0/gcc/config.gcc
 --- baseline-gcc-10.2.0/gcc/config.gcc	2020-10-06 18:40:22.825132369 +1100
 +++ gcc-10.2.0/gcc/config.gcc	2020-10-06 18:54:15.427753212 +1100
-@@ -776,6 +776,10 @@
+@@ -776,6 +776,11 @@
  *-*-fuchsia*)
    native_system_header_dir=/include
    ;;
 +*-*-coyotos* | *-*-capros*)
 +  extra_options="${extra_options} capos.opt"
-+  use_gcc_stdint=provide
++  use_gcc_stdint=wrap
++  default_use_cxa_atexit=yes
 +  ;;
  *-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu | *-*-uclinuxfdpiceabi)
    extra_options="$extra_options gnu-user.opt"
    gas=yes
-@@ -1838,6 +1838,62 @@
+@@ -1838,6 +1838,61 @@
  		dwarf2=no
  	fi
  	;;
@@ -479,8 +492,7 @@ diff -ruN baseline-gcc-10.2.0/gcc/config.gcc gcc-10.2.0/gcc/config.gcc
 +	esac
 +	default_use_cxa_atexit=yes
 +	tm_file="dbxelf.h elfos.h arm/unknown-elf.h arm/elf.h arm/bpabi.h"
-+	tmake_file="${tmake_file} arm/t-arm arm/t-arm-elf"
-+       tmake_file="${tmake_file} arm/t-bpapi"
++	tmake_file="${tmake_file} arm/t-arm arm/t-ram-elf arm/t-bpabi"
 +	tm_file="${tm_file} arm/aout.h arm/arm.h"
 +	tm_file="${tm_file} newlib-stdint.h capros.h arm/capros.h"
 +	target_cpu_cname="generic-armv7-a"
@@ -559,7 +571,7 @@ diff -ruN baseline-gcc-10.2.0/gcc/config/capos.opt gcc-10.2.0/gcc/config/capos.o
 diff -ruN baseline-gcc-10.2.0/libgcc/config.host gcc-10.2.0/libgcc/config.host
 --- baseline-gcc-10.2.0/libgcc/config.host	2020-10-06 18:40:11.269152047 +1100
 +++ gcc-10.2.0/libgcc/config.host	2020-10-17 23:07:07.716069378 +1100
-@@ -1491,6 +1491,18 @@
+@@ -1491,6 +1491,22 @@
  	tmake_file="$tmake_file nvptx/t-nvptx"
  	extra_parts="crt0.o"
  	;;
@@ -574,6 +586,10 @@ diff -ruN baseline-gcc-10.2.0/libgcc/config.host gcc-10.2.0/libgcc/config.host
 +	;;
 +arm-*-coyotos*|arm-*-capros*)
 +	extra_parts="crtbegin.o crtend.o"
++	tmake_file="${tmake_file} arm/t-arm arm/t-elf arm/t-bpabi"
++	tmake_file="${tmake_file} arm/tsoftfp t-softfp"
++	tm_file="${tm_file} arm/bpabi-lib.h"
++	unwind_header=config/arm/unwind-arm.h
 +	;;
  *)
  	echo "*** Configuration ${host} not supported" 1>&2
